@@ -1,0 +1,25 @@
+.btn-parallelogram {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   width: 150px; // Chiều rộng
+   height: 30px; // Chiều cao
+   background-color: #41A11E; // Màu nền
+   color: white; // Màu chữ
+   font-weight: bold;
+   border: none;
+   transform: skew(-20deg); // Biến dạng thành hình bình hành
+   position: relative;
+   cursor: pointer;
+   transition: 0.3s;
+
+   // Giữ nội dung không bị nghiêng theo nút
+   span {
+      transform: skew(20deg);
+   }
+
+   // Hover sáng lên
+   &:hover {
+      background-color: #12b152;
+   }
+}
