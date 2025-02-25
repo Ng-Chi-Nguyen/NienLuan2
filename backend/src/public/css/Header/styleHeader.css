@@ -1,0 +1,40 @@
+body{
+   overflow-x: hidden;
+}
+a{
+   text-decoration: none;
+}
+ul{
+   list-style: none;
+}
+.header{
+   background: url("../../image/bg-header.png");
+   background-repeat: no-repeat;
+   background-size: cover;
+   box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.1), 
+            0 2px 6px -1px rgba(0, 0, 0, 0.08), 
+            0 3px 8px 0 rgba(0, 0, 0, 0.06);
+   z-index: 999;
+}
+.header .Header-logo{
+   width: 15%;
+}
+.header .Header-logo img{
+   width: 100%;
+   height: auto;
+}
+.header .menuList{
+   width: 50%;
+   margin: 0;
+   padding: 0 30px;
+   display: flex;
+   align-items: center;
+}
+.header .menuList li a{
+   padding: 0 30px;
+   color: #FFF;
+   font-size: 19px;
+}
+.header .menuList li a:hover{
+   color: yellow;
+}
