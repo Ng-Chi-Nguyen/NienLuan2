@@ -1,0 +1,9 @@
+.createUser{
+   margin-top: 100px;
+}
+.formCreateUser{
+   width: 60%;
+}
+.formCreateUser button{
+   padding: 5px 40px;
+}

@@ -1,0 +1,74 @@
+
+table td,
+table th {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.co-oreg{
+  color: orange;
+}
+.co-red{
+  color: red;
+}
+.card {
+  border-radius: .5rem;
+}
+
+.mask-custom {
+  background: rgba(24, 24, 16, .2);
+  border-radius: 2em;
+  backdrop-filter: blur(25px);
+  border: 2px solid rgba(255, 255, 255, 0.05);
+  background-clip: padding-box;
+  box-shadow: 10px 10px 10px rgba(46, 54, 68, 0.03);
+}
+
+.tableUser .headerTableUser{
+   border-bottom: 1px solid #ccc;
+}
+.tableUser .bodyTableUser tr{
+  border-bottom: 1px solid #ccc;
+}
+.createUser{
+   margin-top: 30px;
+   height: 100px;
+   cursor: pointer;
+   border-collapse: collapse;
+}
+.createUser i{
+   border: 1px solid springgreen;
+   background-color: springgreen;
+   padding: 20px;
+   font-size: 30px;
+   border-radius: 5px;
+   color: #FFF;
+}
+
+.addUser{
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+.modelBody{
+  width: 135% !important;
+  height: 300px !important;
+}
+.mg-0{
+  margin: 0;
+}
+
+.bodyShow{
+  margin-left: calc(50% - 22%) !important
+}
+.card-body{
+  padding: 0 !important;
+}
+.tableUser .bodyTableUser tr:hover{
+  background-color: #ccc !important;
+  cursor: pointer;
+}
+.bodyTableUser tr th i{
+  cursor: pointer;
+  font-size: 20px;
+}
+
