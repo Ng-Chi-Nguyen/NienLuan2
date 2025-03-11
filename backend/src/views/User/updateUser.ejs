@@ -1,0 +1,52 @@
+<div class="modal fade" id="updateUserModal" tabindex="-1" aria-labelledby="updateUserLabel" aria-hidden="true">
+   <div class="modal-dialog bodyShowUpdate">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h1 class="modal-title fs-5" id="updateUserLabel">Update User</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body content-UpdateUser">
+            <div class="createUser">
+               <form class="row g-3" method="post" action="/api/user/edit-user/<%= User.id %>">
+                  <div class="col-md-6 box-2">
+                     <label class="form-label">Username</label>
+                     <input type="text" name="name" class="form-control" value="<%= User.name %>">
+                  </div>
+                  <div class="col-md-6 box-2">
+                     <label class="form-label">Email</label>
+                     <input type="email" name="email" class="form-control" value="<%= User.email %>" disabled>
+                  </div>
+                  <input type="hidden" name="password" value="<%= User.password %>">
+                  <div class="col-md-12 box-2">
+                     <label class="form-label">Address</label>
+                     <input type="text" name="address" class="form-control" value="<%= User.address %>">
+                  </div>
+                  <div class="col-md-5 box-2">
+                     <label class="form-label">Phone</label>
+                     <input type="tel" name="phone" class="form-control" value="<%= User.phone %>" disabled>
+                  </div>
+                  <div class="col-md-4 box-2">
+                     <label class="form-label">Gender</label>
+                     <select class="form-select" name="gender">
+                        <option value="true" <%=User.gender ? "selected" : "" %>>Male</option>
+                        <option value="false" <%=!User.gender ? "selected" : "" %>>Female</option>
+                     </select>
+                  </div>
+                  <div class="col-md-3 box-2">
+                     <label class="form-label">Role</label>
+                     <select class="form-select" name="role" disabled>
+                        <option value="2" <%=User.role===2 ? "selected" : "" %>>User</option>
+                        <option value="1" <%=User.role===1 ? "selected" : "" %>>Owner</option>
+                        <option value="0" <%=User.role===0 ? "selected" : "" %>>Admin</option>
+                     </select>
+                  </div>
+                  <div class="col-12 text-end">
+                     <button type="submit" class="btn btn-primary">Update</button>
+                  </div>
+               </form>
+            </div>
+
+         </div>
+      </div>
+   </div>
+</div>

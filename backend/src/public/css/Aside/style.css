@@ -1,0 +1,16 @@
+.Aside{
+   border-right: 2px solid #ccc;
+   height: 100vh;
+   padding: 20px;
+
+}
+.Aside ul{
+   padding: 0;
+   list-style: none;
+}
+.Aside ul li{
+   padding: 5px;
+}
+.Aside ul li a{
+   text-decoration: none;
+}

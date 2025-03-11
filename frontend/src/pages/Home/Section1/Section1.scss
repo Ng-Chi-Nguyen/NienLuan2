@@ -1,0 +1,54 @@
+
+.co-white{
+   color: #FFF;
+}
+.Section1{
+   font-family: Arial, sans-serif;
+   text-align: center;
+   background: url("../../../assets/bg-home.png") ;
+   background-repeat: no-repeat; /* Không lặp lại */
+   background-size: cover; /* Căng đầy màn hình */
+   background-position: center; /* Căn giữa */
+   position: relative;
+   height: 725px;
+   padding-top: 50px;
+   .title{
+      text-align: center;
+      font-size: 25px;
+      h2:first-of-type{
+         padding-top: 20px;
+         margin: 0;
+      }
+      h2:last-of-type{
+         padding: 0;
+         margin: 0;
+      }
+   }
+   .listBtn{
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      .btn-parallelogram{
+         margin: 3px;
+      }
+   }
+   .content{
+      text-align: left;
+      background: url("../../../assets/bg-content.jpg");
+      background-repeat: no-repeat; /* Không lặp lại */
+      background-size: cover; /* Căng đầy màn hình */
+      background-position: center; /* Căn giữa */
+      position: absolute;
+      left: calc(50% - 420px);
+      bottom: calc(20% - 325px);
+      padding: 20px;
+      width: 800px;
+      height: 325px;
+      margin: auto;
+      p{
+         margin: 0;
+      }
+   }
+}

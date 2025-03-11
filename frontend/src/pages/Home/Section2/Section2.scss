@@ -1,0 +1,59 @@
+.Section2{
+   background-color: #FFF;
+   text-align: center;
+   box-shadow: 0px -20px 30px -10px rgba(0, 0, 0, 0.5);
+   position: relative;
+   padding: 50px;
+   &::before{
+      content: "";
+      position: absolute;
+      top: -84px;
+      left: 0;
+      width: 100%;
+      height: 100px;
+      background: linear-gradient(to bottom, transparent, #FFF);
+   }
+   .title{
+      position: relative;
+      color: #000;
+      font-size: 22px;
+      margin-bottom: 40px;
+      text-align: center;
+      padding: 5px 20px;
+   }
+   .Execute{
+      flex-wrap: nowrap; // Ngăn xuống dòng
+      gap: 20px; // Khoảng cách giữa các Box là 20px
+      justify-content: center;
+      @media screen and (max-width: 768px) {
+         flex-wrap: wrap; // Khi màn hình nhỏ, cho phép xuống dòng
+         margin-bottom: 20px;
+      }
+      .Box{
+         padding: 30px;
+         height: auto;
+         cursor: pointer;
+         background: #FFF;
+         z-index: 3;
+         box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
+         &:hover{
+            background: #b3e8ce;
+            transition: 1s;
+
+         }
+         span{
+            font-size: 80px;
+            font-weight: 900;
+            color: #27C375;
+         }
+         h3{
+            margin: 0;
+            margin-bottom: 20px;
+            color: #27C375;
+         }
+         p{
+            margin: 0;
+         }
+      }
+   }
+}

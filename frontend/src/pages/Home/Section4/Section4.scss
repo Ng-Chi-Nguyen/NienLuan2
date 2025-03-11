@@ -1,0 +1,44 @@
+.Section4{
+   margin-top: 60px;
+   .bodyContentFAQs{
+      width: 70%;
+      margin: auto;
+      margin-bottom: 50px;
+   }
+   .support{
+      .bodyImg{
+         justify-content: space-around;
+         margin-top: 40px;
+         padding-left: 50px;
+         padding-right: 50px;
+         a{
+            width: auto;
+            img{
+               width: 100px;
+               height: auto;
+            }
+         }
+      }
+   }
+}
+
+
+/* 🌟 iPad (từ 768px đến 1024px) → Chia thành 2 cột */
+@media (max-width: 1024px) {
+   .Section4 .bodyContentFAQs{
+      width: 80%;
+   }
+   .Section4 .bodyImg a img{
+      width: 75px !important;
+   }
+}
+
+/* 🌟 Mobile (dưới 768px) → Chia thành 1 cột */
+@media (max-width: 768px) {
+   .Section4 .bodyContentFAQs{
+      width: 100%;
+   }
+   .Section4 .bodyImg a img{
+      width: 50px !important;
+   }
+}

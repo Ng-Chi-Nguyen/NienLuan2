@@ -26,9 +26,11 @@
    }
    &-center{
       justify-content: flex-end;
+      align-items: center;
       .menuList{
          display: flex;
          list-style: none;
+         margin-bottom: 0;
          li{
             padding: 5px 15px;
             cursor: pointer;

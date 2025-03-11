@@ -14,6 +14,11 @@ const viewEngine = (app) => {
 
    // Cho phép sử dụng Bootstrap từ node_modules
    app.use('/bootstrap', express.static(path.join(__dirname, '../../node_modules/bootstrap/dist')));
+
+   app.use('/jquery', express.static(path.join(__dirname, '../../node_modules/jquery/dist')));
+
+   app.get("/favicon.ico", (req, res) => res.status(204).end()); //Ngan chan file favicon.ico
+
 }
 
 module.exports = viewEngine;

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Quản lý sân bóng mini</title>
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+   <script src="/jquery/jquery.min.js"></script>
+   <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+   <link rel="stylesheet" href="/css/index.css">
+   <link rel="stylesheet" href="/css/Header/style.css">
+   <link rel="stylesheet" href="/css/Aside/style.css">
+   <link rel="stylesheet" href="/css/User/style.css">
+</head>
+
+<body>
+   <%- include("./Header/Header.ejs") %>
+      <div class="d-flex">
+         <div class="left col-xxl-2">
+            <%- include("./Aside/Aside.ejs") %>
+         </div>
+         <div class="right col-xxl-10">
+            <div class="content-body"></div>
+         </div>
+      </div>
+
+
+      <script src="/js/loadAside.js"></script>
+      <script src="/js/User/api.js"></script>
+
+      <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

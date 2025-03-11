@@ -6,33 +6,16 @@ module.exports = {
          let body = req.body;
          let newUser = await UsersModel.create(body);
 
-         // Kiểm tra nếu request từ Postman (ứng dụng gửi JSON)
-         if (req.headers["accept"] && req.headers["accept"].includes("application/json")) {
-            return res.status(201).json({
-               errCode: 0,
-               message: "Tạo người dùng thành công",
-               user: newUser
-            });
-         }
-
-         // Nếu không phải Postman (ví dụ trình duyệt) thì chuyển hướng
-         return res.redirect("/user");
-
-      } catch (e) {
-         console.error("Lỗi khi tạo user:", e);
-
-         // Xử lý tương tự: Postman trả về JSON, trình duyệt thì redirect
-         if (req.headers["accept"] && req.headers["accept"].includes("application/json")) {
-            return res.status(500).json({
-               errCode: 1,
-               message: "Lỗi khi tạo user",
-               error: e.message
-            });
-         }
-
-         return res.redirect("/user");
+         return res.render("/User/User.ejs");
+      } catch (error) {
+         console.error("Lỗi khi tạo user:", error);
+         res.status(500).json({
+            errCode: 1,
+            message: "Lỗi server: " + error.message
+         });
       }
    },
+
    getUsers: async (req, res) => {
       try {
          let users = await UsersModel.find(); // Lấy tất cả user
@@ -66,7 +49,7 @@ module.exports = {
                user: updateUser
             });
          }
-         return res.redirect("/user");
+         return res.redirect("/#user");
       } catch (e) {
          console.log(e)
       }

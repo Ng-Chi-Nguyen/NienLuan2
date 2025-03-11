@@ -1,0 +1,170 @@
+.Section3{
+   .title{
+      margin-bottom: 40px;
+      text-align: center;
+   }
+   .Body {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px; /* Khoảng cách giữa các Box */
+      .Box {
+         padding: 10px;
+         flex: 1 1 calc(25% - 40px);
+         margin-top: 15px;
+         border-radius: 7px;
+         .icon{
+            font-size: 50px;
+         }
+         .title-item{
+            font-size: 20px;
+            text-align: left;
+            height: 50px;
+         }
+         p{
+            margin: 0;
+         }
+         &:nth-child(1){
+            box-shadow: rgba(170, 122, 255, 0.5) 0px 10px 15px 0px;
+            .icon{
+               color: #AA7AFF;
+            }
+            .title-item{
+               color: #AA7AFF;
+               margin-bottom: 20px;
+            }
+            &:hover{
+               transform: translateY(-30px);
+               background: #E3DEFF;
+               transition: 0.5s;
+            }
+         }
+         &:nth-child(2){
+            box-shadow: rgba(255, 172, 36, 0.5) 0px 10px 10px 0px;
+            .icon{
+               color: #FFAC24;
+            }
+            .title-item{
+               color: #FFAC24;
+               margin-bottom: 20px;
+            }
+            &:hover{
+               transform: translateY(-30px);
+               background: #FFDDCE;
+               transition: 0.5s;
+            }
+         }
+         &:nth-child(3){
+            box-shadow: rgba(63, 109, 255, 0.5) 0px 10px 10px 0px;
+            .icon{
+               color: #3F6DFF;
+            }
+            .title-item{
+               color: #3F6DFF;
+               margin-bottom: 20px;
+            }
+            &:hover{
+               transform: translateY(-30px);
+               background: #D9E8FF;
+               transition: 0.5s;
+            }
+         }
+         &:nth-child(4){
+            box-shadow: rgba(163, 246, 130, 0.5) 0px 10px 10px 0px;
+            .icon{
+               color: #7eef52;
+            }
+            .title-item{
+               color: #7eef52;
+               margin-bottom: 20px;
+            }
+            &:hover{
+               transform: translateY(-30px);
+               background: #e5f9dd;
+               transition: 0.5s;
+            }
+         }
+         &:nth-child(5){
+            box-shadow: rgba(249, 157, 157, 0.5) 0px 10px 10px 0px;
+
+            .icon{
+               color: #f99d9d;
+            }
+            .title-item{
+               color: #f99d9d;
+               margin-bottom: 20px;
+            }
+            &:hover{
+               transform: translateY(-30px);
+               background: #fad2d2;
+               transition: 0.5s;
+            }
+         }
+         &:nth-child(6){
+            box-shadow: rgba(230, 89, 207, 0.927) 0px 10px 10px 0px;
+            .icon{
+               color: #f782e6;
+            }
+            .title-item{
+               color: #f782e6;
+               margin-bottom: 20px;
+            }
+            &:hover{
+               transform: translateY(-30px);
+               background: #fed7f7;
+               transition: 0.5s;
+            }
+         }
+         &:nth-child(7){
+            box-shadow: rgba(0, 236, 186, 0.8) 0px 10px 15px 0px;
+            .icon{
+               color: #00ECBA;
+            }
+            .title-item{
+               color: #00ECBA;
+               margin-bottom: 20px;
+            }
+            &:hover{
+               transform: translateY(-30px);
+               background: #caf4eb;
+               transition: 0.5s;
+            }
+         }
+         &:nth-child(8){
+            box-shadow: rgba(238, 130, 76, 0.8) 0px 10px 15px 0px;
+            .icon{
+               color: #ee824c;
+            }
+            .title-item{
+               color: #ee824c;
+               margin-bottom: 20px;
+            }
+            &:hover{
+               transform: translateY(-30px);
+               background: #f3d8cb;
+               transition: 0.5s;
+            }
+         }
+      }
+   }
+}
+
+
+/* 🌟 iPad (từ 768px đến 1024px) → Chia thành 2 cột */
+@media (max-width: 1024px) {
+   .Section3 .Body .Box {
+      flex: 1 1 calc(50% - 20px); /* Mỗi hàng có 2 Box */
+   }
+   .Section3 .Body .Box .title-item{
+      height: 35px;
+   }
+}
+
+/* 🌟 Mobile (dưới 768px) → Chia thành 1 cột */
+@media (max-width: 768px) {
+   .Section3 .Body .Box {
+      flex: 1 1 100%; /* Mỗi hàng chỉ có 1 Box */
+   }
+   .Section3 .Body .Box .title-item{
+      height: 30px;
+   }
+}

@@ -1,17 +1,21 @@
 const mongoose = require("mongoose")
 const ModelFoField = require("../models/FoField.model");
-const { propfind } = require("../routes/web.route");
 
 module.exports = {
    createFF: async (req, res) => {
       try {
          let body = req.body;
          let FF = await ModelFoField.create(body)
-         return res.status(201).json({
-            errCode: 0,
-            message: "Tạo sân bóng thành công",
-            FoField: FF
-         })
+         if (req.headers["accept"] && req.headers["accept"].includes("application/json")) {
+            return res.status(201).json({
+               errCode: 0,
+               message: "Tạo người dùng thành công",
+               user: newUser
+            });
+         }
+
+         // Nếu không phải Postman (ví dụ trình duyệt) thì chuyển hướng
+         return res.redirect("/foolballField");
       } catch (e) {
          console.log(e)
       }
@@ -44,7 +48,6 @@ module.exports = {
    },
    deleteFF: async (req, res) => {
       try {
-         let body = req.body;
          let id = req.params.id;
          let deleteFF = await ModelFoField.deleteOne({ _id: id });
          return res.status(200).json({
