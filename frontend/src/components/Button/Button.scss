@@ -23,3 +23,41 @@
       background-color: #12b152;
    }
 }
+
+
+.btn-add{
+   padding: 5px 10px;
+   background: #12b152;
+   color: #FFF;
+   border: 0;
+   border-radius: 3px;
+   &:hover{
+      background: #12b152;
+   }
+}
+
+.search{
+   position: relative;
+   width: 80%;
+   cursor: pointer;
+   input{
+      width: 100%;
+      padding: 5px 20px;
+      border: 2px solid #12b152;
+      border-radius: 5px;
+      &:focus-visible{
+         border: 2px solid #12b152;
+         outline: none;
+      }
+   }
+   span{
+      position: absolute;
+      top: 5px;
+      right: 22px;
+      border-left: 1px solid #ccc;
+      padding-left: 10px;
+      &:hover{
+         color: #41A11E;
+      }
+   }
+}

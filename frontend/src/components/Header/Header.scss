@@ -11,6 +11,9 @@
    &-left{
       display: flex;
       align-items: center;
+      span{
+         display: none;
+      }
       .logo{
          width: 300px;
          height: auto;
@@ -35,6 +38,12 @@
             padding: 5px 15px;
             cursor: pointer;
             font-size: 18px;
+            .item{
+               display: flex;
+               p{
+                  margin: 0;
+               }
+            }
             a{
                text-decoration: none;
                color: #000;
@@ -64,6 +73,56 @@
          font-size: 22px;
          cursor: pointer;
          color: #ccc;
+         margin-bottom: 15px;
       }
+   }
+}
+@media (max-width: 1192px) {
+   .Header-right {
+      .name{
+         display: none;
+      }
+      .avatar{
+         margin-right: 15px;
+      }
+   }
+}
+@media (min-width: 992px) {
+   .Header-center .menuList li .item span{
+      display: none;
+   }
+   .Header-center .menuList li .item p{
+      display: inline;
+   }
+}
+@media (max-width: 991px) {
+   .Header-center .menuList li .item span{
+      display: inline;
+      svg{
+         width: 30px;
+         height: auto;
+      }
+   }
+   .Header-center .menuList li .item p{
+      display: none;
+   }
+}
+@media (max-width: 768px) {
+   .Header-left .logo{
+      width: 200px;
+      height: auto;
+   }
+   .Header-center .menuList{
+      padding-left: 0;
+   }
+}
+@media (max-width: 567px) {
+   .Header-left span{
+      display: inline;
+      margin-right: 20px;
+      cursor: pointer;
+   }
+   .Header-center{
+      display: none;
    }
 }
