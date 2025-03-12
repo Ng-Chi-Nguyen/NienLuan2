@@ -34,6 +34,10 @@
    &:hover{
       background: #12b152;
    }
+   &:focus-visible{
+      outline: none;
+      border: 0;
+   }
 }
 
 .search{
