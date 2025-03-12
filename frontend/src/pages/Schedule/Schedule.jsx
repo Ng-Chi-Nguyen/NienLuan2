@@ -80,13 +80,30 @@ export default function Schedule() {
          setWards([]);
       }
    }, [selectedDistrict, API_URL]);
+
+
+   const [currentPage, setCurrentPage] = useState(1);
+   const itemsPerPage = 8; // Số lượng sân hiển thị mỗi trang
+
+   // Danh sách sân bóng giả định có STT từ 1 đến 20
+   const stadiums = Array.from({ length: 23 }, (_, index) => ({
+      id: index + 1,
+      name: `Sân Bóng Việt Hùng Đông Hương ${index + 1}`,
+      phone: "012346789",
+      address: "Cần Thơ",
+   }));
+
+   // Tính toán danh sách sân hiển thị theo trang hiện tại
+   const startIndex = (currentPage - 1) * itemsPerPage;
+   const paginatedStadiums = stadiums.slice(startIndex, startIndex + itemsPerPage);
+
    return (
       <>
          <Header />
          <div className="SchedulePage">
             <div className="container">
                <div className="row">
-                  <div className="left col-xl-2">
+                  <div className="left col-xl-3">
                      <h4>Lọc sân bóng</h4>
                      {/* Khi người dùng chọn một tỉnh, selectedProvince sẽ được cập nhật.
                      Khi selectedProvince thay đổi, useEffect sẽ gọi API để lấy danh sách quận/huyện. */}
@@ -121,64 +138,39 @@ export default function Schedule() {
                         ))}
                      </select>
                   </div>
-                  <div className="right col-xl-10">
+                  <div className="right col-xl-9">
                      <div className="mg-r row justify-content-center">
                         <Search name="Tìm sân bóng" />
                      </div>
                      <h2 className="text-center">Bãi sân</h2>
                      <div className="row">
-                        <div className="Box">
-                           <div className="name">Sân Bóng Việt Hùng Đông Hương</div>
-                           <div className="phone"><span><FaPhoneAlt /></span> <p>012346789</p></div>
-                           <div className="address"><span><FaMapMarkedAlt /></span><p>Cần Thơ</p></div>
-                           <div className="btn_add_FF"> <BtnAdd name="Chi tiết" /></div>
-                        </div>
-                        <div className="Box">
-                           <div className="name">Sân Bóng Việt Hùng Đông Hương</div>
-                           <div className="phone"><span><FaPhoneAlt /></span> <p>012346789</p></div>
-                           <div className="address"><span><FaMapMarkedAlt /></span><p>Cần Thơ</p></div>
-                           <div className="btn_add_FF"> <BtnAdd name="Chi tiết" /></div>
-                        </div>
-                        <div className="Box">
-                           <div className="name">Sân Bóng Việt Hùng Đông Hương</div>
-                           <div className="phone"><span><FaPhoneAlt /></span> <p>012346789</p></div>
-                           <div className="address"><span><FaMapMarkedAlt /></span><p>Cần Thơ</p></div>
-                           <div className="btn_add_FF"> <BtnAdd name="Chi tiết" /></div>
-                        </div>
-                        <div className="Box">
-                           <div className="name">Sân Bóng Việt Hùng Đông Hương</div>
-                           <div className="phone"><span><FaPhoneAlt /></span> <p>012346789</p></div>
-                           <div className="address"><span><FaMapMarkedAlt /></span><p>Cần Thơ</p></div>
-                           <div className="btn_add_FF"> <BtnAdd name="Chi tiết" /></div>
-                        </div>
-                        <div className="Box">
-                           <div className="name">Sân Bóng Việt Hùng Đông Hương</div>
-                           <div className="phone"><span><FaPhoneAlt /></span> <p>012346789</p></div>
-                           <div className="address"><span><FaMapMarkedAlt /></span><p>Cần Thơ</p></div>
-                           <div className="btn_add_FF"> <BtnAdd name="Chi tiết" /></div>
-                        </div>
-                        <div className="Box">
-                           <div className="name">Sân Bóng Việt Hùng Đông Hương</div>
-                           <div className="phone"><span><FaPhoneAlt /></span> <p>012346789</p></div>
-                           <div className="address"><span><FaMapMarkedAlt /></span><p>Cần Thơ</p></div>
-                           <div className="btn_add_FF"> <BtnAdd name="Chi tiết" /></div>
-                        </div>
-                        <div className="Box">
-                           <div className="name">Sân Bóng Việt Hùng Đông Hương</div>
-                           <div className="phone"><span><FaPhoneAlt /></span> <p>012346789</p></div>
-                           <div className="address"><span><FaMapMarkedAlt /></span><p>Cần Thơ</p></div>
-                           <div className="btn_add_FF"> <BtnAdd name="Chi tiết" /></div>
-                        </div>
-                        <div className="Box">
-                           <div className="name">Sân Bóng Việt Hùng Đông Hương</div>
-                           <div className="phone"><span><FaPhoneAlt /></span> <p>012346789</p></div>
-                           <div className="address"><span><FaMapMarkedAlt /></span><p>Cần Thơ</p></div>
-                           <div className="btn_add_FF"> <BtnAdd name="Chi tiết" /></div>
-                        </div>
+                        {paginatedStadiums.map((stadium) => (
+                           <div className="Box" key={stadium.id}>
+                              <div className="name">{stadium.name}</div>
+                              <div className="phone">
+                                 <span><FaPhoneAlt /></span> <p>{stadium.phone}</p>
+                              </div>
+                              <div className="address">
+                                 <span><FaMapMarkedAlt /></span><p>{stadium.address}</p>
+                              </div>
+                              <div className="btn_add_FF">
+                                 <BtnAdd name="Chi tiết" />
+                              </div>
+                           </div>
+                        ))}
                      </div>
                   </div>
                </div>
-               <Pagination align="end" defaultCurrent={1} total={50} />
+               {/* Phân trang */}
+               <div className="Pagination">
+                  <Pagination
+                     align="end"
+                     current={currentPage}
+                     pageSize={itemsPerPage}
+                     total={stadiums.length}
+                     onChange={(page) => setCurrentPage(page)}
+                  />
+               </div>
             </div>
          </div >
       </>
