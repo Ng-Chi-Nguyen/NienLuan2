@@ -1,13 +1,18 @@
-const mongoose = require('mongoose');
-require('dotenv').config();
+import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
 
+dotenv.config();
 
-async function connectDB() {
+let sql;
+
+const connectDB = () => {
    try {
-      await mongoose.connect(process.env.URI + process.env.DBNAME)
-      console.log("Connect database success")
-   } catch (e) {
-      console.log(e)
+      sql = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+      console.log('Supabase connected successfully!');
+   } catch (error) {
+      console.error('Supabase connection error:', error);
+      process.exit(1); // Dừng chương trình nếu kết nối thất bại
    }
-}
-module.exports = connectDB;
+};
+
+export { sql, connectDB };

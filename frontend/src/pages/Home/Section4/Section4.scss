@@ -7,14 +7,14 @@
    }
    .support{
       .bodyImg{
-         justify-content: space-around;
+         justify-content: center;
          margin-top: 40px;
          padding-left: 50px;
          padding-right: 50px;
          a{
             width: auto;
             img{
-               width: 100px;
+               width: 50px;
                height: auto;
             }
          }
@@ -29,7 +29,7 @@
       width: 80%;
    }
    .Section4 .bodyImg a img{
-      width: 75px !important;
+      width: 15px !important;
    }
 }
 
@@ -39,6 +39,6 @@
       width: 100%;
    }
    .Section4 .bodyImg a img{
-      width: 50px !important;
+      width: 10px !important;
    }
 }

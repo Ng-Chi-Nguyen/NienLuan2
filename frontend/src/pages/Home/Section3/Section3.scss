@@ -37,6 +37,10 @@
                background: #E3DEFF;
                transition: 0.5s;
             }
+            &:not(:hover){
+               transform: translateY(0);
+               transition: 0.5s;
+            }
          }
          &:nth-child(2){
             box-shadow: rgba(255, 172, 36, 0.5) 0px 10px 10px 0px;
@@ -50,6 +54,10 @@
             &:hover{
                transform: translateY(-30px);
                background: #FFDDCE;
+               transition: 0.5s;
+            }
+            &:not(:hover){
+               transform: translateY(0);
                transition: 0.5s;
             }
          }
@@ -67,6 +75,10 @@
                background: #D9E8FF;
                transition: 0.5s;
             }
+            &:not(:hover){
+               transform: translateY(0);
+               transition: 0.5s;
+            }
          }
          &:nth-child(4){
             box-shadow: rgba(163, 246, 130, 0.5) 0px 10px 10px 0px;
@@ -80,6 +92,10 @@
             &:hover{
                transform: translateY(-30px);
                background: #e5f9dd;
+               transition: 0.5s;
+            }
+            &:not(:hover){
+               transform: translateY(0);
                transition: 0.5s;
             }
          }
@@ -98,6 +114,10 @@
                background: #fad2d2;
                transition: 0.5s;
             }
+            &:not(:hover){
+               transform: translateY(0);
+               transition: 0.5s;
+            }
          }
          &:nth-child(6){
             box-shadow: rgba(230, 89, 207, 0.927) 0px 10px 10px 0px;
@@ -111,6 +131,10 @@
             &:hover{
                transform: translateY(-30px);
                background: #fed7f7;
+               transition: 0.5s;
+            }
+            &:not(:hover){
+               transform: translateY(0);
                transition: 0.5s;
             }
          }
@@ -128,6 +152,10 @@
                background: #caf4eb;
                transition: 0.5s;
             }
+            &:not(:hover){
+               transform: translateY(0);
+               transition: 0.5s;
+            }
          }
          &:nth-child(8){
             box-shadow: rgba(238, 130, 76, 0.8) 0px 10px 15px 0px;
@@ -141,6 +169,10 @@
             &:hover{
                transform: translateY(-30px);
                background: #f3d8cb;
+               transition: 0.5s;
+            }
+            &:not(:hover){
+               transform: translateY(0);
                transition: 0.5s;
             }
          }

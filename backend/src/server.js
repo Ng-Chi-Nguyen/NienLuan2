@@ -1,13 +1,14 @@
-const express = require('express');
-const viewEngine = require('./config/viewEngine');
-const connectDB = require('./config/connect');
+import express from 'express';
+import viewEngine from './config/viewEngine.js';
 
-const UsersModel = require('./models/user.model')
-const footballfield = require('./models/FoField.model')
+import { sql, connectDB } from "./config/connect.js"
 
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
-const Routers = require('./routes')
+
+import Routers from './routes/index.routes.js';
+
 
 const app = express();
 
@@ -17,7 +18,9 @@ app.use(express.urlencoded({ extended: true }));
 
 const port = process.env.PORT || 8081;
 const hostname = process.env.HOST_NAME;
-connectDB();
+
+connectDB();  // Gọi hàm kết nối database
+
 // Middleware quan trọng để đọc JSON
 app.use(express.json()); // Cái này rất quan trọng!
 

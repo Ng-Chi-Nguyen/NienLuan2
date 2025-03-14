@@ -1,24 +1,19 @@
-// File nay se cau hinh file cua chung ta
-const express = require('express');
-const path = require('path')
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const viewEngine = (app) => {
+   app.set('views', path.join(__dirname, '../views'));
+   app.set('view engine', 'ejs');
 
-   // Sau khi cai dat ejs thi phai khai bao oi luu tru file day
-
-   app.set('views', path.join('./src', './views'));
-
-   app.set('view engine', 'ejs')
-
-   // config static file
-   app.use(express.static(path.join('./src', 'public')))
-
-   // Cho phép sử dụng Bootstrap từ node_modules
+   app.use(express.static(path.join(__dirname, '../public')));
    app.use('/bootstrap', express.static(path.join(__dirname, '../../node_modules/bootstrap/dist')));
-
    app.use('/jquery', express.static(path.join(__dirname, '../../node_modules/jquery/dist')));
 
-   app.get("/favicon.ico", (req, res) => res.status(204).end()); //Ngan chan file favicon.ico
+   app.get("/favicon.ico", (req, res) => res.status(204).end()); // Ngăn chặn lỗi favicon.ico
+};
 
-}
-
-module.exports = viewEngine;
+export default viewEngine;

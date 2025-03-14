@@ -81,7 +81,8 @@ export default function Schedule() {
       }
    }, [selectedDistrict, API_URL]);
 
-
+   // currentPage: Theo dõi trang hiện tại.
+   // itemsPerPage: Xác định số lượng sân bóng hiển thị trên mỗi trang.
    const [currentPage, setCurrentPage] = useState(1);
    const itemsPerPage = 8; // Số lượng sân hiển thị mỗi trang
 
@@ -94,6 +95,12 @@ export default function Schedule() {
    }));
 
    // Tính toán danh sách sân hiển thị theo trang hiện tại
+
+   /*
+      startIndex: Xác định chỉ mục bắt đầu của trang hiện tại.
+      VD: Nếu currentPage = 2, thì startIndex = (2 - 1) * 8 = 8 (tức là bỏ qua 8 phần tử đầu tiên).
+      stadiums.slice(startIndex, startIndex + itemsPerPage): Lấy 8 sân bóng tiếp theo từ danh sách tổng.
+    */
    const startIndex = (currentPage - 1) * itemsPerPage;
    const paginatedStadiums = stadiums.slice(startIndex, startIndex + itemsPerPage);
 
@@ -165,10 +172,10 @@ export default function Schedule() {
                <div className="Pagination">
                   <Pagination
                      align="end"
-                     current={currentPage}
-                     pageSize={itemsPerPage}
-                     total={stadiums.length}
-                     onChange={(page) => setCurrentPage(page)}
+                     current={currentPage} // Xác định trang hiện tại.
+                     pageSize={itemsPerPage} // Số sân hiển thị trên mỗi trang (8 sân).
+                     total={stadiums.length} // Tổng số sân bóng (23 sân).
+                     onChange={(page) => setCurrentPage(page)} // Khi nhấn nút chuyển trang, cập nhật currentPage.
                   />
                </div>
             </div>
