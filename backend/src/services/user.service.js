@@ -1,11 +1,15 @@
 import { sql } from '../config/connect.js';
 
 let createUserService = async (userData) => {
-   const { name, email, password, phone, gender } = userData;
-   const { data } = await sql.from('User').insert([
-      { name, email, password, phone, gender }
-   ]);
-   return { success: true, data };
+   const { name, email, password, phone, gender, address } = userData;
+   const { data, error } = await sql.from('User')
+      .insert([{ name, email, password, phone, gender, address }])
+      .select("*");
+   if (error) {
+      console.error("❌ Lỗi insert vào Supabase:", error);
+      return { success: false, error };
+   }
+   return data;
 }
 
 export { createUserService };

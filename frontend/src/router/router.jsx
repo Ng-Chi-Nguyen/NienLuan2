@@ -6,6 +6,7 @@ import Rank from '../pages/Rank/Rank';
 import News from '../pages/News/News';
 import Team from '../pages/Team/Team';
 import Tournament from '../pages/Tournament/Tournament';
+import Login from '../pages/Auth/Login';
 export const routers = createBrowserRouter([
    {
       path: "/",
@@ -34,5 +35,9 @@ export const routers = createBrowserRouter([
    {
       path: "/Team",
       element: <Team />
+   },
+   {
+      path: "/Login",
+      element: <Login />
    },
 ]);

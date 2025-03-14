@@ -1,7 +1,7 @@
 
 import './Header.scss';
 import LogoAvatar from "../../assets/Logo.svg";
-import { RiMenuUnfold4Line } from "react-icons/ri";
+// import { RiMenuUnfold4Line } from "react-icons/ri";
 import { PiNewspaper } from "react-icons/pi";
 import { FaHome } from "react-icons/fa";
 import { TbBrandBooking } from "react-icons/tb";
@@ -62,9 +62,10 @@ export default function Header() {
                </ul>
             </div>
             <div className="Header-right">
-               <div className="avatar"></div>
+               {/* <div className="avatar"></div>
                <p className="name">Nguyễn Chí Nguyện</p>
-               <div className="menu"><RiMenuUnfold4Line /></div>
+               <div className="menu"><RiMenuUnfold4Line /></div> */}
+               <Link to="/Login">Đăng nhập</Link>
             </div>
          </div>
       </>

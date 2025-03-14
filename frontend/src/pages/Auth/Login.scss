@@ -1,0 +1,99 @@
+.LoginPage{
+   box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.2);
+   width: 30%;
+   margin: 50px auto 0;
+   padding: 20px;
+   .title{
+      font-size: 22px;
+      font-weight: bold;
+      text-align: center;
+   }
+   .cardLogin{
+      .social-login{
+         display: flex;
+         justify-content: center;
+         .login-gg, .login-fb{
+            padding: 5px 15px;
+            margin: 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            color: #FFF;
+            border: 0;
+            font-size: 14px;
+            &:hover {
+               filter: brightness(1.2);
+            }
+            p{
+               margin: 0;
+            }
+            span{
+               margin-right: 7px;
+               display: flex;
+            }
+         }
+         .login-gg{
+            background: #FF2000;
+         }
+         .login-fb{
+            background: #3F6DFF;
+         }
+      }
+      input{
+         padding: 5px;
+         border: 1px solid #ccc;
+         border-radius: 3px;
+         &:focus{
+            outline: none;
+         }
+         &:nth-child(1){
+            width: 100%;
+            margin-bottom: 10px;
+         }
+         &:nth-child(2), &:nth-child(6), &:nth-child(8){
+            margin-right: 10px;
+         }
+         &:nth-child(2), &:nth-child(3), &:nth-child(6), &:nth-child(7), &:nth-child(8), &:nth-child(9){
+            width: calc(50% - 5px);
+         }
+         &:nth-child(4){
+            margin: 10px 0 0 0;
+         }
+         &:nth-child(5){
+            margin: 10px 0;
+         }
+         &:nth-child(8), &:nth-child(9){
+            margin-top: 10px;
+         }
+      }
+      button{
+         padding: 5px 0;
+         width: 100%;
+         border: 0;
+         background: #41A11E;
+         color: #FFF;
+         margin: 10px 0;
+         &:hover {
+            transition: 1s;
+            filter: brightness(1.2);
+         }
+      }
+   }
+   .loginFalse{
+      input{
+         &:nth-child(2){
+            width: 100% !important;
+         }
+      }
+   }
+   .btn-switch{
+      cursor: pointer;
+      color: #3F6DFF;
+   }
+}
+
+@media (max-width: 1200px) {
+   .LoginPage{
+      width: 90%;
+   }
+}
