@@ -9,7 +9,7 @@ let createUserService = async (userData) => {
       console.error("❌ Lỗi insert vào Supabase:", error);
       return { success: false, error };
    }
-   return data;
+   return { success: true, data };
 }
 
 export { createUserService };

@@ -7,6 +7,8 @@ import { Tabs } from 'antd';
 import { FaGoogle, FaFacebookF } from "react-icons/fa";
 import axios from "axios";
 export default function Rank() {
+   const [loading, setLoading] = useState(false); // Loading o dang ky
+
 
    const [formData, setFormData] = useState({
       name: "",
@@ -21,6 +23,7 @@ export default function Rank() {
       established_date: ""
    });
 
+
    const handleChange = (e) => {
       let { name, value } = e.target;
 
@@ -33,17 +36,57 @@ export default function Rank() {
 
    const handleCreateUser = async (e) => {
       e.preventDefault();
-      console.log("API URL:", process.env.REACT_APP_API_URL);
       try {
-         console.log("formData:", formData)
+         setLoading(true);
+         console.log("formData User:", formData)
          const response = await axios.post("/api/user/", formData);
          console.log("Phản hồi từ backend:", response.data);
-         setLogin(true)
+         setFormData({
+            name: "",
+            phone: "",
+            email: "",
+            password: "",
+            gender: true,
+            address: "",
+            owner_name: "",
+            license_number: "",
+            tax_code: "",
+            established_date: ""
+         })
+         setLoading(false);
+         setLogin(!login)
       } catch (error) {
          console.error("Lỗi đăng ký:", error.response?.data || error.message);
          alert("Đăng ký thất bại! Chi tiết lỗi: " + JSON.stringify(error.response?.data || error.message));
       }
    };
+
+   const handleCreateBuness = async (e) => {
+      e.preventDefault()
+      try {
+         setLoading(true);
+         console.log("formData Buness:", formData)
+         const response = await axios.post("/api/buness/", formData);
+         console.log("Phản hồi từ backend:", response.data);
+         setFormData({
+            name: "",
+            phone: "",
+            email: "",
+            password: "",
+            gender: true,
+            address: "",
+            owner_name: "",
+            license_number: "",
+            tax_code: "",
+            established_date: ""
+         })
+         setLoading(false);
+         setLogin(!login)
+      } catch (error) {
+         console.error("Lỗi đăng ký:", error.response?.data || error.message);
+         alert("Đăng ký thất bại! Chi tiết lỗi: " + JSON.stringify(error.response?.data || error.message));
+      }
+   }
 
 
    const handleLogin = (e) => {
@@ -110,7 +153,7 @@ export default function Rank() {
                         onChange={handleChange}
                         value={formData.address}
                      />
-                     <button type="submit">Đăng ký</button>
+                     <button type="submit" disabled={loading}> {loading ? "Đang xử lý..." : "Đăng ký"}</button>
                   </div>
                </form>
             </div>
@@ -133,7 +176,7 @@ export default function Rank() {
                   </button>
                </div>
                <p className="text-center">Hoặc tạo tài khoản</p>
-               <form onSubmit={handleCreateUser}>
+               <form onSubmit={handleCreateBuness}>
                   <div className="row">
                      <input
                         type="text"
@@ -198,7 +241,7 @@ export default function Rank() {
                         onChange={handleChange}
                         value={formData.established_date}
                      />
-                     <button type="submit">Đăng ký</button>
+                     <button type="submit" disabled={loading}> {loading ? "Đang xử lý..." : "Đăng ký"}</button>
                   </div>
                </form>
             </div>

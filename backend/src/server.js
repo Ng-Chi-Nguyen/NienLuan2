@@ -1,15 +1,14 @@
 import express from 'express';
 import viewEngine from './config/viewEngine.js';
-app.use(cors());
-import { sql, connectDB } from "./config/connect.js"
-
+import { connectDB } from "./config/connect.js"
+import Routers from './routes/index.routes.js';
 import dotenv from 'dotenv';
+import cors from 'cors';
 
-const cors = require("cors");
+
 dotenv.config();
 
 
-import Routers from './routes/index.routes.js';
 
 
 const app = express();
