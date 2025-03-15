@@ -5,24 +5,46 @@ import { CiUser } from "react-icons/ci";
 import { IoBusinessOutline } from "react-icons/io5";
 import { Tabs } from 'antd';
 import { FaGoogle, FaFacebookF } from "react-icons/fa";
+import axios from "axios";
 export default function Rank() {
+
    const [formData, setFormData] = useState({
-      fullName: "",
+      name: "",
       phone: "",
       email: "",
       password: "",
-      address: ""
+      gender: true,
+      address: "",
+      owner_name: "",
+      license_number: "",
+      tax_code: "",
+      established_date: ""
    });
 
    const handleChange = (e) => {
-      const { name, value } = e.target;
+      let { name, value } = e.target;
+
+      if (name === "gender") {
+         value = value === "true"; // Chuyển "true" thành true, "false" thành false
+      }
+
       setFormData({ ...formData, [name]: value });
    };
 
-   const handleCreateUser = (e) => {
+   const handleCreateUser = async (e) => {
       e.preventDefault();
-      console.log("Dữ liệu form:", formData);
+      console.log("API URL:", process.env.REACT_APP_API_URL);
+      try {
+         console.log("formData:", formData)
+         const response = await axios.post("/api/user/", formData);
+         console.log("Phản hồi từ backend:", response.data);
+         setLogin(true)
+      } catch (error) {
+         console.error("Lỗi đăng ký:", error.response?.data || error.message);
+         alert("Đăng ký thất bại! Chi tiết lỗi: " + JSON.stringify(error.response?.data || error.message));
+      }
    };
+
 
    const handleLogin = (e) => {
       e.preventDefault();
@@ -35,7 +57,7 @@ export default function Rank() {
          label: "Tài khoản thường",
          icon: <CiUser />,
          children: (
-            <div className="cardLogin">
+            <div className="cardLogin user">
                <div className="social-login">
                   <button className="login-gg">
                      <span><FaGoogle /></span>
@@ -49,11 +71,45 @@ export default function Rank() {
                <p className="text-center">Hoặc tạo tài khoản</p>
                <form onSubmit={handleCreateUser}>
                   <div className="row">
-                     <input type="text" name="fullName" placeholder="Họ và tên" onChange={handleChange} />
-                     <input type="tel" name="phone" placeholder="Số điện thoại" onChange={handleChange} />
-                     <input type="email" name="email" placeholder="Email" onChange={handleChange} />
-                     <input type="password" name="password" placeholder="Mật khẩu" onChange={handleChange} />
-                     <input type="text" name="address" placeholder="Địa chỉ" onChange={handleChange} />
+                     <input
+                        type="text"
+                        name="name"
+                        placeholder="Họ và tên"
+                        onChange={handleChange}
+                        value={formData.name}
+                     />
+                     <input
+                        type="tel"
+                        name="phone"
+                        placeholder="Số điện thoại"
+                        onChange={handleChange}
+                        value={formData.phone}
+                     />
+                     <input
+                        type="email"
+                        name="email"
+                        placeholder="Email"
+                        onChange={handleChange}
+                        value={formData.email}
+                     />
+                     <input
+                        type="password"
+                        name="password"
+                        placeholder="Mật khẩu"
+                        onChange={handleChange}
+                        value={formData.password}
+                     />
+                     <select name="gender" onChange={handleChange} value={formData.gender}>
+                        <option value="true">Nam</option>
+                        <option value="false">Nữ</option>
+                     </select>
+                     <input
+                        type="text"
+                        name="address"
+                        placeholder="Địa chỉ"
+                        onChange={handleChange}
+                        value={formData.address}
+                     />
                      <button type="submit">Đăng ký</button>
                   </div>
                </form>
@@ -65,7 +121,7 @@ export default function Rank() {
          label: "Tài khoản doanh nghiệp",
          icon: <IoBusinessOutline />,
          children: (
-            <div className="cardLogin">
+            <div className="cardLogin buness">
                <div className="social-login">
                   <button className="login-gg">
                      <span><FaGoogle /></span>
@@ -79,15 +135,69 @@ export default function Rank() {
                <p className="text-center">Hoặc tạo tài khoản</p>
                <form onSubmit={handleCreateUser}>
                   <div className="row">
-                     <input type="text" name="fullName" placeholder="Tên cửa hàng" onChange={handleChange} />
-                     <input type="tel" name="phone" placeholder="Số điện thoại" onChange={handleChange} />
-                     <input type="email" name="email" placeholder="Email" onChange={handleChange} />
-                     <input type="password" name="password" placeholder="Mật khẩu" onChange={handleChange} />
-                     <input type="text" name="address" placeholder="Địa chỉ" onChange={handleChange} />
-                     <input type="text" name="owner_name" placeholder="Tên chủ doanh nghiệp" onChange={handleChange} />
-                     <input type="text" name="license_number" placeholder="Số giấy phép kinh doanh" onChange={handleChange} />
-                     <input type="text" name="tax_code" placeholder="Mã số thuế" onChange={handleChange} />
-                     <input type="date" name="established_date" placeholder="Ngày thành lập" onChange={handleChange} />
+                     <input
+                        type="text"
+                        name="name"
+                        placeholder="Tên cửa hàng"
+                        onChange={handleChange}
+                        value={formData.name}
+                     />
+                     <input
+                        type="tel"
+                        name="phone"
+                        placeholder="Số điện thoại"
+                        onChange={handleChange}
+                        value={formData.phone}
+                     />
+                     <input
+                        type="email"
+                        name="email"
+                        placeholder="Email"
+                        onChange={handleChange}
+                        value={formData.email}
+                     />
+                     <input
+                        type="password"
+                        name="password"
+                        placeholder="Mật khẩu"
+                        onChange={handleChange}
+                        value={formData.password}
+                     />
+                     <input
+                        type="text"
+                        name="address"
+                        placeholder="Địa chỉ"
+                        onChange={handleChange}
+                        value={formData.address}
+                     />
+                     <input
+                        type="text"
+                        name="owner_name"
+                        placeholder="Tên chủ doanh nghiệp"
+                        onChange={handleChange}
+                        value={formData.owner_name}
+                     />
+                     <input
+                        type="text"
+                        name="license_number"
+                        placeholder="Số giấy phép kinh doanh"
+                        onChange={handleChange}
+                        value={formData.license_number}
+                     />
+                     <input
+                        type="text"
+                        name="tax_code"
+                        placeholder="Mã số thuế"
+                        onChange={handleChange}
+                        value={formData.tax_code}
+                     />
+                     <input
+                        type="date"
+                        name="established_date"
+                        placeholder="Ngày thành lập"
+                        onChange={handleChange}
+                        value={formData.established_date}
+                     />
                      <button type="submit">Đăng ký</button>
                   </div>
                </form>

@@ -1,7 +1,8 @@
-
+import { useState } from 'react';
+import { Drawer } from "antd";
 import './Header.scss';
 import LogoAvatar from "../../assets/Logo.svg";
-// import { RiMenuUnfold4Line } from "react-icons/ri";
+import { RiMenuUnfold4Line } from "react-icons/ri";
 import { PiNewspaper } from "react-icons/pi";
 import { FaHome } from "react-icons/fa";
 import { TbBrandBooking } from "react-icons/tb";
@@ -12,6 +13,9 @@ import { CiMenuBurger } from "react-icons/ci";
 import { Link } from 'react-router-dom';
 
 export default function Header() {
+
+   const [open, setOpen] = useState(false);
+
    return (
       <>
          <div className="Header">
@@ -63,9 +67,20 @@ export default function Header() {
             </div>
             <div className="Header-right">
                {/* <div className="avatar"></div>
-               <p className="name">Nguyễn Chí Nguyện</p>
-               <div className="menu"><RiMenuUnfold4Line /></div> */}
-               <Link to="/Login">Đăng nhập</Link>
+               <p className="name">Nguyễn Chí Nguyện</p>*/}
+               <div className="menu" onClick={() => setOpen(true)}><RiMenuUnfold4Line /></div>
+               <Drawer
+                  title="Menu"
+                  placement="right" // Menu trượt từ bên phải
+                  onClose={() => setOpen(false)}
+                  open={open} // Điều khiển trạng thái mở/tắt
+                  width="150"
+               >
+                  <p>Trang chủ</p>
+                  <p>Dịch vụ</p>
+                  <p>Liên hệ</p>
+                  <Link to="/Login">Đăng nhập</Link>
+               </Drawer>
             </div>
          </div>
       </>

@@ -1,9 +1,11 @@
 import express from 'express';
 import viewEngine from './config/viewEngine.js';
-
+app.use(cors());
 import { sql, connectDB } from "./config/connect.js"
 
 import dotenv from 'dotenv';
+
+const cors = require("cors");
 dotenv.config();
 
 
@@ -12,7 +14,7 @@ import Routers from './routes/index.routes.js';
 
 const app = express();
 
-
+app.use(cors());
 // Middleware để đọc dữ liệu từ form HTML
 app.use(express.urlencoded({ extended: true }));
 
