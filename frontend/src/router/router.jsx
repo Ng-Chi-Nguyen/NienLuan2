@@ -7,6 +7,7 @@ import News from '../pages/News/News';
 import Team from '../pages/Team/Team';
 import Tournament from '../pages/Tournament/Tournament';
 import Login from '../pages/Auth/Login';
+import User from '../pages/User/User';
 export const routers = createBrowserRouter([
    {
       path: "/",
@@ -40,4 +41,8 @@ export const routers = createBrowserRouter([
       path: "/Login",
       element: <Login />
    },
+   {
+      path: "/User",
+      element: <User />
+   }
 ]);

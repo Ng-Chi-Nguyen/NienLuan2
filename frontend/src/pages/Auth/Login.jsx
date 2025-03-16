@@ -1,12 +1,16 @@
 import Header from "../../components/Header/Header";
 import './Login.scss';
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { CiUser } from "react-icons/ci";
 import { IoBusinessOutline } from "react-icons/io5";
 import { Tabs } from 'antd';
 import { FaGoogle, FaFacebookF } from "react-icons/fa";
 import axios from "axios";
 export default function Rank() {
+
+   const navigate = useNavigate();
+
    const [loading, setLoading] = useState(false); // Loading o dang ky
 
 
@@ -89,10 +93,31 @@ export default function Rank() {
    }
 
 
-   const handleLogin = (e) => {
+   const handleLogin = async (e) => {
       e.preventDefault();
       console.log("Dữ liệu form:", formData);
+      try {
+         setLoading(true);
+         const response = await axios.post("/api/auth/login", {
+            email: formData.email,
+            password: formData.password
+         });
+
+         console.log("Đăng nhập thành công:", response.data);
+
+         // Lưu token vào localStorage hoặc state (tùy vào cách bạn xử lý đăng nhập)
+         localStorage.setItem("token", response.data.token);
+         localStorage.setItem("user", JSON.stringify(response.data.user)); // Lưu thông tin user
+
+         navigate("/User");
+         setLoading(false);
+      } catch (e) {
+         console.log(e)
+         setLoading(false);
+      }
    };
+
+
 
    const itemTabs = [
       {
@@ -251,6 +276,8 @@ export default function Rank() {
 
    const [login, setLogin] = useState(false)
 
+
+
    return (
       <>
          <Header />
@@ -270,10 +297,10 @@ export default function Rank() {
                <div className="cardLogin loginFalse">
                   <div className="title">ĐĂNG NHẬP</div>
                   <div className="social-login">
-                     <button className="login-gg">
+                     <a href="api/auth/google" className="login-gg">
                         <span><FaGoogle /></span>
                         <p>Đăng nhập Google</p>
-                     </button>
+                     </a>
                      <button className="login-fb">
                         <span><FaFacebookF /></span>
                         <p>Đăng nhập Facebook</p>
@@ -282,9 +309,21 @@ export default function Rank() {
                   <p className="text-center">Hoặc đăng nhập Email</p>
                   <form onSubmit={handleLogin}>
                      <div className="row">
-                        <input type="email" name="email" placeholder="Email" onChange={handleChange} />
-                        <input type="password" name="password" placeholder="Mật khẩu" onChange={handleChange} />
-                        <button type="submit">Đăng nhập</button>
+                        <input
+                           type="email"
+                           name="email"
+                           placeholder="Email"
+                           onChange={handleChange}
+                           value={formData.email}
+                        />
+                        <input
+                           type="password"
+                           name="password"
+                           placeholder="Mật khẩu"
+                           onChange={handleChange}
+                           value={formData.password}
+                        />
+                        <button type="submit" disabled={loading}>{loading ? "Đang xử lý..." : "Đăng nhập"}</button>
                      </div>
                   </form>
                   <p className="text-center">Bạn chưa có tài khoản?
@@ -293,7 +332,6 @@ export default function Rank() {
                </div>
             </div>
          )}
-
       </>
    );
 }

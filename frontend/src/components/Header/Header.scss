@@ -57,11 +57,22 @@
    &-right{
       display: flex;
       align-items: center;
+      .user-info{
+         display: flex;
+         align-items: center;
+         a{
+            text-decoration: none;
+            cursor: pointer;
+            .name:hover{
+               color: #1e90ff;
+            }
+         }
+      }
       .avatar{
          width: 25px;
          height: 25px;
+         border: 1px solid #ccc;
          border-radius: 50%;
-         background: #1e90ff;
       }
       .name{
          margin: 0 10px;

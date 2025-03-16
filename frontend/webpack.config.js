@@ -1,5 +1,6 @@
 module.exports = {
    watchOptions: {
-      ignored: ['**/node_modules', '**/D:/System Volume Information', '**/D:/$RECYCLE.BIN'],
+      ignored: [/node_modules/, /System Volume Information/, /$RECYCLE.BIN/]
+
    },
 };

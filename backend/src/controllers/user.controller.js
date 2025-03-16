@@ -12,7 +12,7 @@ export const createUser = async (req, res) => {
       const result = await createUserService({ name, email, password, phone, gender, address });
 
       if (!result.success) {
-         return res.status(500).json({ error: 'Lỗi khi tạo user!' });
+         return res.status(500).json({ error: result.error });
       }
 
       res.json({

@@ -1,4 +1,6 @@
 import express from 'express';
+import session from "express-session";
+import passport from "./config/passport.js";
 import viewEngine from './config/viewEngine.js';
 import { connectDB } from "./config/connect.js"
 import Routers from './routes/index.routes.js';
@@ -28,8 +30,17 @@ app.use(express.json()); // Cái này rất quan trọng!
 // Cấu hình template engine
 viewEngine(app);
 
-Routers(app)
 
+app.use(session({
+   secret: "secret",
+   resave: false,
+   saveUninitialized: false, // Đổi từ `true` → `false` để tránh lưu session không cần thiết
+   cookie: { secure: false } // Nếu dùng HTTPS, đổi `false` thành `true`
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+Routers(app)
 
 
 app.listen(port, hostname, () => {
