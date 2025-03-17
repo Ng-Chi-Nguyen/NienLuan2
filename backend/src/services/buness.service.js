@@ -1,16 +1,20 @@
 import { sql } from '../config/connect.js';
 
 let createBusinessService = async (businessData) => {
-   const { name, email, password, phone, address } = businessData;
+   console.log("Dữ liệu nhận được:", businessData);
+
 
    try {
-      // Kiểm tra email và số điện thoại trong bảng Users
+      const { name, email, password, phone, address, owner_name, license_number, tax_code, established_date } = businessData;
+
+
+      // Kiểm tra email và số điện thoại trong bảng User
       let { data: userExists } = await sql
          .from("User")
          .select("id")
          .or(`email.eq.${email},phone.eq.${phone}`);
 
-      // Kiểm tra email và số điện thoại trong bảng Businesses
+      // Kiểm tra email và số điện thoại trong bảng Business
       let { data: businessExists } = await sql
          .from("Business")
          .select("id")
@@ -23,10 +27,11 @@ let createBusinessService = async (businessData) => {
 
       // Tạo tài khoản doanh nghiệp
       const { data, error } = await sql
-         .from("Businesses")
-         .insert([{ name, email, password, phone, address }])
+         .from("Business")
+         .insert([{ name, email, password, phone, address, owner_name, license_number, tax_code, established_date }])
          .select("*");
 
+      console.log("Kết quả insert:", data, error);
       if (error) {
          console.error("❌ Lỗi insert vào Supabase:", error);
          return { success: false, error };

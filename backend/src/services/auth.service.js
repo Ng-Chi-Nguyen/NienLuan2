@@ -1,9 +1,8 @@
 import { sql } from '../config/connect.js';
 import jwt from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
 
 const SECRET_KEY = process.env.SECRET_KEY;
-
-// const client = new OAuth2Client(GG_CLIENT_ID);
 
 let loginUserService = async (userData) => {
    try {
@@ -17,6 +16,7 @@ let loginUserService = async (userData) => {
          .single();
 
       let userType = "user"; // Mặc định là tài khoản thường
+      let additionalInfo = {}; // Dữ liệu bổ sung cho doanh nghiệp
 
       if (error || !user) {
          // Nếu không tìm thấy trong Users, kiểm tra Businesses
@@ -32,6 +32,14 @@ let loginUserService = async (userData) => {
 
          user = business; // Nếu tìm thấy trong Businesses, gán vào biến user
          userType = "business"; // Xác định loại tài khoản là doanh nghiệp
+
+         // Thêm thông tin cho tài khoản doanh nghiệp
+         additionalInfo = {
+            owner_name: user.owner_name,
+            license_number: user.license_number,
+            tax_code: user.tax_code,
+            established_date: user.established_date,
+         };
       }
 
       // Kiểm tra mật khẩu
@@ -46,19 +54,28 @@ let loginUserService = async (userData) => {
          { expiresIn: "7d" }
       );
 
+      // Tạo object kết quả trả về
+      let responseUser = {
+         id: user.id,
+         name: user.name,
+         email: user.email,
+         phone: user.phone,
+         address: user.address,
+         created_at: user.created_at,
+         type: userType, // Gửi thông tin loại tài khoản
+         ...additionalInfo, // Thêm thông tin nếu là doanh nghiệp
+      };
+
+      // Nếu là tài khoản User, thì thêm gender
+      if (userType === "user") {
+         responseUser.gender = user.gender;
+      }
+
       return {
          success: true,
          message: "Đăng nhập thành công!",
          token,
-         user: {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            phone: user.phone,
-            gender: user.gender,
-            address: user.address,
-            type: userType, // Gửi thông tin loại tài khoản
-         },
+         user: responseUser,
       };
    } catch (e) {
       console.log(e);
@@ -66,5 +83,56 @@ let loginUserService = async (userData) => {
    }
 };
 
+// ✅ Hàm tạo token JWT
+let generateToken = (user) => {
+   return jwt.sign(
+      { id: user.id, email: user.email, type: "user" },
+      SECRET_KEY,
+      { expiresIn: "7d" }
+   );
+};
+// ✅ Hàm xử lý login với Google
+let handleGoogleLogin = async (googleUser) => {
+   const { email, name, picture } = googleUser;
 
-export { loginUserService };
+   try {
+      let { data: existingUser, error } = await sql
+         .from("User")
+         .select("*")
+         .eq("email", email)
+         .single();
+
+      if (error || !existingUser) {
+         // Nếu chưa có tài khoản, tạo tài khoản mới
+         let newUser = {
+            UID: uuidv4(),
+            name: name,
+            email: email,
+            avatar_url: picture,
+            created_at: new Date(),
+         };
+
+         let { data: insertedUser, error: insertError } = await sql
+            .from("User")
+            .insert([newUser])
+            .select()
+            .single();
+
+         if (insertError) {
+            console.error("Lỗi khi tạo tài khoản:", insertError);
+            return { success: false, error: "Lỗi khi tạo tài khoản" };
+         }
+
+         existingUser = insertedUser;
+      }
+
+      // ✅ Tạo token sau khi đăng nhập thành công
+      const token = generateToken(existingUser);
+      return { success: true, token, user: existingUser };
+
+   } catch (e) {
+      console.error("Lỗi hệ thống:", e);
+      return { success: false, error: "Lỗi hệ thống" };
+   }
+};
+export { loginUserService, handleGoogleLogin };

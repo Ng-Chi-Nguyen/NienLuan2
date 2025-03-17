@@ -84,7 +84,9 @@ export default function Header() {
          <div className="Header-right">
             {isLoggedIn ? (
                <div className="user-info">
-                  <div className="avatar"></div>
+                  <div className="avatar">
+                     <img src={user.avatar_url ? user.avatar_url : ""} alt="" />
+                  </div>
                   <Link to="/User"><p className="name">{user?.name}</p></Link>
                </div>
             ) : (

@@ -1,4 +1,4 @@
-import { loginUserService } from "../services/auth.service.js";
+import { loginUserService, handleGoogleLogin } from "../services/auth.service.js";
 import { sql } from '../config/connect.js';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
@@ -34,49 +34,19 @@ export const googleAuth = passport.authenticate("google", { scope: ["profile", "
 export const googleCallback = (req, res, next) => {
    passport.authenticate("google", { session: false }, async (err, user, info) => {
       if (err) return next(err);
-      if (!user) return res.redirect("http://localhost:3000/Login");
+      if (!user) return res.redirect("http://localhost:3000/Login?error=google_failed");
 
-      const { email, name, picture } = user._json; // Lấy dữ liệu từ Google
+      const googleUser = user._json;
+      const result = await handleGoogleLogin(googleUser);
 
-      try {
-         let { data: existingUser, error } = await sql
-            .from("User")
-            .select("*")
-            .eq("email", email)
-            .single();
-
-         if (error || !existingUser) {
-            // Nếu chưa có tài khoản, tạo tài khoản mới với dữ liệu từ Google
-            let newUser = {
-               UID: uuidv4(),
-               name: name,
-               email: email,
-               avatar_url: picture,
-               created_at: new Date(),
-            };
-
-            let { data: insertedUser, error: insertError } = await sql
-               .from("User")
-               .insert([newUser])
-               .select()
-               .single();
-
-            if (insertError) {
-               console.error("Lỗi khi tạo tài khoản:", insertError);
-               return res.redirect("http://localhost:3000/Login?error=signup_failed");
-            }
-
-            existingUser = insertedUser;
-         }
-
-         // ✅ Sử dụng generateToken để tạo token
-         const token = generateToken(existingUser);
-
-         // Gửi token về frontend để đăng nhập
-         res.redirect(`http://localhost:3000/User?token=${token}`);
-      } catch (e) {
-         console.error("Lỗi hệ thống:", e);
-         return res.redirect("http://localhost:3000/Login?error=server_error");
+      if (!result.success) {
+         return res.redirect("http://localhost:3000/Login?error=" + encodeURIComponent(result.error));
       }
+
+      const token = generateToken(result.user);
+      const userData = encodeURIComponent(JSON.stringify(result.user));
+
+      // ✅ Chuyển hướng về `/User` với token và thông tin user
+      res.redirect(`http://localhost:3000/User?token=${token}&user=${userData}`);
    })(req, res, next);
 };
