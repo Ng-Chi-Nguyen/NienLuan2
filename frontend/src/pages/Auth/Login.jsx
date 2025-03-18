@@ -7,7 +7,7 @@ import { IoBusinessOutline } from "react-icons/io5";
 import { Tabs } from 'antd';
 import { FaGoogle, FaFacebookF } from "react-icons/fa";
 import axios from "axios";
-export default function Rank() {
+export default function Login() {
 
    const navigate = useNavigate();
 

@@ -83,14 +83,6 @@ let loginUserService = async (userData) => {
    }
 };
 
-// ✅ Hàm tạo token JWT
-let generateToken = (user) => {
-   return jwt.sign(
-      { id: user.id, email: user.email, type: "user" },
-      SECRET_KEY,
-      { expiresIn: "7d" }
-   );
-};
 // ✅ Hàm xử lý login với Google
 let handleGoogleLogin = async (googleUser) => {
    const { email, name, picture } = googleUser;
@@ -126,13 +118,34 @@ let handleGoogleLogin = async (googleUser) => {
          existingUser = insertedUser;
       }
 
-      // ✅ Tạo token sau khi đăng nhập thành công
-      const token = generateToken(existingUser);
-      return { success: true, token, user: existingUser };
+      // Tạo token với type: "user"
+      const token = jwt.sign(
+         { id: existingUser.id, email: existingUser.email, type: "user" },
+         SECRET_KEY,
+         { expiresIn: "7d" }
+      );
+
+      // Trả về thông tin user kèm type: "user"
+      let responseUser = {
+         id: existingUser.id,
+         name: existingUser.name,
+         email: existingUser.email,
+         avatar_url: existingUser.avatar_url,
+         created_at: existingUser.created_at,
+         type: "user", // Không cần lưu trong CSDL, chỉ gửi đi trong response
+      };
+
+      return {
+         success: true,
+         message: "Đăng nhập thành công!",
+         token,
+         user: responseUser,
+      };
 
    } catch (e) {
       console.error("Lỗi hệ thống:", e);
       return { success: false, error: "Lỗi hệ thống" };
    }
 };
+
 export { loginUserService, handleGoogleLogin };

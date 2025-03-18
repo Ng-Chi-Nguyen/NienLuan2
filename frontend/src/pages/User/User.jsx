@@ -3,24 +3,28 @@ import LogoUser from "../../assets/logo-user.jpg";
 import LogoUserFemale from "../../assets/avatar-user-female.png";
 import Avatar from "../../assets/avatar-business.png";
 import './User.scss';
+
+
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";  //
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
 import { CiUser } from "react-icons/ci";
 import { TfiEmail } from "react-icons/tfi";
 import { SlScreenSmartphone } from "react-icons/sl";
 import { PiMapPinArea } from "react-icons/pi";
-import { BsGenderFemale, BsGenderMale } from "react-icons/bs";
 import { IoBusinessOutline } from "react-icons/io5";
 import { FaBarcode } from "react-icons/fa";
 import { RxIdCard } from "react-icons/rx";
 import { HiOutlineCalendarDateRange } from "react-icons/hi2";
 import { AiOutlineSetting } from "react-icons/ai";
-import { EditOutlined, DeleteOutlined, KeyOutlined, CustomerServiceOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, KeyOutlined } from '@ant-design/icons';
 
-import { FloatButton } from 'antd';
+import { FloatButton, Modal } from 'antd';
 
 export default function User() {
 
+   const [isModalOpen, setIsModalOpen] = useState(false);
    const [user, setUser] = useState(null);
    const navigate = useNavigate();
 
@@ -31,7 +35,7 @@ export default function User() {
       const userData = params.get("user");
 
       if (token && userData) {
-         // ✅ Lưu vào localStorage
+         //  Lưu vào localStorage
          localStorage.setItem("token", token);
          localStorage.setItem("user", userData);
 
@@ -56,7 +60,94 @@ export default function User() {
    const date = new Date(user.created_at).toLocaleDateString("vi-VN");
    const established_date = new Date(user.established_date).toLocaleDateString("vi-VN");
 
-   // Dữ liệu bảng đặt sân
+   // Edit
+
+   const showModal = () => {
+      setIsModalOpen(true);
+   };
+   const handleCancel = () => {
+      setIsModalOpen(false);
+   };
+
+   const handleChange = (e) => {
+      let { name, value } = e.target;
+
+      // Chuyển đổi kiểu dữ liệu
+      if (name === "gender") {
+         value = value === "true"; // Chuyển thành true/false
+      } else if (name === "phone") {
+         value = value.replace(/\D/g, ""); // Chỉ giữ số cho phone
+      }
+
+      setUser((prev) => ({ ...prev, [name]: value }));
+   };
+
+   let handleUpdateUser = async (e) => {
+      e.preventDefault();
+      console.log("Dữ liệu form trước khi gửi:", user);
+      console.log("Token trước khi cập nhật:", localStorage.getItem("token"));
+
+      if (!user.id) {
+         console.error("Lỗi: Không có ID người dùng!");
+         return;
+      }
+
+      try {
+         let id = user.id;
+         let response = await axios.post(`/api/user/${id}`, {
+            name: user.name || "",
+            phone: user.phone || "",
+            email: user.email || "",
+            address: user.address || "",
+            gender: user.gender ?? null
+         });
+
+         console.log("Dữ liệu trả về từ API:", response.data);
+
+         if (response.data.success) {
+            // ✅ Lấy dữ liệu cũ để giữ lại các thuộc tính không thay đổi
+            const oldUserData = JSON.parse(localStorage.getItem("user")) || {};
+
+            // ✅ Dữ liệu mới từ API
+            const updatedUser = response.data.data;
+
+            // ✅ Gộp dữ liệu cũ + mới
+            const mergedUser = { ...oldUserData, ...updatedUser };
+
+            // ✅ Xóa dữ liệu cũ và thay bằng user mới
+            localStorage.removeItem("user");
+            localStorage.setItem("user", JSON.stringify(mergedUser));
+
+            console.log("User sau khi cập nhật:", mergedUser);
+
+            // ✅ Kiểm tra & cập nhật token nếu có
+            if (response.data.token) {
+               console.log("Token mới từ API:", response.data.token);
+               localStorage.setItem("token", response.data.token);
+            }
+
+            console.log("Token sau khi cập nhật:", localStorage.getItem("token"));
+
+            // ✅ Cập nhật state để re-render
+            setUser(mergedUser);
+
+            // ✅ Gọi lại API để chắc chắn dữ liệu mới đã cập nhật
+            handleCancel();
+         } else {
+            console.error("Lỗi cập nhật:", response.data.error);
+         }
+      } catch (e) {
+         console.error("Lỗi khi cập nhật user:", e);
+      }
+   };
+
+
+
+
+
+
+
+   console.log(user.avatar_url)
 
    return (
       <>
@@ -65,7 +156,7 @@ export default function User() {
             <div className="userPage">
                <div className="infoUser row">
                   <h4 className="title-user">
-                     {(user.type === "user") ? <p>hông tin người dùng</p> : (<p>Thông tin doanh ngiệp</p>)}
+                     {(user.type === "user") ? <p>Thông tin người dùng</p> : (<p>Thông tin doanh ngiệp</p>)}
                   </h4>
                   <div className="edit">
                      <FloatButton.Group
@@ -77,8 +168,12 @@ export default function User() {
                         }}
                         icon={<AiOutlineSetting />}
                      >
-                        <FloatButton icon={<EditOutlined />} tooltip="Sửa" />
-                        <FloatButton icon={<DeleteOutlined />} tooltip="Xóa" />
+                        <FloatButton
+                           icon={<EditOutlined className="co-orange" />}
+                           tooltip="Sửa"
+                           onClick={showModal}
+                        />
+                        <FloatButton icon={<DeleteOutlined className="co-red" />} tooltip="Xóa" />
                         <FloatButton icon={<KeyOutlined />} tooltip="Đổi mật khẩu" />
                      </FloatButton.Group>
                   </div>
@@ -86,23 +181,13 @@ export default function User() {
                      <div className="logo">
                         {(user.type === "user") ? (
                            <>
-                              <div className="info-item-gender">
-                                 {user.gender === "female" ? (
-                                    <span className="co-pink"><BsGenderFemale /></span>
-                                 ) : (
-                                    <span className="co-blue"><BsGenderMale /></span>
-                                 )}
-                              </div>
                               <img
-                                 src={user.avatar_url ? user.avatar_url : (user.gender === "female" ? LogoUserFemale : LogoUser)}
+                                 src={user?.avatar_url || (user?.gender === "female" ? LogoUserFemale : LogoUser)}
                                  alt="User Avatar"
                               />
                            </>
                         ) : (
                            <>
-                              <div className="info-item-gender">
-                                 <span className="co-yelow"><IoBusinessOutline /></span>
-                              </div>
                               <img
                                  src={user.avatar_url ? user.avatar_url : Avatar}
                                  alt="Business Avatar"
@@ -159,7 +244,55 @@ export default function User() {
                <div className="table-booking">
                   <h4 className="title-table">Danh sách đặt chỗ</h4>
                </div>
+               <div>
+                  <Modal
+                     title="CẬP NHẬT THÔNG TIN NGƯỜI DÙNG"
+                     open={isModalOpen}
+                     onCancel={handleCancel} // Cho phép bấm ra ngoài để tắt modal
+                     footer={null} // Ẩn nút OK và Cancel
+                     maskClosable={true} // Cho phép click bên ngoài để đóng
+                  >
+                     <form onSubmit={handleUpdateUser}>
+                        <div className="row model-edit">
+                           <input
+                              type="text"
+                              name="name"
+                              placeholder="Tên cửa hàng"
+                              value={user.name}
+                              onChange={handleChange}
+                           />
+                           <input
+                              type="tel"
+                              name="phone"
+                              placeholder="Số điện thoại"
+                              value={user.phone}
+                              onChange={handleChange}
+                           />
+                           <input
+                              type="text"
+                              name="address"
+                              placeholder="Địa chỉ"
+                              value={user.address}
+                              onChange={handleChange}
+                           />
+                           <select name="gender" onChange={handleChange} value={user.gender ? user.gender.toString() : ""}>
+                              <option value="" disabled>--</option>
+                              <option value="true">Nam</option>
+                              <option value="false">Nữ</option>
+                           </select>
+
+                           <div className="submit">
+                              <button type="submit" className="btn-submit">
+                                 Cập nhật
+                              </button>
+                           </div>
+                        </div>
+                     </form>
+                  </Modal>
+               </div>
+
             </div>
+
          </div >
       </>
    );

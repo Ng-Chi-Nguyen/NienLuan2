@@ -7,6 +7,12 @@
 .co-yelow{
    color: #FFD600;
 }
+.co-orange{
+   color: orange;
+}
+.co-red{
+   color: red;
+}
 .userPage{
    padding-top: 40px;
    display: flex;
@@ -15,7 +21,7 @@
       width: 40%;
       box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.2);
       padding: 15px 0;
-      background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+      background: linear-gradient(to right, #ff9933, #ff6600);
       transition: transform 0.3s ease-in-out;
       display: flex;
       position: relative;
@@ -31,7 +37,7 @@
          position: relative;
          .logo{
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
+            // border-radius: 50%;
             width: 120px;
             height: 120px;
             overflow: hidden;
@@ -46,8 +52,9 @@
          }
          .info-item-gender{
             position: absolute;
-            top: -3px;
-            right: 20px;
+            top: -20px;
+            right: 8px;
+
             font-size: 20px;
          }
       }
@@ -63,7 +70,8 @@
             span{
                margin-right: 10px;
                font-size: 18px;
-               color: #41A11E;
+               color: #000;
+               margin-bottom: 2px;
                &::after {
                   content: attr(data-tooltip);
                   position: absolute;
@@ -88,7 +96,6 @@
             p{
                margin: 0;
                overflow: hidden;
-               white-space: nowrap;
                text-overflow: ellipsis; // Hiển thị dấu "..."
                max-width: 350px;
             }
@@ -101,5 +108,51 @@
       margin-left: 50px;
       border: 1px solid blueviolet;
       height: 400px;
+   }
+   
+}
+.model-edit{
+   padding-top: 15px;
+   input{
+      margin-bottom: 10px;
+      height: 30px;
+      border: 1px solid #ccc;
+      outline: 0;
+      border-radius: 3px;
+      &:focus-visible{
+         border: 1px solid #98ee26;
+      }
+      &:nth-child(1){
+         width: 50%;
+      }
+      &:nth-child(2){
+         width: calc(50% - 10px);
+         margin-left: 10px;
+      }
+      &:nth-child(3){
+         width: 80%;
+      }
+   }
+   select{
+      width: calc(20% - 10px);
+      margin-left: 10px;
+      margin-bottom: 10px;
+      height: 30px;
+      border: 1px solid #ccc;
+      outline: 0;
+      border-radius: 3px;
+   }
+   .submit{
+      display: flex;
+      justify-content: flex-end;
+      padding-right: 0;
+      button{
+         padding: 5px 15px;
+         background: #1E90FF;
+         border: 0;
+         color: #FFF;
+         border-radius: 5px;
+         font-weight: 500;
+      }
    }
 }

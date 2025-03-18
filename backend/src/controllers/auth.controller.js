@@ -6,7 +6,7 @@ import passport from "passport";
 
 const SECRET_KEY = process.env.SECRET_KEY;
 
-// 🔥 Hàm tạo token JWT (DÙNG CHUNG CHO LOGIN VÀ GOOGLE LOGIN)
+// Hàm tạo token JWT (DÙNG CHUNG CHO LOGIN VÀ GOOGLE LOGIN)
 const generateToken = (user) => {
    return jwt.sign(
       { id: user.id, email: user.email, type: "user" },
@@ -46,7 +46,7 @@ export const googleCallback = (req, res, next) => {
       const token = generateToken(result.user);
       const userData = encodeURIComponent(JSON.stringify(result.user));
 
-      // ✅ Chuyển hướng về `/User` với token và thông tin user
+      // Chuyển hướng về `/User` với token và thông tin user
       res.redirect(`http://localhost:3000/User?token=${token}&user=${userData}`);
    })(req, res, next);
 };
