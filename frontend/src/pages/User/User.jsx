@@ -86,7 +86,6 @@ export default function User() {
       e.preventDefault();
       console.log("Dữ liệu form trước khi gửi:", user);
       console.log("Token trước khi cập nhật:", localStorage.getItem("token"));
-      <div></div>
       if (!user.id) {
          console.error("Lỗi: Không có ID người dùng!");
          return;
@@ -158,6 +157,7 @@ export default function User() {
                   <h4 className="title-user">
                      {(user.type === "user") ? <p>Thông tin người dùng</p> : (<p>Thông tin doanh ngiệp</p>)}
                   </h4>
+                  <div>OK</div>
                   <div className="edit">
                      <FloatButton.Group
                         trigger="click"
