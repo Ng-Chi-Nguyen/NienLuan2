@@ -86,7 +86,7 @@ export default function User() {
       e.preventDefault();
       console.log("Dữ liệu form trước khi gửi:", user);
       console.log("Token trước khi cập nhật:", localStorage.getItem("token"));
-
+      <div></div>
       if (!user.id) {
          console.error("Lỗi: Không có ID người dùng!");
          return;
@@ -105,22 +105,22 @@ export default function User() {
          console.log("Dữ liệu trả về từ API:", response.data);
 
          if (response.data.success) {
-            // ✅ Lấy dữ liệu cũ để giữ lại các thuộc tính không thay đổi
+            // Lấy dữ liệu cũ để giữ lại các thuộc tính không thay đổi
             const oldUserData = JSON.parse(localStorage.getItem("user")) || {};
 
-            // ✅ Dữ liệu mới từ API
+            // Dữ liệu mới từ API
             const updatedUser = response.data.data;
 
-            // ✅ Gộp dữ liệu cũ + mới
+            // Gộp dữ liệu cũ + mới
             const mergedUser = { ...oldUserData, ...updatedUser };
 
-            // ✅ Xóa dữ liệu cũ và thay bằng user mới
+            // Xóa dữ liệu cũ và thay bằng user mới
             localStorage.removeItem("user");
             localStorage.setItem("user", JSON.stringify(mergedUser));
 
             console.log("User sau khi cập nhật:", mergedUser);
 
-            // ✅ Kiểm tra & cập nhật token nếu có
+            // Kiểm tra & cập nhật token nếu có
             if (response.data.token) {
                console.log("Token mới từ API:", response.data.token);
                localStorage.setItem("token", response.data.token);
@@ -128,10 +128,10 @@ export default function User() {
 
             console.log("Token sau khi cập nhật:", localStorage.getItem("token"));
 
-            // ✅ Cập nhật state để re-render
+            // Cập nhật state để re-render
             setUser(mergedUser);
 
-            // ✅ Gọi lại API để chắc chắn dữ liệu mới đã cập nhật
+            // Gọi lại API để chắc chắn dữ liệu mới đã cập nhật
             handleCancel();
          } else {
             console.error("Lỗi cập nhật:", response.data.error);
