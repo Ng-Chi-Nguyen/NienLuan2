@@ -19,7 +19,6 @@ import { RxIdCard } from "react-icons/rx";
 import { HiOutlineCalendarDateRange } from "react-icons/hi2";
 import { AiOutlineSetting } from "react-icons/ai";
 import { EditOutlined, DeleteOutlined, KeyOutlined } from '@ant-design/icons';
-
 import { FloatButton, Modal } from 'antd';
 
 export default function User() {
@@ -33,25 +32,38 @@ export default function User() {
       const params = new URLSearchParams(window.location.search);
       const token = params.get("token");
       const userData = params.get("user");
-
+      console.log(token)
+      console.log(userData)
       if (token && userData) {
-         //  Lưu vào localStorage
-         localStorage.setItem("token", token);
-         localStorage.setItem("user", userData);
+         try {
+            // 🛠 Parse userData trước khi lưu
+            const parsedUser = JSON.parse(userData);
 
-         // ✅ Cập nhật state user
-         setUser(JSON.parse(userData));
+            // ✅ Lưu vào localStorage
+            localStorage.setItem("token", token);
+            localStorage.setItem("user", JSON.stringify(parsedUser));
 
-         // ✅ Xóa token & user khỏi URL
-         navigate("/User", { replace: true });
+            // ✅ Cập nhật state user
+            setUser(parsedUser);
+
+            // ✅ Xóa token & user khỏi URL
+            navigate("/User", { replace: true });
+         } catch (error) {
+            console.error("Lỗi parse userData:", error);
+         }
       } else {
-         // Nếu không có trên URL, lấy từ localStorage
-         const infoUser = localStorage.getItem("user");
-         if (infoUser) {
-            setUser(JSON.parse(infoUser));
+         // ✅ Nếu không có trên URL, lấy từ localStorage
+         const storedUser = localStorage.getItem("user");
+         if (storedUser) {
+            try {
+               setUser(JSON.parse(storedUser));
+            } catch (error) {
+               console.error("Lỗi khi parse user từ localStorage:", error);
+            }
          }
       }
    }, [navigate]);
+
 
    if (!user) {
       return <p>Loading user...</p>;
@@ -84,8 +96,8 @@ export default function User() {
 
    let handleUpdateUser = async (e) => {
       e.preventDefault();
-      console.log("Dữ liệu form trước khi gửi:", user);
-      console.log("Token trước khi cập nhật:", localStorage.getItem("token"));
+      // console.log("Dữ liệu form trước khi gửi:", user);
+      // console.log("Token trước khi cập nhật:", localStorage.getItem("token"));
       if (!user.id) {
          console.error("Lỗi: Không có ID người dùng!");
          return;
@@ -101,7 +113,7 @@ export default function User() {
             gender: user.gender ?? null
          });
 
-         console.log("Dữ liệu trả về từ API:", response.data);
+         // console.log("Dữ liệu trả về từ API:", response.data);
 
          if (response.data.success) {
             // Lấy dữ liệu cũ để giữ lại các thuộc tính không thay đổi
@@ -114,18 +126,18 @@ export default function User() {
             const mergedUser = { ...oldUserData, ...updatedUser };
 
             // Xóa dữ liệu cũ và thay bằng user mới
-            localStorage.removeItem("user");
+            // localStorage.removeItem("user");
             localStorage.setItem("user", JSON.stringify(mergedUser));
 
-            console.log("User sau khi cập nhật:", mergedUser);
+            // console.log("User sau khi cập nhật:", mergedUser);
 
             // Kiểm tra & cập nhật token nếu có
             if (response.data.token) {
-               console.log("Token mới từ API:", response.data.token);
+               // console.log("Token mới từ API:", response.data.token);
                localStorage.setItem("token", response.data.token);
             }
 
-            console.log("Token sau khi cập nhật:", localStorage.getItem("token"));
+            // console.log("Token sau khi cập nhật:", localStorage.getItem("token"));
 
             // Cập nhật state để re-render
             setUser(mergedUser);
@@ -140,13 +152,64 @@ export default function User() {
       }
    };
 
+   let handleUpdateBusiness = async (e) => {
+      e.preventDefault();
+      // console.log("Dữ liệu form trước khi gửi:", user);
+      // console.log("Token trước khi cập nhật:", localStorage.getItem("token"));
+      if (!user.id) {
+         console.error("Lỗi: Không có ID người dùng!");
+         return;
+      }
+      try {
+         let id = user.id;
+         let response = await axios.post(`/api/business/${id}`, {
+            name: user.name || "",
+            phone: user.phone || "",
+            email: user.email || "",
+            owner_name: user.owner_name || "",
+            address: user.address || "",
+         });
 
+         // console.log("Dữ liệu trả về từ API:", response.data);
 
+         if (response.data.success) {
+            // Lấy dữ liệu cũ để giữ lại các thuộc tính không thay đổi
+            const oldUserData = JSON.parse(localStorage.getItem("user")) || {};
 
+            // Dữ liệu mới từ API
+            const updatedUser = response.data.data;
 
+            // Gộp dữ liệu cũ + mới
+            const mergedUser = { ...oldUserData, ...updatedUser };
 
+            // Xóa dữ liệu cũ và thay bằng user mới
+            // localStorage.removeItem("user");
+            localStorage.setItem("user", JSON.stringify(mergedUser));
 
-   console.log(user.avatar_url)
+            // console.log("User sau khi cập nhật:", mergedUser);
+
+            // Kiểm tra & cập nhật token nếu có
+            if (response.data.token) {
+               // console.log("Token mới từ API:", response.data.token);
+               localStorage.setItem("token", response.data.token);
+            }
+
+            // console.log("Token sau khi cập nhật:", localStorage.getItem("token"));
+
+            // Cập nhật state để re-render
+            setUser(mergedUser);
+
+            // Gọi lại API để chắc chắn dữ liệu mới đã cập nhật
+            handleCancel();
+         } else {
+            console.error("Lỗi cập nhật:", response.data.error);
+         }
+      } catch (e) {
+         console.error("Lỗi khi cập nhật user:", e);
+      }
+   }
+
+   // console.log("Avatar: ", user.avatar_url)
 
    return (
       <>
@@ -157,7 +220,6 @@ export default function User() {
                   <h4 className="title-user">
                      {(user.type === "user") ? <p>Thông tin người dùng</p> : (<p>Thông tin doanh ngiệp</p>)}
                   </h4>
-                  <div>OK</div>
                   <div className="edit">
                      <FloatButton.Group
                         trigger="click"
@@ -244,52 +306,134 @@ export default function User() {
                <div className="table-booking">
                   <h4 className="title-table">Danh sách đặt chỗ</h4>
                </div>
-               <div>
-                  <Modal
-                     title="CẬP NHẬT THÔNG TIN NGƯỜI DÙNG"
-                     open={isModalOpen}
-                     onCancel={handleCancel} // Cho phép bấm ra ngoài để tắt modal
-                     footer={null} // Ẩn nút OK và Cancel
-                     maskClosable={true} // Cho phép click bên ngoài để đóng
-                  >
-                     <form onSubmit={handleUpdateUser}>
-                        <div className="row model-edit">
-                           <input
-                              type="text"
-                              name="name"
-                              placeholder="Tên cửa hàng"
-                              value={user.name}
-                              onChange={handleChange}
-                           />
-                           <input
-                              type="tel"
-                              name="phone"
-                              placeholder="Số điện thoại"
-                              value={user.phone}
-                              onChange={handleChange}
-                           />
-                           <input
-                              type="text"
-                              name="address"
-                              placeholder="Địa chỉ"
-                              value={user.address}
-                              onChange={handleChange}
-                           />
-                           <select name="gender" onChange={handleChange} value={user.gender ? user.gender.toString() : ""}>
-                              <option value="" disabled>--</option>
-                              <option value="true">Nam</option>
-                              <option value="false">Nữ</option>
-                           </select>
-
-                           <div className="submit">
-                              <button type="submit" className="btn-submit">
-                                 Cập nhật
-                              </button>
+               {user.type === "user" ? (
+                  <div>
+                     <Modal
+                        title="CẬP NHẬT THÔNG TIN NGƯỜI DÙNG"
+                        open={isModalOpen}
+                        onCancel={handleCancel} // Cho phép bấm ra ngoài để tắt modal
+                        footer={null} // Ẩn nút OK và Cancel
+                        maskClosable={true} // Cho phép click bên ngoài để đóng
+                     >
+                        <form onSubmit={handleUpdateUser}>
+                           <div className="row model-edit">
+                              <div className="item">
+                                 <label>Tên người dùng</label>
+                                 <input
+                                    type="text"
+                                    name="name"
+                                    placeholder="Tên người dùng"
+                                    value={user.name}
+                                    onChange={handleChange}
+                                 />
+                              </div>
+                              <div className="item">
+                                 <label>Số điện thoại</label>
+                                 <input
+                                    type="tel"
+                                    name="phone"
+                                    placeholder="Số điện thoại"
+                                    value={user.phone}
+                                    onChange={handleChange}
+                                 />
+                              </div>
+                              <div className="item">
+                                 <label>Địa chỉ</label>
+                                 <input
+                                    type="text"
+                                    name="address"
+                                    placeholder="Địa chỉ"
+                                    value={user.address}
+                                    onChange={handleChange}
+                                 />
+                              </div>
+                              <div className="item">
+                                 <label>Giới tính</label>
+                                 <select name="gender" onChange={handleChange} value={user.gender ? user.gender.toString() : ""}>
+                                    <option value="" disabled>--</option>
+                                    <option value="true">Nam</option>
+                                    <option value="false">Nữ</option>
+                                 </select>
+                              </div>
+                              <div className="submit">
+                                 <button type="submit" className="btn-submit">
+                                    Cập nhật
+                                 </button>
+                              </div>
                            </div>
-                        </div>
-                     </form>
-                  </Modal>
-               </div>
+                        </form>
+                     </Modal>
+                  </div>
+               ) : (
+                  <div className="modelUpdateBusiness">
+                     <Modal
+                        title="CẬP NHẬT THÔNG TIN DOANH NGHIỆP"
+                        open={isModalOpen}
+                        onCancel={handleCancel} // Cho phép bấm ra ngoài để tắt modal
+                        footer={null} // Ẩn nút OK và Cancel
+                        maskClosable={true} // Cho phép click bên ngoài để đóng
+                     >
+                        <form onSubmit={handleUpdateBusiness}>
+                           <div className="row model-edit model-edit-business">
+                              <div className="item">
+                                 <label>Tên chủ doanh nghiệp</label>
+                                 <input
+                                    type="text"
+                                    name="name"
+                                    placeholder="Tên chủ doanh nghiệp"
+                                    value={user.name}
+                                    onChange={handleChange}
+                                 />
+                              </div>
+                              <div className="item">
+                                 <label>Số điện thoại</label>
+                                 <input
+                                    type="tel"
+                                    name="phone"
+                                    placeholder="Số điện thoại"
+                                    value={user.phone}
+                                    onChange={handleChange}
+                                 />
+                              </div>
+                              <div
+                                 className="item"
+                                 style={{
+                                    width: user.type === "business" ? "calc(100%  - 10px)" : "",
+                                 }}
+                              >
+                                 <label>Tên doanh nghiệp</label>
+                                 <input
+                                    type="text"
+                                    name="owner_name"
+                                    placeholder="Tên doanh nghiệp"
+                                    value={user.owner_name}
+                                    onChange={handleChange}
+                                 />
+                              </div>
+                              <div className="item"
+                                 style={{
+                                    width: user.type === "business" ? "calc(100%  - 10px)" : "",
+                                 }}
+                              >
+                                 <label>Địa chỉ</label>
+                                 <input
+                                    type="text"
+                                    name="address"
+                                    placeholder="Địa chỉ"
+                                    value={user.address}
+                                    onChange={handleChange}
+                                 />
+                              </div>
+                              <div className="submit">
+                                 <button type="submit" className="btn-submit">
+                                    Cập nhật
+                                 </button>
+                              </div>
+                           </div>
+                        </form>
+                     </Modal>
+                  </div>
+               )}
 
             </div>
 

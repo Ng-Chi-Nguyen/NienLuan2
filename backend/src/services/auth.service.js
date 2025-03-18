@@ -118,6 +118,19 @@ let handleGoogleLogin = async (googleUser) => {
          existingUser = insertedUser;
       }
 
+      if (!existingUser.phone || !existingUser.address) {
+         let { data: fullUserInfo, error: fetchError } = await sql
+            .from("User")
+            .select("phone, address")
+            .eq("id", existingUser.id)
+            .single();
+
+         if (!fetchError && fullUserInfo) {
+            existingUser.phone = fullUserInfo.phone;
+            existingUser.address = fullUserInfo.address;
+         }
+      }
+
       // Tạo token với type: "user"
       const token = jwt.sign(
          { id: existingUser.id, email: existingUser.email, type: "user" },
@@ -130,6 +143,8 @@ let handleGoogleLogin = async (googleUser) => {
          id: existingUser.id,
          name: existingUser.name,
          email: existingUser.email,
+         address: existingUser.address || "Chưa cập nhật",
+         phone: existingUser.phone || "Chưa cập nhật",
          avatar_url: existingUser.avatar_url,
          created_at: existingUser.created_at,
          type: "user", // Không cần lưu trong CSDL, chỉ gửi đi trong response

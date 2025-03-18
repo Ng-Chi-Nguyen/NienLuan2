@@ -1,0 +1,27 @@
+.drawer-menu{
+   list-style: none;
+   padding-left: 0;
+   li{
+      margin: 5px 0;
+      border-bottom: 1px solid #ccc;
+      padding: 5px 10px;
+      &:hover a{
+         color: #3F6DFF;
+      }
+      a{
+         text-decoration: none;
+         cursor: pointer;
+         color: #000;
+         
+      }
+      
+   }
+   .btn-logout{
+      margin: 5px 0;
+      cursor: pointer;
+      padding: 5px 10px;
+      &:hover{
+         color: red;
+      }
+   }
+}

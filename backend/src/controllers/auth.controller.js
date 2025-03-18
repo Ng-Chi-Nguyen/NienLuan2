@@ -17,14 +17,14 @@ const generateToken = (user) => {
 
 export const loginUser = async (req, res) => {
    const result = await loginUserService(req.body);
-   console.log("Login Service Result:", result);
+   // console.log("Login Service Result:", result);
 
    if (!result.success) {
       return res.status(400).json({ message: result.error });
    }
 
    const token = generateToken(result.user);
-   console.log("Generated Token:", token);
+   // console.log("Generated Token:", token);
 
    res.json({ success: true, token, user: result.user });
 };

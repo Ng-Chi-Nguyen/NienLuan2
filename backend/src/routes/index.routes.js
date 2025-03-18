@@ -5,7 +5,7 @@ import authRouter from './auth.routes.js';
 
 const Routers = (app) => {
    app.use('/api/user/', userRouter);
-   app.use('/api/buness/', bunessRouter);
+   app.use('/api/business/', bunessRouter);
    app.use('/api/auth/', authRouter);
 
 };

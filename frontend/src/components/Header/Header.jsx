@@ -11,10 +11,12 @@ import { MdOutlineShoppingCartCheckout } from "react-icons/md";
 import { CiMenuBurger } from "react-icons/ci";
 import { Link, useNavigate } from 'react-router-dom';
 
+import MenuDrawer from "../MenuDrawer/MenuDrawer";
 export default function Header() {
    const navigate = useNavigate();
    const [loading, setLoading] = useState(false);
-   const [open, setOpen] = useState(false);
+   const [openLeft, setOpenLeft] = useState(false);  // Trạng thái menu trái
+   const [openRight, setOpenRight] = useState(false); // Trạng thái menu phải
    const [user, setUser] = useState(null);
    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -62,24 +64,40 @@ export default function Header() {
          navigate("/Login");
       }, 1500);
    };
-   console.log(isLoggedIn)
+   // console.log(isLoggedIn)
+
+   // Danh sách menu bên trái
+   const menuLeft = [
+      { path: "/", label: "Trang chủ" },
+      { path: "/Schedule", label: "Đặt sân" },
+   ];
+
+   // Danh sách menu bên phải
+   const menuRight = [
+      { path: "/User", label: "Thông tin tài khoản" },
+      { path: "/User", label: "Lịch đặt sân" },
+   ];
+
    return (
       <div className="Header">
          <div className="Header-left">
-            <span><CiMenuBurger /></span>
+            <div className="menu" onClick={() => { setOpenLeft(true); setOpenRight(false); }}>
+               <CiMenuBurger />
+            </div>
+            <MenuDrawer
+               open={openLeft}
+               setOpen={setOpenLeft}
+               isLoggedIn={isLoggedIn}
+               handleLogout={handleLogout}
+               placement="left"
+               menuItems={menuLeft}
+            />
             <div className="logo">
                <img src={LogoAvatar} alt="Logo" />
             </div>
          </div>
          <div className="Header-center">
-            <ul className='menuList'>
-               <li><Link to="/" className='item'><p>Trang chủ</p><span><FaHome /></span></Link></li>
-               <li><Link to="/Shopping" className='item'><p>Mua sắm</p><span><MdOutlineShoppingCartCheckout /></span></Link></li>
-               <li><Link to="/News" className='item'><p>Tin tức</p><span><PiNewspaper /></span></Link></li>
-               <li><Link to="/Tournament" className='item'><p>Giải đấu</p><span><GiTargetPrize /></span></Link></li>
-               <li><Link to="/Team" className='item'><p>Đội</p><span><GiTeamIdea /></span></Link></li>
-               <li><Link to="/Schedule" className='item'><p>Đặt sân</p><span><TbBrandBooking /></span></Link></li>
-            </ul>
+
          </div>
          <div className="Header-right">
             {isLoggedIn ? (
@@ -92,20 +110,17 @@ export default function Header() {
             ) : (
                <Link to="/Login" className="btn-login">Đăng nhập</Link>
             )}
-            <div className="menu" onClick={() => setOpen(true)}><RiMenuUnfold4Line /></div>
-            <Drawer
-               title="Menu"
+            <div className="menu" onClick={() => { setOpenRight(true); setOpenLeft(false); }}>
+               <RiMenuUnfold4Line />
+            </div>
+            <MenuDrawer
+               open={openRight}
+               setOpen={setOpenRight}
+               isLoggedIn={isLoggedIn}
+               handleLogout={handleLogout}
                placement="right"
-               onClose={() => setOpen(false)}
-               open={open}
-               width="150"
-            >
-               {isLoggedIn ? (
-                  <p className="btn-logout" onClick={handleLogout}>Đăng xuất</p>
-               ) : (
-                  <Link to="/Login" className="btn-login">Đăng nhập</Link>
-               )}
-            </Drawer>
+               menuItems={menuRight}
+            />
          </div>
       </div>
    );

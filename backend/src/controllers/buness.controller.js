@@ -1,10 +1,10 @@
-import { createBusinessService } from "../services/buness.service.js";
+import { createBusinessService, updateBusinessService } from "../services/buness.service.js";
 
 export const createBuness = async (req, res) => {
-   
+
    try {
       const { name, email, password, phone, address, owner_name, license_number, tax_code, established_date } = req.body;
-      
+
 
       // Kiểm tra nếu có trường nào bị thiếu
       if (!name || !email || !password || !phone || !address || !owner_name || !license_number || !tax_code || established_date === undefined) {
@@ -28,3 +28,31 @@ export const createBuness = async (req, res) => {
       return res.status(500).json({ error: "Internal Server Error" });
    }
 };
+
+export const updateBusiness = async (req, res) => {
+   try {
+      const { id } = req.params;
+      const { name, email, phone, owner_name, address } = req.body;
+
+      if (!id) {
+         return res.status(400).json({ error: "Thiếu ID người dùng!" });
+      }
+
+      const result = await updateBusinessService(id, { name, email, phone, owner_name, address });
+
+      if (!result.success) {
+         return res.status(500).json({ error: result.error });
+      }
+      // console.log(result)
+      return res.json({
+         message: "Cập nhật người doanh nghiệp thành công!",
+         data: result.data,
+         success: result.success,
+         token: result.token, // Gửi token mới về frontend
+      });
+
+   } catch (e) {
+      console.error("Lỗi hệ thống:", e);
+      return res.status(500).json({ error: "Lỗi hệ thống" });
+   }
+}
