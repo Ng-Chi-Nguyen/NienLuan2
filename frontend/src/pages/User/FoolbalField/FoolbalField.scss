@@ -1,0 +1,72 @@
+.FoolbalField {
+   width: 100%;
+   margin-top: 20px;
+   .title{
+      font-size: 26px;
+      font-weight: 500;
+      margin-bottom: 10px;
+   }
+   .addFF{
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      width: 20%;
+      cursor: pointer;
+      button{
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         border: 0;
+         background: linear-gradient(to left, #FFF, #1E90FF);
+         font-size: 27px;
+      }
+      &:hover{
+         span{
+            color: #1E90FF;
+         }
+      }
+   }
+   table {
+      width: 100%;
+      thead{
+         tr{
+            background: linear-gradient(to left, #FFF, #1E90FF);
+            th{
+               border: 1px solid #FFF;
+               padding: 3px 5px;
+               text-align: center;
+            }
+         }
+      }
+      tbody{
+         tr{
+            cursor: pointer;
+            &:hover{
+               background: #fbfafa;
+               border: 1px solid #FFF;
+            }
+            td{
+               border: 1px solid #ddd;
+               padding: 3px 5px;
+               height: 30px;
+               white-space: nowrap;  // Không xuống dòng
+               overflow: hidden;      // Ẩn phần bị tràn
+               text-overflow: ellipsis;  // Hiển thị "..."
+               &:nth-child(6){
+                  color: #27C375;
+                  font-size: 19px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+
+               }
+               &:nth-child(7){
+                  &:hover{
+                     color: #3F6DFF;
+                  }
+               }
+            }
+         }
+      }
+   }
+}

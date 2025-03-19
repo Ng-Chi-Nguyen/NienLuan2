@@ -83,11 +83,14 @@ let loginUserService = async (userData) => {
    }
 };
 
-// ✅ Hàm xử lý login với Google
+// Hàm xử lý login với Google
 let handleGoogleLogin = async (googleUser) => {
+
+   // Nhận email, tên và ảnh đại diện từ Google
    const { email, name, picture } = googleUser;
 
    try {
+      // data: Chứa dữ liệu của user nếu tìm thấy
       let { data: existingUser, error } = await sql
          .from("User")
          .select("*")
@@ -101,6 +104,9 @@ let handleGoogleLogin = async (googleUser) => {
             name: name,
             email: email,
             avatar_url: picture,
+            gender: true,
+            phone: null,
+            address: "Chưa cập nhật",
             created_at: new Date(),
          };
 
@@ -118,20 +124,9 @@ let handleGoogleLogin = async (googleUser) => {
          existingUser = insertedUser;
       }
 
-      if (!existingUser.phone || !existingUser.address) {
-         let { data: fullUserInfo, error: fetchError } = await sql
-            .from("User")
-            .select("phone, address")
-            .eq("id", existingUser.id)
-            .single();
-
-         if (!fetchError && fullUserInfo) {
-            existingUser.phone = fullUserInfo.phone;
-            existingUser.address = fullUserInfo.address;
-         }
-      }
-
       // Tạo token với type: "user"
+
+      // Tạo JWT: Chứa ID, email và loại tài khoản
       const token = jwt.sign(
          { id: existingUser.id, email: existingUser.email, type: "user" },
          SECRET_KEY,
@@ -144,7 +139,8 @@ let handleGoogleLogin = async (googleUser) => {
          name: existingUser.name,
          email: existingUser.email,
          address: existingUser.address || "Chưa cập nhật",
-         phone: existingUser.phone || "Chưa cập nhật",
+         phone: existingUser.phone,
+         gender: existingUser.gender,
          avatar_url: existingUser.avatar_url,
          created_at: existingUser.created_at,
          type: "user", // Không cần lưu trong CSDL, chỉ gửi đi trong response

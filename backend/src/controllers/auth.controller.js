@@ -28,7 +28,7 @@ export const loginUser = async (req, res) => {
 
    res.json({ success: true, token, user: result.user });
 };
-
+// Bắt đầu quá trình xác thực -  Yêu cầu quyền truy cập thông tin cá nhân và email.
 export const googleAuth = passport.authenticate("google", { scope: ["profile", "email"] });
 
 export const googleCallback = (req, res, next) => {

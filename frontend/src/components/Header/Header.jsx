@@ -1,13 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Drawer, message } from "antd";
+import { message } from "antd";
 import './Header.scss';
 import LogoAvatar from "../../assets/Logo.svg";
 import { RiMenuUnfold4Line } from "react-icons/ri";
-import { PiNewspaper } from "react-icons/pi";
-import { FaHome } from "react-icons/fa";
-import { TbBrandBooking } from "react-icons/tb";
-import { GiTargetPrize, GiTeamIdea } from "react-icons/gi";
-import { MdOutlineShoppingCartCheckout } from "react-icons/md";
+
 import { CiMenuBurger } from "react-icons/ci";
 import { Link, useNavigate } from 'react-router-dom';
 

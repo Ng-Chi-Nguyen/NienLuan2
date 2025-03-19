@@ -92,7 +92,6 @@ export default function Login() {
       }
    }
 
-
    const handleLogin = async (e) => {
       e.preventDefault();
       console.log("Dữ liệu form:", formData);
@@ -117,8 +116,6 @@ export default function Login() {
       }
    };
 
-
-
    const itemTabs = [
       {
          key: "1",
@@ -127,10 +124,10 @@ export default function Login() {
          children: (
             <div className="cardLogin user">
                <div className="social-login">
-                  <button className="login-gg">
+                  <a href="api/auth/google" className="login-gg">
                      <span><FaGoogle /></span>
                      <p>Đăng nhập Google</p>
-                  </button>
+                  </a>
                   <button className="login-fb">
                      <span><FaFacebookF /></span>
                      <p>Đăng nhập Facebook</p>
@@ -191,10 +188,10 @@ export default function Login() {
          children: (
             <div className="cardLogin buness">
                <div className="social-login">
-                  <button className="login-gg">
+                  <a href="api/auth/google" className="login-gg">
                      <span><FaGoogle /></span>
                      <p>Đăng nhập Google</p>
-                  </button>
+                  </a>
                   <button className="login-fb">
                      <span><FaFacebookF /></span>
                      <p>Đăng nhập Facebook</p>
