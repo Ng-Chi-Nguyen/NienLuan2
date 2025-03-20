@@ -52,8 +52,6 @@ export default function User() {
       return <p>Loading user...</p>;
    }
 
-   // console.log("Avatar: ", user.avatar_url)
-
    return (
       <>
          <Header />

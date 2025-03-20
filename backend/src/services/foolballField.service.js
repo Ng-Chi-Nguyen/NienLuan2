@@ -1,14 +1,14 @@
 import { sql } from '../config/connect.js';
 
 let createFoolballFieldService = async (FFData) => {
-   const { name, size, price, image, status, address, idBusiness } = FFData;
+   const { name, size, price, images, status, address, idBusiness } = FFData;
+   
    try {
       if (!FFData || !idBusiness) {
          return { success: false, error: "Dữ liệu không hợp lệ!" };
       }
-      // console.log("ID Business:", FFData.idBusiness, typeof FFData.idBusiness);
 
-      // Kiểm tra idBusiness có tồn tại trong bảng Business k
+      // Kiểm tra doanh nghiệp có tồn tại không
       let { data: businessExists, error: businessError } = await sql
          .from("Business")
          .select("id")
@@ -19,23 +19,31 @@ let createFoolballFieldService = async (FFData) => {
          return { success: false, error: "Doanh nghiệp không tồn tại!" };
       }
 
-      // Kiểm tra xem trong cùng một doanh nghiệp đã có sân bóng cùng tên chưa
-      let { data: footballFieldExists, error } = await sql
-         .from("FootbalField")
+      // Kiểm tra trùng tên sân bóng
+      let { data: footballFieldExists } = await sql
+         .from("FoolbalField")
          .select("id")
          .eq("idBusiness", idBusiness)
          .eq("name", name)
          .single();
 
       if (footballFieldExists) {
-         return { success: false, error: "Tên sân bóng đã tồn tại trong doanh nghiệp của bạn!" };
+         return { success: false, error: "Tên sân bóng đã tồn tại!" };
       }
 
+      // ✅ Fix lỗi địa chỉ
+      const parsedAddress = typeof address === "string" ? JSON.parse(address) : address;
+      const formattedAddress = `{${parsedAddress.map(addr => `"${addr}"`).join(",")}}`;
+
       let newField = {
-         name, size, price,
-         image: Array.isArray(image) ? image : [image],  // Chuyển thành mảng nếu chưa phải mảng, 
-         status, address, idBusiness
-      }
+         name,
+         size,
+         price,
+         image: `{${images.map(img => `"${img}"`).join(",")}}`, // ✅ Lưu mảng ảnh vào PostgreSQL
+         status,
+         address: formattedAddress, // ✅ Định dạng địa chỉ đúng kiểu ARRAY PostgreSQL
+         idBusiness,
+      };
 
       let { data: insertedField, error: insertError } = await sql
          .from("FoolbalField")
@@ -50,12 +58,12 @@ let createFoolballFieldService = async (FFData) => {
 
       return { success: true, message: "Tạo sân bóng thành công!", data: insertedField };
 
-
    } catch (e) {
       console.log(e);
       return { success: false, error: "Lỗi hệ thống!" };
    }
-}
+};
+
 
 let displayFoolbalField = async (idBusiness) => {
    try {

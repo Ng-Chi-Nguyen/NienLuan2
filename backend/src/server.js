@@ -6,11 +6,10 @@ import { connectDB } from "./config/connect.js"
 import Routers from './routes/index.routes.js';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import path from "path";
 
 
 dotenv.config();
-
-
 
 
 const app = express();
@@ -31,6 +30,7 @@ app.use(express.json()); // Cái này rất quan trọng!
 viewEngine(app);
 
 
+
 app.use(session({
    secret: "secret",
    resave: false,
@@ -42,6 +42,8 @@ app.use(passport.session());
 
 Routers(app)
 
+// Cấu hình Express để phục vụ ảnh tĩnh
+app.use("/image", express.static(path.join(process.cwd(), "public/image")));
 
 app.listen(port, hostname, () => {
    console.log(`Example app listening on port ${port}`);
