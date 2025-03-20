@@ -5,8 +5,9 @@ import { FaRegCheckCircle, FaRegEdit } from "react-icons/fa";
 import { IoAddOutline } from "react-icons/io5";
 import { CiNoWaitingSign } from "react-icons/ci";
 import { MdOutlineDeleteOutline } from "react-icons/md";
+import { IoMdClose } from "react-icons/io";
 
-
+import Address from "../../../components/Address/Address";
 
 import { Modal, InputNumber, Select, Input } from 'antd';
 
@@ -15,6 +16,12 @@ export default function FoolbalField({ user }) {
 
    const [isModalOpen, setIsModalOpen] = useState(false);
    const [data, setData] = useState([]);
+   const [selectedFiles, setSelectedFiles] = useState([]);
+   const [address, setAddress] = useState({
+      province: "",
+      district: "",
+      ward: "",
+   });
 
    useEffect(() => {
       const fetchDataFoolbalField = async () => {
@@ -43,6 +50,12 @@ export default function FoolbalField({ user }) {
       }
    }, [user.id]);
 
+   useEffect(() => {
+      return () => {
+         selectedFiles.forEach(file => URL.revokeObjectURL(file.preview));
+      };
+   }, [selectedFiles]);
+
    const showModal = () => {
       setIsModalOpen(true);
    };
@@ -55,6 +68,36 @@ export default function FoolbalField({ user }) {
       e.preventDefault();
       showModal()
    }
+
+   // Hàm xử lý khi chọn file
+   const handleFileChange = (event) => {
+      const files = Array.from(event.target.files);
+      const newFileObjects = files.map(file => ({
+         file,
+         preview: URL.createObjectURL(file) // Tạo URL tạm thời
+      }));
+
+      // Thêm vào danh sách, không ghi đè
+      setSelectedFiles(prevFiles => [...prevFiles, ...newFileObjects]);
+   };
+
+   // Hàm xóa file cụ thể
+   const handleRemoveFile = (event, index) => {
+      event.preventDefault(); // Ngăn reload trang
+
+      setSelectedFiles(prevFiles => {
+         // Kiểm tra nếu index hợp lệ
+         if (index < 0 || index >= prevFiles.length) return prevFiles;
+
+         // Giải phóng bộ nhớ ảnh bị xóa
+         URL.revokeObjectURL(prevFiles[index].preview);
+
+         // Cập nhật danh sách ảnh, loại bỏ ảnh bị xóa
+         return prevFiles.filter((_, i) => i !== index);
+      });
+   };
+
+
    return (
       <div className="FoolbalField">
          <p className='title'>Bãi sân của tôi</p>
@@ -68,12 +111,13 @@ export default function FoolbalField({ user }) {
             footer={null} // Ẩn nút OK và Cancel
             maskClosable={true} // Cho phép click bên ngoài để đóng
          >
-            <form action="">
+            <form className='formCreateFF'>
                <div className="item">
                   <label>Tên sân bóng</label>
                   <Input />
                </div>
                <div className="item">
+                  <label>Loại sân</label>
                   <Select
                      defaultValue="Sân 5"
                      style={{ width: 120 }}
@@ -85,16 +129,11 @@ export default function FoolbalField({ user }) {
                   />
                </div>
                <div className="item">
+                  <label>Giá</label>
                   <InputNumber min={1} defaultValue={1} changeOnWheel />
                </div>
                <div className="item">
-                  <Input />
-               </div>
-               <div className="item">
-                  <label>Địa chỉ</label>
-                  <Input />
-               </div>
-               <div className="item">
+                  <label>Trang thái</label>
                   <Select
                      defaultValue="Mở"
                      style={{ width: 120 }}
@@ -105,10 +144,46 @@ export default function FoolbalField({ user }) {
                   />
                </div>
                <div className="item">
-                  <input type="file" multiple accept="image/*" />
+                  <label>Địa chỉ</label>
+                  <Address onSelect={setAddress} />
                </div>
                <div className="item">
-                  <button type='submit'>Thêm thoi</button>
+                  <label>Ảnh mô tả</label>
+                  <label htmlFor="upload" className="custom-file-upload">
+                     Chọn ảnh
+                  </label>
+                  <input
+                     id="upload"
+                     type="file"
+                     multiple
+                     accept="image/*"
+                     onChange={handleFileChange}
+                  />
+
+                  {/* Danh sách file được chọn */}
+                  <div className="file-list">
+                     {selectedFiles.length > 0 ? (
+                        selectedFiles.map((fileObj, index) => (
+                           <div key={fileObj.preview} className="file-item">
+                              <img
+                                 src={fileObj.preview}
+                                 alt="Ảnh xem trước"
+                                 className="preview-image"
+                                 onError={(e) => e.target.style.display = "none"} // Ẩn ảnh nếu lỗi
+                              />
+                              <button className='btn-del-file' onClick={(e) => handleRemoveFile(e, index)}>
+                                 <IoMdClose />
+                              </button>
+                           </div>
+                        ))
+                     ) : (
+                        <p>Chưa chọn tệp nào</p>
+                     )}
+                  </div>
+
+               </div>
+               <div className="submit">
+                  <button type='submit'>Thêm mới</button>
                </div>
             </form>
          </Modal>

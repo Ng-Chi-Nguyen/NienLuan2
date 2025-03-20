@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Select } from "antd";
+
 
 export default function Address({ onSelect }) {
    const API_URL = process.env.REACT_APP_API_PROVINCE;
@@ -10,6 +12,10 @@ export default function Address({ onSelect }) {
    const [selectedProvince, setSelectedProvince] = useState("");
    const [selectedDistrict, setSelectedDistrict] = useState("");
    const [selectedWard, setSelectedWard] = useState("");
+
+   const [provinceName, setProvinceName] = useState("");
+   const [districtName, setDistrictName] = useState("");
+   const [wardName, setWardName] = useState("");
 
    useEffect(() => {
       axios.get(`${API_URL}/?depth=1`)
@@ -37,56 +43,94 @@ export default function Address({ onSelect }) {
       }
    }, [selectedDistrict, API_URL]);
 
-   const handleChange = (e) => {
-      const { name, value } = e.target;
+   const handleChange = (value, name) => {
+      let newAddress = {
+         address: `${wardName ? wardName + ", " : ""}${districtName ? districtName + ", " : ""}${provinceName}`,
+         province: [selectedProvince, provinceName],
+         district: [selectedDistrict, districtName],
+         ward: [selectedWard, wardName]
+      };
 
       if (name === "province") {
          setSelectedProvince(value);
+         setProvinceName(provinces.find(p => p.code === value)?.name || "");
          setSelectedDistrict("");
          setSelectedWard("");
-         onSelect({ province: value, district: "", ward: "" });
+         setDistrictName("");
+         setWardName("");
+
+         newAddress = {
+            address: provinces.find(p => p.code === value)?.name || "",
+            province: [value, provinces.find(p => p.code === value)?.name || ""],
+            district: [],
+            ward: []
+         };
       }
 
       if (name === "district") {
          setSelectedDistrict(value);
+         setDistrictName(districts.find(d => d.code === value)?.name || "");
          setSelectedWard("");
-         onSelect({ province: selectedProvince, district: value, ward: "" });
+         setWardName("");
+
+         newAddress = {
+            ...newAddress,
+            address: `${districts.find(d => d.code === value)?.name || ""}, ${provinceName}`,
+            district: [value, districts.find(d => d.code === value)?.name || ""],
+            ward: []
+         };
       }
 
       if (name === "ward") {
          setSelectedWard(value);
-         onSelect({ province: selectedProvince, district: selectedDistrict, ward: value });
+         setWardName(wards.find(w => w.code === value)?.name || "");
+
+         newAddress = {
+            ...newAddress,
+            address: `${wards.find(w => w.code === value)?.name || ""}, ${districtName}, ${provinceName}`,
+            ward: [value, wards.find(w => w.code === value)?.name || ""]
+         };
       }
+
+      onSelect(newAddress);
    };
 
    return (
       <div className="address">
-         <select name="province" value={selectedProvince} onChange={handleChange}>
-            <option value="">Chọn Tỉnh - Thành Phố</option>
-            {provinces.map((province) => (
-               <option key={province.code} value={province.code}>
-                  {province.name}
-               </option>
-            ))}
-         </select>
+         <Select
+            value={selectedProvince}
+            onChange={(value) => handleChange(value, "province")}
+            placeholder="Chọn Tỉnh - Thành Phố"
+            style={{ width: "100%", marginBottom: 10 }}
+            options={provinces.map((province) => ({
+               value: province.code,
+               label: province.name
+            }))}
+         />
 
-         <select name="district" value={selectedDistrict} onChange={handleChange} disabled={!selectedProvince}>
-            <option value="">Chọn Quận - Huyện</option>
-            {districts.map((district) => (
-               <option key={district.code} value={district.code}>
-                  {district.name}
-               </option>
-            ))}
-         </select>
+         <Select
+            value={selectedDistrict}
+            onChange={(value) => handleChange(value, "district")}
+            placeholder="Chọn Quận - Huyện"
+            style={{ width: "100%", marginBottom: 10 }}
+            disabled={!selectedProvince}
+            options={districts.map((district) => ({
+               value: district.code,
+               label: district.name
+            }))}
+         />
 
-         <select name="ward" value={selectedWard} onChange={handleChange} disabled={!selectedDistrict}>
-            <option value="">Chọn Xã - Phường</option>
-            {wards.map((ward) => (
-               <option key={ward.code} value={ward.code}>
-                  {ward.name}
-               </option>
-            ))}
-         </select>
+         <Select
+            value={selectedWard}
+            onChange={(value) => handleChange(value, "ward")}
+            placeholder="Chọn Xã - Phường"
+            style={{ width: "100%" }}
+            disabled={!selectedDistrict}
+            options={wards.map((ward) => ({
+               value: ward.code,
+               label: ward.name
+            }))}
+         />
       </div>
    );
 }
