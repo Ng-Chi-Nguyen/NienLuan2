@@ -1,33 +1,42 @@
-import { createFoolballFieldService, displayFoolbalField } from "../services/foolballField.service.js";
+import {
+   createFoolballFieldService,
+   displayFoolbalField
+} from "../services/foolballField.service.js";
 
-export const createFoolbalField = async (req, res) => {
-   console.log("🔍 Giá trị address nhận được:", req.body.address);
+export const createFoolballField = async (req, res) => {
+   console.log("🔍 Dữ liệu nhận được từ client:", req.body);
+   console.log("🔍 Files nhận được từ client:", req.files);
+
+   const requestData = req.body;
+
+   // Kiểm tra địa chỉ
+   if (!requestData.address) {
+      return res.status(400).json({ error: "Địa chỉ không hợp lệ!" });
+   }
 
    try {
-      const { name, size, price, status, address, idBusiness } = req.body;
+      const { name, size, price, status, idProvince, idDistrict, idWard, address, idBusiness } = requestData;
 
-      // Kiểm tra nếu không có file nào được tải lên
-      if (!req.files || req.files.length === 0) {
-         return res.status(400).json({ error: "Vui lòng tải lên ít nhất 1 hình ảnh!" });
-      }
-
-      // Lưu đường dẫn ảnh vào mảng images
-      const images = req.files.map(file => `/image/uploads/${file.filename}`);
-
-      // Kiểm tra dữ liệu đầu vào
-      if (!name || !size || !price || images.length === 0 || status === undefined || !address || !idBusiness) {
+      // Kiểm tra các trường dữ liệu
+      if (!name || !size || !price || status == null || !address || !idBusiness) {
          return res.status(400).json({
             error: "Thiếu thông tin cần thiết!",
-            data: { name, size, price, images, status, address, idBusiness },
+            data: { name, size, price, status, address, idBusiness },
          });
       }
 
-      // Lưu vào database
+      // Lấy các tệp ảnh và tạo danh sách đường dẫn
+      const images = req.files ? req.files.map(file => `/image/uploads/${file.filename}`) : [];
+
+      // Gọi service để lưu vào database
       const result = await createFoolballFieldService({
          name,
          size,
          price,
          images,
+         idProvince,
+         idDistrict,
+         idWard,
          status,
          address,
          idBusiness,
@@ -44,8 +53,6 @@ export const createFoolbalField = async (req, res) => {
       res.status(500).json({ error: "Lỗi hệ thống!" });
    }
 };
-
-
 
 
 export const getAllFoolbalField = async (req, res) => {

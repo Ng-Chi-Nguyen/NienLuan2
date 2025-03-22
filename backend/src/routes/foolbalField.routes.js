@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import path from "path";
-import { createFoolbalField, getAllFoolbalField } from "../controllers/foolbalField.controller.js";
+import { createFoolballField, getAllFoolbalField } from "../controllers/foolbalField.controller.js";
 
 const foolbalFieldRouter = express.Router();
 
@@ -19,7 +19,7 @@ const upload = multer({ storage });
 
 // API tạo sân bóng (hỗ trợ upload nhiều ảnh)
 foolbalFieldRouter
-   .post("/", upload.array("images", 5), createFoolbalField)
+   .post("/", upload.array("images", 5), createFoolballField)
    .get("/:id", getAllFoolbalField)
 
 export default foolbalFieldRouter;

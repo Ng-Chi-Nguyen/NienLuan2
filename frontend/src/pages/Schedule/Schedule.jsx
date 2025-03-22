@@ -1,5 +1,6 @@
 import { BtnAdd, Search } from "../../components/Button/Button";
-import Address from "../../components/Address/Address";
+import { AddressSelector } from "../../components/Address/Address";
+
 import Header from "../../components/Header/Header";
 import "./Schedule.scss";
 import { FaPhoneAlt, FaMapMarkedAlt } from "react-icons/fa";
@@ -43,7 +44,7 @@ export default function Schedule() {
                   {/* Bộ lọc sân bóng */}
                   <div className="left col-xl-3">
                      <h4>Lọc sân bóng</h4>
-                     <Address onSelect={setAddress} />
+                     <AddressSelector onSelect={setAddress} />
                   </div>
 
                   {/* Danh sách sân bóng */}

@@ -6,39 +6,53 @@ import { IoAddOutline } from "react-icons/io5";
 import { CiNoWaitingSign } from "react-icons/ci";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
-
-import Address from "../../../components/Address/Address";
-
 import { Modal, InputNumber, Select, Input } from 'antd';
 
+import { AddressSelector, AddressFetcher } from '../../../components/Address/Address';
 
 export default function FoolbalField({ user }) {
 
    const [isModalOpen, setIsModalOpen] = useState(false);
+   const [isModalEdit, setIsModalEdit] = useState(false);
    const [data, setData] = useState([]);
    const [selectedFiles, setSelectedFiles] = useState([]);
    const [loading, setLoading] = useState(false)
+
+   const [provinceCode, setProvinceCode] = useState("");
+   const [districtCode, setDistrictCode] = useState("");
+   const [wardCode, setWardCode] = useState("");
    const [address, setAddress] = useState({
       province: "",
       district: "",
       ward: "",
    });
-   const [size, setSize] = useState("5");
-   const [status, setStatus] = useState("true");
-   const [price, setPrice] = useState(1);
+
+   // const [size, setSize] = useState("5");
+   // const [status, setStatus] = useState("true");
+   // const [price, setPrice] = useState(1);
 
    const [selectedImages, setSelectedImages] = useState([]);
    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
+   const [selectedFF, setSelectedFF] = useState(null);
 
+   const [addressData, setAddressData] = useState(null);
+
+
+   const [name, setName] = useState("");
+   const [size, setSize] = useState("5");
+   const [price, setPrice] = useState(1);
+   const [status, setStatus] = useState("true");
+   const [addressDetail, setAddressDetail] = useState("");
+
+   const [deletedImages, setDeletedImages] = useState([]);
+
+   // Lấy dữ liệu sân bóng từ API
    useEffect(() => {
       const fetchDataFoolbalField = async () => {
          try {
             const response = await fetch(`/api/foolbalField/${user.id}`);
             const result = await response.json();
-
-            // console.log("Dữ liệu từ API:", result.data); // Kiểm tra dữ liệu
-
             if (result.success) {
                const updatedData = result.data.map((item, index) => ({
                   ...item,
@@ -64,6 +78,44 @@ export default function FoolbalField({ user }) {
       };
    }, [selectedFiles]);
 
+   // Lấy thông tin địa phương từ API
+   useEffect(() => {
+      const fetchAddressData = async () => {
+         const newAddressData = {};
+         for (const item of data) {
+            const { province, district, ward } = await AddressFetcher(
+               item.idProvince,
+               item.idDistrict,
+               item.idWard
+            );
+            newAddressData[item.id] = { province, district, ward };
+         }
+         setAddressData(newAddressData);
+         // console.log(newAddressData)
+      };
+
+      if (data.length > 0) {
+         fetchAddressData();
+      }
+   }, [data]);
+
+   useEffect(() => {
+      if (selectedFF) {
+         setName(selectedFF.name);
+         setSize(selectedFF.size);
+         setPrice(selectedFF.price);
+         setStatus(selectedFF.status ? "true" : "false");
+         setAddressDetail(selectedFF.address);
+
+         // Cập nhật giá trị mặc định cho địa chỉ
+         setProvinceCode(selectedFF.idProvince);
+         setDistrictCode(selectedFF.idDistrict);
+         setWardCode(selectedFF.idWard);
+      }
+   }, [selectedFF]);
+
+
+   // Hiển thị Modal thêm sân bóng
    const showModal = () => {
       setIsModalOpen(true);
    };
@@ -74,67 +126,53 @@ export default function FoolbalField({ user }) {
 
    let hangCreateFollbalField = (e) => {
       e.preventDefault();
-      showModal()
-   }
+      showModal();
+   };
 
-   // Hàm xử lý khi chọn file
+   // Xử lý khi chọn file
    const handleFileChange = (event) => {
       const files = Array.from(event.target.files);
       const newFileObjects = files.map(file => ({
          file,
-         preview: URL.createObjectURL(file) // Tạo URL tạm thời
+         preview: URL.createObjectURL(file)
       }));
-
-      // Thêm vào danh sách, không ghi đè
       setSelectedFiles(prevFiles => [...prevFiles, ...newFileObjects]);
    };
 
-   // Hàm xóa file cụ thể
+   // Xóa file
    const handleRemoveFile = (event, index) => {
-      event.preventDefault(); // Ngăn reload trang
-
-      setSelectedFiles(prevFiles => {
-         // Kiểm tra nếu index hợp lệ
-         if (index < 0 || index >= prevFiles.length) return prevFiles;
-
-         // Giải phóng bộ nhớ ảnh bị xóa
-         URL.revokeObjectURL(prevFiles[index].preview);
-
-         // Cập nhật danh sách ảnh, loại bỏ ảnh bị xóa
-         return prevFiles.filter((_, i) => i !== index);
-      });
+      event.preventDefault();
+      setSelectedFF(prevFF => ({
+         ...prevFF,
+         image: prevFF.image.filter((_, i) => i !== index),
+      }));
    };
 
+
+   // Tạo sân bóng mới
    let handleCreateFF = async (e) => {
       e.preventDefault();
       setLoading(true);
 
       const formData = new FormData(e.target);
-      formData.delete("price"); // Xóa nếu đã tồn tại
-      formData.append("price", price); // Chỉ append 1 lần
+      formData.delete("price");
+      formData.append("price", price);
 
       formData.append("size", size);
       formData.append("status", status ?? true);
-      formData.append("idBusiness", user.id); // Đảm bảo gửi idBusiness nếu cần
+      formData.append("idBusiness", user.id);
 
-      const formattedAddress = [address.province[1], address.district[1], address.ward[1]];
-      formData.append("address", JSON.stringify(formattedAddress));
-      // Chuyển file vào FormData
+      formData.append("idProvince", provinceCode);
+      formData.append("idDistrict", districtCode);
+      formData.append("idWard", wardCode);
+
       selectedFiles.forEach(fileObj => {
          formData.append("images", fileObj.file);
       });
 
-      // 🔍 Kiểm tra trước khi gửi
-      console.log("🔥 Dữ liệu FormData trước khi gửi:");
-      for (let pair of formData.entries()) {
-         console.log(pair[0], pair[1]);
-      }
       try {
          let response = await axios.post(`/api/foolbalField/`, formData);
 
-         console.log(response)
-
-         console.log(response.data.success)
          if (response.data.success) {
             setData(prevData => [
                ...prevData,
@@ -151,6 +189,7 @@ export default function FoolbalField({ user }) {
       }
    };
 
+   // Xử lý xem ảnh
    const handleShowImages = (images) => {
       try {
          const imageArray = typeof images === "string" ? JSON.parse(images.replace(/{|}/g, "[").replace(/,/g, '","')) : images;
@@ -163,10 +202,28 @@ export default function FoolbalField({ user }) {
       }
    };
 
+   let hangEditFollbalField = (e, field) => {
+      e.preventDefault();
+      if (!field) {
+         console.error("Dữ liệu sân bóng không hợp lệ:", field);
+         return;
+      }
+      console.log("Dữ liệu sân bóng được chọn:", field);
+      setSelectedFF(field);
+      setIsModalEdit(true);
+   };
 
 
+   const handleUpdateFF = async (e) => {
+      e.preventDefault();
+      setLoading(true);
+   };
 
-   console.log("🔥 Ảnh từ API:", selectedImages);
+   const handleSelect = (value) => {
+      console.log("Giá trị chọn:", value);
+      setSelectedFF(value);
+   };
+   console.log("selectedFF", selectedFF)
 
    return (
       <div className="FoolbalField">
@@ -174,12 +231,15 @@ export default function FoolbalField({ user }) {
          <div className="addFF" onClick={hangCreateFollbalField}>
             <button><IoAddOutline /></button><span>Thêm sân bóng</span>
          </div>
+
+         {/* Modal Thêm sân bóng */}
          <Modal
             title="THÊM SÂN BÓNG"
             open={isModalOpen}
-            onCancel={handleCancel} // Cho phép bấm ra ngoài để tắt modal
-            footer={null} // Ẩn nút OK và Cancel
-            maskClosable={true} // Cho phép click bên ngoài để đóng
+            onCancel={handleCancel}
+            footer={null}
+            maskClosable={true}
+            className='modelCreateFF'
          >
             <form className='formCreateFF' onSubmit={handleCreateFF} encType="multipart/form-data">
                <div className="item">
@@ -190,12 +250,12 @@ export default function FoolbalField({ user }) {
                   <label>Loại sân</label>
                   <Select
                      defaultValue={size}
-                     onChange={value => setSize(value)} // Cập nhật state
+                     onChange={value => setSize(value)}
                      style={{ width: 120 }}
                      options={[
                         { value: '5', label: 'Sân 5' },
                         { value: '7', label: 'Sân 7' },
-                        { value: '11', label: 'Sân 11 ' },
+                        { value: '11', label: 'Sân 11' },
                      ]}
                   />
                </div>
@@ -206,14 +266,14 @@ export default function FoolbalField({ user }) {
                      defaultValue={1}
                      changeOnWheel
                      name="price"
-                     onChange={(value) => setPrice(value)} // Cập nhật state khi thay đổi
+                     onChange={(value) => setPrice(value)}
                   />
                </div>
                <div className="item">
                   <label>Trang thái</label>
                   <Select
                      defaultValue={status}
-                     onChange={value => setStatus(value)} // Cập nhật state
+                     onChange={value => setStatus(value)}
                      style={{ width: 120 }}
                      options={[
                         { value: 'true', label: 'Mở' },
@@ -223,7 +283,23 @@ export default function FoolbalField({ user }) {
                </div>
                <div className="item">
                   <label>Địa chỉ</label>
-                  <Address onSelect={setAddress} />
+                  <AddressSelector
+                     onSelect={(address) => {
+                        setAddress({
+                           province: address.province,
+                           district: address.district,
+                           ward: address.ward,
+                        });
+
+                        setProvinceCode(address.province);
+                        setDistrictCode(address.district);
+                        setWardCode(address.ward);
+                     }}
+                  />
+               </div>
+               <div className="item">
+                  <label>Địa chỉ cụ thể</label>
+                  <Input name='address' required />
                </div>
                <div className="item">
                   <label>Ảnh mô tả</label>
@@ -237,8 +313,6 @@ export default function FoolbalField({ user }) {
                      accept="image/*"
                      onChange={handleFileChange}
                   />
-
-                  {/* Danh sách file được chọn */}
                   <div className="file-list">
                      {selectedFiles.length > 0 ? (
                         selectedFiles.map((fileObj, index) => (
@@ -253,13 +327,14 @@ export default function FoolbalField({ user }) {
                         <p>Chưa chọn tệp nào</p>
                      )}
                   </div>
-
                </div>
                <div className="submit">
-                  <button type='submit'>{loading ? "Đang xữ lý..." : ("Thêm mới")}</button>
+                  <button type='submit'>{loading ? "Đang xử lý..." : "Thêm mới"}</button>
                </div>
             </form>
          </Modal>
+
+         {/* Modal Xem ảnh */}
          <Modal
             title="Ảnh mô tả sân bóng"
             open={isImageModalOpen}
@@ -276,6 +351,8 @@ export default function FoolbalField({ user }) {
                )}
             </div>
          </Modal>
+
+         {/* Table */}
          <div className="table-container">
             <table>
                <thead>
@@ -292,25 +369,141 @@ export default function FoolbalField({ user }) {
                   </tr>
                </thead>
                <tbody>
-                  {data.map((item) => (
-                     <tr key={item.key}>
-                        <td className='text-center'>{item.id}</td>
-                        <td>{item.name}</td>
-                        <td className='text-center'>{item.size}</td>
-                        <td>{item.price}</td>
-                        <td>{item.address.join(", ")}</td>
-                        <td>{(item.status) ? (<FaRegCheckCircle />) : (<CiNoWaitingSign />)}</td>
-                        <td className='text-center' onClick={() => handleShowImages(item.image)}>
-                           Xem ảnh
-                        </td>
-                        <td className='text-center'>{new Date(item.created_at).toLocaleDateString("vi-VN")}</td>
-                        <td className='action'>
-                           <button><FaRegEdit /></button>
-                           <button><MdOutlineDeleteOutline /></button>
-                        </td>
+                  {data && Array.isArray(data) && data.length > 0 ? (
+                     data.map((item) => (
+                        <tr key={item.key}>
+                           <td className='text-center'>{item.id}</td>
+                           <td>{item.name}</td>
+                           <td className='text-center'>{item.size}</td>
+                           <td>{item.price}</td>
+                           <td>
+                              {addressData && addressData[item.id]
+                                 ? `${item.address}, ${addressData[item.id].ward}, ${addressData[item.id].district}, ${addressData[item.id].province}`
+                                 : <></>}
+                           </td>
+                           <td>{(item.status) ? (<FaRegCheckCircle />) : (<CiNoWaitingSign />)}</td>
+                           <td className='text-center' onClick={() => handleShowImages(item.image)}>
+                              Xem ảnh
+                           </td>
+                           <td className='text-center'>{new Date(item.created_at).toLocaleDateString("vi-VN")}</td>
+                           <td className='action'>
+                              <button onClick={(e) => hangEditFollbalField(e, item)}>
+                                 <FaRegEdit />
+                              </button>
+                              <button>
+                                 <MdOutlineDeleteOutline />
+                              </button>
+                           </td>
+                        </tr>
+                     ))
+                  ) : (
+                     <tr>
+                        <td colSpan="9" className="text-center">Không có dữ liệu</td>
                      </tr>
-                  ))}
+                  )}
                </tbody>
+               <Modal
+                  title="CẬP NHẬT SÂN BÓNG"
+                  open={isModalEdit} // Sử dụng isModalEdit thay vì isModalOpen
+                  onCancel={() => setIsModalEdit(false)} // Đóng modal khi bấm hủy
+                  footer={null}
+                  maskClosable={true}
+                  className='modelEditFF'
+               >
+                  <form className='formCreateFF' onSubmit={handleUpdateFF} encType="multipart/form-data">
+                     <div className="item">
+                        <label>Tên sân bóng</label>
+                        <Input name='name' value={selectedFF?.name} required />
+                     </div>
+                     <div className="item">
+                        <label>Loại sân</label>
+                        <Select
+                           value={size}
+                           onChange={value => setSize(value)}
+                           style={{ width: 120 }}
+                           options={[
+                              { value: '5', label: 'Sân 5' },
+                              { value: '7', label: 'Sân 7' },
+                              { value: '11', label: 'Sân 11' },
+                           ]}
+                        />
+                     </div>
+                     <div className="item">
+                        <label>Giá</label>
+                        <InputNumber
+                           min={1}
+                           value={price}
+                           changeOnWheel
+                           name="price"
+                           onChange={(value) => setPrice(value)}
+                        />
+                     </div>
+                     <div className="item">
+                        <label>Trạng thái</label>
+                        <Select
+                           value={status}
+                           onChange={value => setStatus(value)}
+                           style={{ width: 120 }}
+                           options={[
+                              { value: 'true', label: 'Mở' },
+                              { value: 'false', label: 'Đóng' }
+                           ]}
+                        />
+                     </div>
+                     <div className="item">
+                        <label>Địa chỉ</label>
+                        <AddressSelector
+                           defaultValue={{
+                              province: selectedFF?.idProvince || "",
+                              district: selectedFF?.idDistrict || "",
+                              ward: selectedFF?.idWard || "",
+                           }}
+                           onSelect={(address) => {
+                              setProvinceCode(address.province);
+                              setDistrictCode(address.district);
+                              setWardCode(address.ward);
+                           }}
+                        />
+
+                     </div>
+                     <div className="item">
+                        <label>Địa chỉ cụ thể</label>
+                        <Input
+                           name='address'
+                           value={selectedFF?.address}
+                           required
+                        />
+                     </div>
+                     <div className="item">
+                        <label>Ảnh mô tả</label>
+                        <input
+                           id="upload"
+                           type="file"
+                           accept="image/*"
+                           multiple
+                           onChange={handleFileChange}
+                        />
+                        <div className="image-preview-container">
+                           {selectedFF?.image && Array.isArray(selectedFF.image) ? (
+                              selectedFF.image.map((img, index) => (
+                                 <div key={index} className="file-item">
+                                    <img src={img} alt={`Ảnh ${index + 1}`} className="preview-image" />
+                                    <button className='btn-del-file' onClick={(e) => handleRemoveFile(e, index)}>
+                                       <IoMdClose />
+                                    </button>
+                                 </div>
+                              ))
+                           ) : (
+                              <p>Không có ảnh nào</p>
+                           )}
+                        </div>
+                     </div>
+                     <div className="submit">
+                        <button type='submit'>{loading ? "Đang xử lý..." : "Cập nhật"}</button>
+                     </div>
+                  </form>
+               </Modal>
+
             </table>
          </div>
       </div>

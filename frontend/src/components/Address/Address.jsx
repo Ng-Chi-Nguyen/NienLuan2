@@ -1,136 +1,162 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { Select } from "antd";
 
-
-export default function Address({ onSelect }) {
-   const API_URL = process.env.REACT_APP_API_PROVINCE;
-
+export function AddressSelector({ defaultValue, onSelect }) {
    const [provinces, setProvinces] = useState([]);
    const [districts, setDistricts] = useState([]);
    const [wards, setWards] = useState([]);
-   const [selectedProvince, setSelectedProvince] = useState("");
-   const [selectedDistrict, setSelectedDistrict] = useState("");
-   const [selectedWard, setSelectedWard] = useState("");
 
-   const [provinceName, setProvinceName] = useState("");
-   const [districtName, setDistrictName] = useState("");
-   const [wardName, setWardName] = useState("");
+   const [selectedProvince, setSelectedProvince] = useState(defaultValue?.province || null);
+   const [selectedDistrict, setSelectedDistrict] = useState(defaultValue?.district || null);
+   const [selectedWard, setSelectedWard] = useState(defaultValue?.ward || null);
+
+   // Lấy danh sách tỉnh
+   useEffect(() => {
+      axios.get("/api/address/provinces/")
+         .then(response => setProvinces(response.data.data)) // Truy cập `data`
+         .catch(error => console.error("Lỗi lấy danh sách tỉnh:", error));
+   }, []);
+
+   // Khi chọn tỉnh -> Lấy danh sách huyện
+   const handleProvinceChange = (provinceId) => {
+      setSelectedProvince(provinceId);
+      setSelectedDistrict(null);
+      setSelectedWard(null);
+      setDistricts([]);
+      setWards([]);
+
+      axios.get(`/api/address/districts/${provinceId}`)
+         .then(response => setDistricts(response.data.data)) // Truy cập `data`
+         .catch(error => console.error("Lỗi lấy danh sách huyện:", error));
+   };
+
+   // Khi chọn huyện -> Lấy danh sách xã
+   const handleDistrictChange = (districtId) => {
+      setSelectedDistrict(districtId);
+      setSelectedWard(null);
+      setWards([]);
+
+      axios.get(`/api/address/wards/${districtId}`)
+         .then(response => setWards(response.data.data)) // Truy cập `data`
+         .catch(error => console.error("Lỗi lấy danh sách xã:", error));
+   };
+
+   // Khi chọn xã
+   const handleWardChange = (wardId) => {
+      setSelectedWard(wardId);
+      onSelect({
+         province: selectedProvince,
+         district: selectedDistrict,
+         ward: wardId
+      });
+   };
+
+   // Khi có giá trị mặc định, tự động lấy danh sách huyện và xã tương ứng
+   useEffect(() => {
+      if (defaultValue?.province) {
+         handleProvinceChange(defaultValue.province);
+      }
+   }, [defaultValue?.province]);
 
    useEffect(() => {
-      axios.get(`${API_URL}/?depth=1`)
-         .then((response) => setProvinces(response.data))
-         .catch((error) => console.error("Lỗi lấy danh sách tỉnh:", error));
-   }, [API_URL]);
+      if (defaultValue?.district) {
+         handleDistrictChange(defaultValue.district);
+      }
+   }, [defaultValue?.district]);
 
    useEffect(() => {
-      if (selectedProvince) {
-         axios.get(`${API_URL}/p/${selectedProvince}?depth=2`)
-            .then((response) => setDistricts(response.data.districts || []))
-            .catch((error) => console.error("Lỗi lấy danh sách quận:", error));
-      } else {
-         setDistricts([]);
+      if (defaultValue?.ward) {
+         handleWardChange(defaultValue.ward);
       }
-   }, [selectedProvince, API_URL]);
+   }, [defaultValue?.ward]);
 
-   useEffect(() => {
-      if (selectedDistrict) {
-         axios.get(`${API_URL}/d/${selectedDistrict}?depth=2`)
-            .then((response) => setWards(response.data.wards || []))
-            .catch((error) => console.error("Lỗi lấy danh sách xã:", error));
-      } else {
-         setWards([]);
-      }
-   }, [selectedDistrict, API_URL]);
-
-   const handleChange = (value, name) => {
-      let newAddress = {
-         address: `${wardName ? wardName + ", " : ""}${districtName ? districtName + ", " : ""}${provinceName}`,
-         province: [selectedProvince, provinceName],
-         district: [selectedDistrict, districtName],
-         ward: [selectedWard, wardName]
-      };
-
-      if (name === "province") {
-         setSelectedProvince(value);
-         setProvinceName(provinces.find(p => p.code === value)?.name || "");
-         setSelectedDistrict("");
-         setSelectedWard("");
-         setDistrictName("");
-         setWardName("");
-
-         newAddress = {
-            address: provinces.find(p => p.code === value)?.name || "",
-            province: [value, provinces.find(p => p.code === value)?.name || ""],
-            district: [],
-            ward: []
-         };
-      }
-
-      if (name === "district") {
-         setSelectedDistrict(value);
-         setDistrictName(districts.find(d => d.code === value)?.name || "");
-         setSelectedWard("");
-         setWardName("");
-
-         newAddress = {
-            ...newAddress,
-            address: `${districts.find(d => d.code === value)?.name || ""}, ${provinceName}`,
-            district: [value, districts.find(d => d.code === value)?.name || ""],
-            ward: []
-         };
-      }
-
-      if (name === "ward") {
-         setSelectedWard(value);
-         setWardName(wards.find(w => w.code === value)?.name || "");
-
-         newAddress = {
-            ...newAddress,
-            address: `${wards.find(w => w.code === value)?.name || ""}, ${districtName}, ${provinceName}`,
-            ward: [value, wards.find(w => w.code === value)?.name || ""]
-         };
-      }
-
-      onSelect(newAddress);
+   const adminUnitMap = {
+      1: "Thành phố",
+      2: "Tỉnh",
+      3: "Thành phố thuộc TP",
+      4: "Thành phố thuộc tỉnh",
+      5: "Quận",
+      6: "Thị xã",
+      7: "Huyện",
+      8: "Phường",
+      9: "Thị trấn",
+      10: "Xã",
    };
 
    return (
-      <div className="address">
+      <div className="address-selector">
          <Select
+            placeholder="Chọn tỉnh"
+            style={{ width: 200, marginRight: 10 }}
             value={selectedProvince}
-            onChange={(value) => handleChange(value, "province")}
-            placeholder="Chọn Tỉnh - Thành Phố"
-            style={{ width: "100%", marginBottom: 10 }}
-            options={provinces.map((province) => ({
-               value: province.code,
-               label: province.name
-            }))}
-         />
+            onChange={handleProvinceChange}
+         >
+            {provinces.map(province => (
+               <Select.Option key={province.code} value={province.code}>
+                  {adminUnitMap[province.administrative_unit_id] || "Không xác định"} {province.name}
+               </Select.Option>
+            ))}
+         </Select>
 
          <Select
+            placeholder="Chọn huyện"
+            style={{ width: 200, marginRight: 10 }}
             value={selectedDistrict}
-            onChange={(value) => handleChange(value, "district")}
-            placeholder="Chọn Quận - Huyện"
-            style={{ width: "100%", marginBottom: 10 }}
+            onChange={handleDistrictChange}
             disabled={!selectedProvince}
-            options={districts.map((district) => ({
-               value: district.code,
-               label: district.name
-            }))}
-         />
+         >
+            {districts.map(district => (
+               <Select.Option key={district.code} value={district.code}>
+                  {adminUnitMap[district.administrative_unit_id] || "Không xác định"} {district.name}
+               </Select.Option>
+            ))}
+         </Select>
 
          <Select
+            placeholder="Chọn xã"
+            style={{ width: 200 }}
             value={selectedWard}
-            onChange={(value) => handleChange(value, "ward")}
-            placeholder="Chọn Xã - Phường"
-            style={{ width: "100%" }}
+            onChange={handleWardChange}
             disabled={!selectedDistrict}
-            options={wards.map((ward) => ({
-               value: ward.code,
-               label: ward.name
-            }))}
-         />
+         >
+            {wards.map(ward => (
+               <Select.Option key={ward.code} value={ward.code}>
+                  {adminUnitMap[ward.administrative_unit_id] || "Không xác định"} {ward.name}
+               </Select.Option>
+            ))}
+         </Select>
       </div>
    );
 }
+
+export const AddressFetcher = async (provinceCode, districtCode, wardCode) => {
+   try {
+      // Lấy tên tỉnh
+      const provinceResponse = await axios.get(`/api/address/province/${provinceCode}`);
+      const provinceName = provinceResponse.data.name;
+
+      // Lấy tên huyện
+      const districtResponse = await axios.get(`/api/address/district/${districtCode}`);
+      const districtName = districtResponse.data.name;
+
+      // Lấy tên xã
+      const wardResponse = await axios.get(`/api/address/ward/${wardCode}`);
+      const wardName = wardResponse.data.name;
+      // console.log(provinceName)
+      // console.log(districtName)
+      // console.log(wardName)
+      return {
+         province: provinceName,
+         district: districtName,
+         ward: wardName,
+      };
+   } catch (error) {
+      console.error("Lỗi khi lấy thông tin địa chỉ:", error);
+      return {
+         province: "Không xác định",
+         district: "Không xác định",
+         ward: "Không xác định",
+      };
+   }
+};

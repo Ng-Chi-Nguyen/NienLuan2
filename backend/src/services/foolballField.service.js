@@ -1,70 +1,63 @@
 import { sql } from '../config/connect.js';
 
-let createFoolballFieldService = async (FFData) => {
-   const { name, size, price, images, status, address, idBusiness } = FFData;
-   
+let createFoolballFieldService = async (fieldData) => {
+   console.log("Dữ liệu nhận được trong service:", fieldData);
+
    try {
-      if (!FFData || !idBusiness) {
-         return { success: false, error: "Dữ liệu không hợp lệ!" };
+      const { name, size, price, status, idProvince, idDistrict, idWard, address, idBusiness, images } = fieldData;
+
+      // Kiểm tra dữ liệu đầu vào
+      if (!name || !size || !price || status == null || !address || !idBusiness || !images || images.length === 0) {
+         return { success: false, error: "Thiếu thông tin cần thiết!" };
       }
 
-      // Kiểm tra doanh nghiệp có tồn tại không
-      let { data: businessExists, error: businessError } = await sql
-         .from("Business")
-         .select("id")
-         .eq("id", idBusiness)
-         .single();
+      // Kiểm tra nếu có trường bóng đá với cùng địa chỉ hoặc tên đã tồn tại
+      const { data: existingFields, error: existingFieldsError } = await sql
+         .from('FoolbalField')
+         .select('id')
+         .eq("name", name);
 
-      if (!businessExists || businessError) {
-         return { success: false, error: "Doanh nghiệp không tồn tại!" };
+      if (existingFieldsError) {
+         console.error("❌ Lỗi khi kiểm tra trường bóng đá:", existingFieldsError);
+         return { success: false, error: existingFieldsError.message };
       }
 
-      // Kiểm tra trùng tên sân bóng
-      let { data: footballFieldExists } = await sql
-         .from("FoolbalField")
-         .select("id")
-         .eq("idBusiness", idBusiness)
-         .eq("name", name)
-         .single();
-
-      if (footballFieldExists) {
-         return { success: false, error: "Tên sân bóng đã tồn tại!" };
+      // Nếu trường bóng đá đã tồn tại với tên hoặc địa chỉ tương tự
+      if (existingFields.length > 0) {
+         return { success: false, error: "Trường bóng đá đã tồn tại!" };
       }
 
-      // ✅ Fix lỗi địa chỉ
-      const parsedAddress = typeof address === "string" ? JSON.parse(address) : address;
-      const formattedAddress = `{${parsedAddress.map(addr => `"${addr}"`).join(",")}}`;
+      // Tạo trường bóng đá mới
+      const { data, error } = await sql
+         .from('FoolbalField')
+         .insert([
+            {
+               name,
+               size,
+               price,
+               status,
+               idProvince,
+               idDistrict,
+               idWard,
+               address,
+               idBusiness,
+               image: images,  // Chuyển đổi mảng thành chuỗi JSON nếu cột là text
+            }
+         ])
+         .select('*')
+         .single()
 
-      let newField = {
-         name,
-         size,
-         price,
-         image: `{${images.map(img => `"${img}"`).join(",")}}`, // ✅ Lưu mảng ảnh vào PostgreSQL
-         status,
-         address: formattedAddress, // ✅ Định dạng địa chỉ đúng kiểu ARRAY PostgreSQL
-         idBusiness,
-      };
-
-      let { data: insertedField, error: insertError } = await sql
-         .from("FoolbalField")
-         .insert([newField])
-         .select()
-         .single();
-
-      if (insertError) {
-         console.error("Lỗi khi tạo sân bóng:", insertError);
-         return { success: false, error: "Lỗi khi tạo sân bóng!" };
+      if (error) {
+         console.error("❌ Lỗi insert vào Supabase:", error);
+         return { success: false, error: error.message };
       }
 
-      return { success: true, message: "Tạo sân bóng thành công!", data: insertedField };
-
+      return { success: true, data };
    } catch (e) {
-      console.log(e);
+      console.error("❌ Lỗi hệ thống:", e);
       return { success: false, error: "Lỗi hệ thống!" };
    }
 };
-
-
 let displayFoolbalField = async (idBusiness) => {
    try {
       if (!idBusiness) {

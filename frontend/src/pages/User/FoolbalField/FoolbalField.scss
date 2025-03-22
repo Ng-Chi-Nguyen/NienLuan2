@@ -62,6 +62,24 @@
                      color: #3F6DFF;
                   }
                }
+               
+            }
+         }
+         .action{
+            font-size: 19px;
+            text-align: center;
+            button{
+               padding: 5px;
+               border: 0;
+               font-size: 22px;
+               background: transparent;
+               margin-top: -10px;
+               &:nth-child(1){
+                  color: orange;
+               }
+               &:nth-child(2){
+                  color: red;
+               }
             }
          }
       }
@@ -106,6 +124,9 @@
          }
       }
       &:nth-child(6) {
+         width: 100%;
+      }
+      &:nth-child(7) {
          width: 100%;
       }
       .custom-file-upload {
@@ -175,6 +196,13 @@
          width: 150px;
       }
    }
+}
+
+.modelCreateFF {
+   width: 600px !important;
+}
+.modelEditFF{
+   width: 600px !important;
 }
 
 .image-preview-container {
