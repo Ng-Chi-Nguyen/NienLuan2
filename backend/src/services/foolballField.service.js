@@ -1,7 +1,7 @@
 import { sql } from '../config/connect.js';
 
 let createFoolballFieldService = async (fieldData) => {
-   console.log("Dữ liệu nhận được trong service:", fieldData);
+   // console.log("Dữ liệu nhận được trong service:", fieldData);
 
    try {
       const { name, size, price, status, idProvince, idDistrict, idWard, address, idBusiness, images } = fieldData;
@@ -80,4 +80,75 @@ let displayFoolbalField = async (idBusiness) => {
    }
 }
 
-export { createFoolballFieldService, displayFoolbalField }
+let updateFootballFieldService = async (id, updateData) => {
+   try {
+      // console.log("🔹 Dữ liệu nhận để cập nhật:", updateData);
+
+      // Lấy dữ liệu cũ trước khi cập nhật
+      const { data: currentData, error: fetchError } = await sql
+         .from("FoolbalField")
+         .select("*")
+         .eq("id", id)
+         .single();
+
+      if (fetchError) return { success: false, error: "Không tìm thấy sân bóng!" };
+
+      // Xóa các trường không có trong DB
+      delete updateData.created_at;  // Giữ nguyên ngày tạo
+      delete updateData.key;         // Xóa 'key' vì không có trong bảng
+
+      const updatedData = { ...currentData, ...updateData };
+
+      // Cập nhật dữ liệu
+      const { data: updatedField, error: updateError } = await sql
+         .from("FoolbalField")
+         .update(updatedData)
+         .eq("id", id)
+         .select("*")
+         .single();
+
+      if (updateError) return { success: false, error: updateError.message };
+
+      return { success: true, data: updatedField };
+   } catch (e) {
+      console.error("❌ Lỗi hệ thống:", e);
+      return { success: false, error: "Lỗi hệ thống!" };
+   }
+};
+
+const deleteFootballFieldService = async (idFF) => {
+   try {
+      const { error, count } = await sql
+         .from("FoolbalField")
+         .delete()
+         .eq("id", idFF);
+
+      if (error) {
+         return {
+            success: false,
+            message: "Lỗi khi xóa sân bóng: " + error.message,
+         };
+      }
+
+      if (count === 0) {
+         return {
+            success: false,
+            message: "Không tìm thấy sân bóng để xóa",
+         };
+      }
+
+      return {
+         success: true,
+         message: "Xóa sân bóng thành công",
+      };
+   } catch (e) {
+      return {
+         success: false,
+         message: "Lỗi hệ thống: " + e.message,
+      };
+   }
+};
+
+
+
+export { createFoolballFieldService, displayFoolbalField, updateFootballFieldService, deleteFootballFieldService }

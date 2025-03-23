@@ -10,7 +10,10 @@ import { Modal, InputNumber, Select, Input } from 'antd';
 
 import { AddressSelector, AddressFetcher } from '../../../components/Address/Address';
 
+import { useNavigate } from "react-router-dom";
 export default function FoolbalField({ user }) {
+
+   const navigate = useNavigate();
 
    const [isModalOpen, setIsModalOpen] = useState(false);
    const [isModalEdit, setIsModalEdit] = useState(false);
@@ -45,32 +48,36 @@ export default function FoolbalField({ user }) {
    const [status, setStatus] = useState("true");
    const [addressDetail, setAddressDetail] = useState("");
 
-   const [deletedImages, setDeletedImages] = useState([]);
+   const [imageList, setImageList] = useState(selectedFF?.image || []);
+
+   const [originalFF, setOriginalFF] = useState(null);
+
+   // Lấy dữ liệu sân bóng từ API
+   const fetchFootballFields = async () => {
+      try {
+         const response = await fetch(`/api/foolbalField/${user.id}`);
+         const result = await response.json();
+         if (result.success) {
+            const updatedData = result.data.map((item, index) => ({
+               ...item,
+               key: item.id || index.toString(),
+            }));
+            setData(updatedData);
+         } else {
+            console.error("Lỗi:", result.message);
+         }
+      } catch (error) {
+         console.error("Lỗi kết nối API:", error);
+      }
+   };
 
    // Lấy dữ liệu sân bóng từ API
    useEffect(() => {
-      const fetchDataFoolbalField = async () => {
-         try {
-            const response = await fetch(`/api/foolbalField/${user.id}`);
-            const result = await response.json();
-            if (result.success) {
-               const updatedData = result.data.map((item, index) => ({
-                  ...item,
-                  key: item.id || index.toString(),
-               }));
-               setData(updatedData);
-            } else {
-               console.error("Lỗi:", result.message);
-            }
-         } catch (error) {
-            console.error("Lỗi kết nối API:", error);
-         }
-      };
-
       if (user.id) {
-         fetchDataFoolbalField();
+         fetchFootballFields();
       }
    }, [user.id]);
+
 
    useEffect(() => {
       return () => {
@@ -105,16 +112,34 @@ export default function FoolbalField({ user }) {
          setSize(selectedFF.size);
          setPrice(selectedFF.price);
          setStatus(selectedFF.status ? "true" : "false");
-         setAddressDetail(selectedFF.address);
+         setAddressDetail(selectedFF.address || "");
 
-         // Cập nhật giá trị mặc định cho địa chỉ
          setProvinceCode(selectedFF.idProvince);
          setDistrictCode(selectedFF.idDistrict);
          setWardCode(selectedFF.idWard);
+
+         // Cập nhật địa chỉ từ selectedFF
+         setAddress({
+            province: selectedFF.idProvince,
+            district: selectedFF.idDistrict,
+            ward: selectedFF.idWard,
+         });
       }
    }, [selectedFF]);
 
+   useEffect(() => {
+      if (selectedFF) {
+         setImageList(selectedFF.image || []);
+      }
+   }, [selectedFF]);
 
+   useEffect(() => {
+      if (selectedFF) {
+         setOriginalFF({ ...selectedFF }); // Tạo một bản sao độc lập
+      }
+   }, [selectedFF]);
+
+   // console.log(selectedFF)
    // Hiển thị Modal thêm sân bóng
    const showModal = () => {
       setIsModalOpen(true);
@@ -142,13 +167,17 @@ export default function FoolbalField({ user }) {
    // Xóa file
    const handleRemoveFile = (event, index) => {
       event.preventDefault();
-      setSelectedFF(prevFF => ({
-         ...prevFF,
-         image: prevFF.image.filter((_, i) => i !== index),
-      }));
+      setSelectedFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
    };
 
-
+   useEffect(() => {
+      console.log("🔹 Sau khi reset các trường địa chỉ:", {
+         provinceCode,
+         districtCode,
+         wardCode,
+         address
+      });
+   }, [provinceCode, districtCode, wardCode, address]);
    // Tạo sân bóng mới
    let handleCreateFF = async (e) => {
       e.preventDefault();
@@ -178,6 +207,27 @@ export default function FoolbalField({ user }) {
                ...prevData,
                { ...response.data.data, key: response.data.data.id || Math.random().toString(36).substr(2, 9) }
             ]);
+
+            // Reset các trường sau khi tạo sân bóng thành công
+            setName("");
+            setSize("5");
+            setPrice(1);
+            setStatus("true");
+            setAddressDetail("");
+            setSelectedFiles([]);
+
+            // Reset các trường địa chỉ
+            setProvinceCode("");
+            setDistrictCode("");
+            setWardCode("");
+            setAddress({
+               province: "",
+               district: "",
+               ward: "",
+            });
+
+            console.log("🔹 Đang reset các trường địa chỉ...");
+
             setIsModalOpen(false);
             setSelectedFiles([]);
          } else {
@@ -202,28 +252,70 @@ export default function FoolbalField({ user }) {
       }
    };
 
-   let hangEditFollbalField = (e, field) => {
+
+   const hangEditFollbalField = (e, field) => {
       e.preventDefault();
-      if (!field) {
-         console.error("Dữ liệu sân bóng không hợp lệ:", field);
-         return;
-      }
-      console.log("Dữ liệu sân bóng được chọn:", field);
       setSelectedFF(field);
       setIsModalEdit(true);
    };
 
-
    const handleUpdateFF = async (e) => {
       e.preventDefault();
-      setLoading(true);
+
+      if (!selectedFF) {
+         console.log("🔹 Không có dữ liệu sân bóng để cập nhật.");
+         return;
+      }
+
+      try {
+         const response = await axios.post(`/api/foolbalField/${selectedFF.id}`, selectedFF);
+
+         if (response.data.success) {
+            console.log("✅ Cập nhật thành công:", response);
+
+            // Cập nhật state mà không cần reload
+            setData(prevData => prevData.map(item =>
+               item.id === selectedFF.id ? { ...item, ...selectedFF } : item
+            ));
+
+            setIsModalEdit(false);
+         } else {
+            console.error("❌ Lỗi khi cập nhật:", response.data.message);
+            alert("Lỗi khi cập nhật: " + response.data.message);
+         }
+      } catch (error) {
+         console.error("❌ Lỗi hệ thống:", error);
+         alert("Lỗi hệ thống khi cập nhật sân bóng!");
+      }
+   };
+
+   const handleDeleteFF = async (id) => {
+      if (!window.confirm("Bạn có chắc chắn muốn xóa sân bóng này không?")) return;
+
+      try {
+         const response = await axios.delete(`/api/foolbalField/${id}`);
+         if (response.data.success) {
+            // Xóa khỏi state để cập nhật giao diện ngay lập tức
+            setData(prevData => prevData.filter(item => item.id !== id));
+         } else {
+            alert(`Lỗi: ${response.data.message}`);
+         }
+      } catch (error) {
+         console.error("Lỗi khi xóa sân bóng:", error);
+         alert("Lỗi hệ thống khi xóa sân bóng!");
+      }
+   };
+
+
+   const handleBookingClickPage = (sanBong) => {
+      navigate(`/BookingBusiness/${sanBong.id}`, { state: sanBong });
    };
 
    const handleSelect = (value) => {
       console.log("Giá trị chọn:", value);
       setSelectedFF(value);
    };
-   console.log("selectedFF", selectedFF)
+   // console.log("selectedFF", selectedFF)
 
    return (
       <div className="FoolbalField">
@@ -244,12 +336,12 @@ export default function FoolbalField({ user }) {
             <form className='formCreateFF' onSubmit={handleCreateFF} encType="multipart/form-data">
                <div className="item">
                   <label>Tên sân bóng</label>
-                  <Input name='name' required />
+                  <Input name='name' value={name} onChange={(e) => setName(e.target.value)} required />
                </div>
                <div className="item">
                   <label>Loại sân</label>
                   <Select
-                     defaultValue={size}
+                     value={size}
                      onChange={value => setSize(value)}
                      style={{ width: 120 }}
                      options={[
@@ -263,7 +355,7 @@ export default function FoolbalField({ user }) {
                   <label>Giá</label>
                   <InputNumber
                      min={1}
-                     defaultValue={1}
+                     value={price}
                      changeOnWheel
                      name="price"
                      onChange={(value) => setPrice(value)}
@@ -272,7 +364,7 @@ export default function FoolbalField({ user }) {
                <div className="item">
                   <label>Trang thái</label>
                   <Select
-                     defaultValue={status}
+                     value={status}
                      onChange={value => setStatus(value)}
                      style={{ width: 120 }}
                      options={[
@@ -284,13 +376,12 @@ export default function FoolbalField({ user }) {
                <div className="item">
                   <label>Địa chỉ</label>
                   <AddressSelector
+                     value={{
+                        province: provinceCode,
+                        district: districtCode,
+                        ward: wardCode
+                     }}
                      onSelect={(address) => {
-                        setAddress({
-                           province: address.province,
-                           district: address.district,
-                           ward: address.ward,
-                        });
-
                         setProvinceCode(address.province);
                         setDistrictCode(address.district);
                         setWardCode(address.ward);
@@ -299,7 +390,7 @@ export default function FoolbalField({ user }) {
                </div>
                <div className="item">
                   <label>Địa chỉ cụ thể</label>
-                  <Input name='address' required />
+                  <Input name='address' value={addressDetail} onChange={(e) => setAddressDetail(e.target.value)} required />
                </div>
                <div className="item">
                   <label>Ảnh mô tả</label>
@@ -371,15 +462,15 @@ export default function FoolbalField({ user }) {
                <tbody>
                   {data && Array.isArray(data) && data.length > 0 ? (
                      data.map((item) => (
-                        <tr key={item.key}>
+                        <tr key={item.id} onClick={() => handleBookingClickPage(item)}>
                            <td className='text-center'>{item.id}</td>
                            <td>{item.name}</td>
                            <td className='text-center'>{item.size}</td>
                            <td>{item.price}</td>
                            <td>
-                              {addressData && addressData[item.id]
-                                 ? `${item.address}, ${addressData[item.id].ward}, ${addressData[item.id].district}, ${addressData[item.id].province}`
-                                 : <></>}
+                              {addressData?.[item.id] ? (
+                                 `${item.address}, ${addressData[item.id]?.ward}, ${addressData[item.id]?.district}, ${addressData[item.id]?.province}`
+                              ) : ""}
                            </td>
                            <td>{(item.status) ? (<FaRegCheckCircle />) : (<CiNoWaitingSign />)}</td>
                            <td className='text-center' onClick={() => handleShowImages(item.image)}>
@@ -390,7 +481,7 @@ export default function FoolbalField({ user }) {
                               <button onClick={(e) => hangEditFollbalField(e, item)}>
                                  <FaRegEdit />
                               </button>
-                              <button>
+                              <button onClick={() => handleDeleteFF(item.id)}>
                                  <MdOutlineDeleteOutline />
                               </button>
                            </td>
@@ -404,52 +495,65 @@ export default function FoolbalField({ user }) {
                </tbody>
                <Modal
                   title="CẬP NHẬT SÂN BÓNG"
-                  open={isModalEdit} // Sử dụng isModalEdit thay vì isModalOpen
-                  onCancel={() => setIsModalEdit(false)} // Đóng modal khi bấm hủy
+                  open={isModalEdit}
+                  onCancel={() => setIsModalEdit(false)}
                   footer={null}
                   maskClosable={true}
-                  className='modelEditFF'
+                  className="modelEditFF"
                >
-                  <form className='formCreateFF' onSubmit={handleUpdateFF} encType="multipart/form-data">
+                  <form className="formCreateFF" onSubmit={handleUpdateFF} encType="multipart/form-data">
+                     {/* Tên sân bóng */}
                      <div className="item">
                         <label>Tên sân bóng</label>
-                        <Input name='name' value={selectedFF?.name} required />
+                        <Input
+                           name="name"
+                           value={selectedFF?.name || ""}
+                           onChange={(e) => setSelectedFF({ ...selectedFF, name: e.target.value })}
+                           required
+                        />
                      </div>
+
+                     {/* Loại sân */}
                      <div className="item">
                         <label>Loại sân</label>
                         <Select
-                           value={size}
-                           onChange={value => setSize(value)}
+                           value={selectedFF?.size || ""}
+                           onChange={(value) => setSelectedFF({ ...selectedFF, size: value })}
                            style={{ width: 120 }}
                            options={[
-                              { value: '5', label: 'Sân 5' },
-                              { value: '7', label: 'Sân 7' },
-                              { value: '11', label: 'Sân 11' },
+                              { value: "5", label: "Sân 5" },
+                              { value: "7", label: "Sân 7" },
+                              { value: "11", label: "Sân 11" },
                            ]}
                         />
                      </div>
+
+                     {/* Giá */}
                      <div className="item">
                         <label>Giá</label>
                         <InputNumber
                            min={1}
-                           value={price}
-                           changeOnWheel
+                           value={selectedFF?.price || ""}
                            name="price"
-                           onChange={(value) => setPrice(value)}
+                           onChange={(value) => setSelectedFF({ ...selectedFF, price: value })}
                         />
                      </div>
+
+                     {/* Trạng thái */}
                      <div className="item">
                         <label>Trạng thái</label>
                         <Select
-                           value={status}
-                           onChange={value => setStatus(value)}
+                           value={selectedFF?.status ? "true" : "false"}
+                           onChange={(value) => setSelectedFF({ ...selectedFF, status: value === "true" })}
                            style={{ width: 120 }}
                            options={[
-                              { value: 'true', label: 'Mở' },
-                              { value: 'false', label: 'Đóng' }
+                              { value: "true", label: "Mở" },
+                              { value: "false", label: "Đóng" },
                            ]}
                         />
                      </div>
+
+                     {/* Địa chỉ */}
                      <div className="item">
                         <label>Địa chỉ</label>
                         <AddressSelector
@@ -459,21 +563,29 @@ export default function FoolbalField({ user }) {
                               ward: selectedFF?.idWard || "",
                            }}
                            onSelect={(address) => {
-                              setProvinceCode(address.province);
-                              setDistrictCode(address.district);
-                              setWardCode(address.ward);
+                              console.log("Địa chỉ được chọn:", address);
+                              setSelectedFF({
+                                 ...selectedFF,
+                                 idProvince: address.province,
+                                 idDistrict: address.district,
+                                 idWard: address.ward,
+                              });
                            }}
                         />
-
                      </div>
+
+                     {/* Địa chỉ cụ thể */}
                      <div className="item">
                         <label>Địa chỉ cụ thể</label>
                         <Input
-                           name='address'
-                           value={selectedFF?.address}
+                           name="address"
+                           value={selectedFF?.address || ""}
+                           onChange={(e) => setSelectedFF({ ...selectedFF, address: e.target.value })}
                            required
                         />
                      </div>
+
+                     {/* Ảnh mô tả */}
                      <div className="item">
                         <label>Ảnh mô tả</label>
                         <input
@@ -488,7 +600,7 @@ export default function FoolbalField({ user }) {
                               selectedFF.image.map((img, index) => (
                                  <div key={index} className="file-item">
                                     <img src={img} alt={`Ảnh ${index + 1}`} className="preview-image" />
-                                    <button className='btn-del-file' onClick={(e) => handleRemoveFile(e, index)}>
+                                    <button className="btn-del-file" onClick={(e) => handleRemoveFile(e, index)}>
                                        <IoMdClose />
                                     </button>
                                  </div>
@@ -498,11 +610,14 @@ export default function FoolbalField({ user }) {
                            )}
                         </div>
                      </div>
+
+                     {/* Nút cập nhật */}
                      <div className="submit">
-                        <button type='submit'>{loading ? "Đang xử lý..." : "Cập nhật"}</button>
+                        <button type="submit">{loading ? "Đang xử lý..." : "Cập nhật"}</button>
                      </div>
                   </form>
                </Modal>
+
 
             </table>
          </div>

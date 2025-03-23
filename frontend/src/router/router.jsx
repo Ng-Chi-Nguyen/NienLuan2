@@ -8,6 +8,7 @@ import Team from '../pages/Team/Team';
 import Tournament from '../pages/Tournament/Tournament';
 import Login from '../pages/Auth/Login';
 import User from '../pages/User/User';
+import BookingBusiness from '../pages/BookingBusiness/BookingBusiness';
 export const routers = createBrowserRouter([
    {
       path: "/",
@@ -44,5 +45,9 @@ export const routers = createBrowserRouter([
    {
       path: "/User",
       element: <User />
+   },
+   {
+      path: "/BookingBusiness/:idFF",
+      element: <BookingBusiness />
    }
 ]);

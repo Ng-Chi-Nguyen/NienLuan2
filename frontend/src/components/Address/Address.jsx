@@ -7,18 +7,38 @@ export function AddressSelector({ defaultValue, onSelect }) {
    const [districts, setDistricts] = useState([]);
    const [wards, setWards] = useState([]);
 
-   const [selectedProvince, setSelectedProvince] = useState(defaultValue?.province || null);
-   const [selectedDistrict, setSelectedDistrict] = useState(defaultValue?.district || null);
-   const [selectedWard, setSelectedWard] = useState(defaultValue?.ward || null);
+   const [selectedProvince, setSelectedProvince] = useState(null);
+   const [selectedDistrict, setSelectedDistrict] = useState(null);
+   const [selectedWard, setSelectedWard] = useState(null);
 
-   // Lấy danh sách tỉnh
    useEffect(() => {
       axios.get("/api/address/provinces/")
-         .then(response => setProvinces(response.data.data)) // Truy cập `data`
+         .then(response => setProvinces(response.data.data))
          .catch(error => console.error("Lỗi lấy danh sách tỉnh:", error));
    }, []);
 
-   // Khi chọn tỉnh -> Lấy danh sách huyện
+   // Gộp chung xử lý `defaultValue`
+   useEffect(() => {
+      if (defaultValue?.province) {
+         setSelectedProvince(defaultValue.province);
+         axios.get(`/api/address/districts/${defaultValue.province}`)
+            .then(response => {
+               setDistricts(response.data.data);
+               if (defaultValue?.district) {
+                  setSelectedDistrict(defaultValue.district);
+                  return axios.get(`/api/address/wards/${defaultValue.district}`);
+               }
+            })
+            .then(response => {
+               if (response?.data?.data && defaultValue?.ward) {
+                  setWards(response.data.data);
+                  setSelectedWard(defaultValue.ward);
+               }
+            })
+            .catch(error => console.error("Lỗi khi tải địa chỉ:", error));
+      }
+   }, [defaultValue]);
+
    const handleProvinceChange = (provinceId) => {
       setSelectedProvince(provinceId);
       setSelectedDistrict(null);
@@ -27,61 +47,28 @@ export function AddressSelector({ defaultValue, onSelect }) {
       setWards([]);
 
       axios.get(`/api/address/districts/${provinceId}`)
-         .then(response => setDistricts(response.data.data)) // Truy cập `data`
+         .then(response => setDistricts(response.data.data))
          .catch(error => console.error("Lỗi lấy danh sách huyện:", error));
    };
 
-   // Khi chọn huyện -> Lấy danh sách xã
    const handleDistrictChange = (districtId) => {
       setSelectedDistrict(districtId);
       setSelectedWard(null);
       setWards([]);
 
       axios.get(`/api/address/wards/${districtId}`)
-         .then(response => setWards(response.data.data)) // Truy cập `data`
+         .then(response => setWards(response.data.data))
          .catch(error => console.error("Lỗi lấy danh sách xã:", error));
    };
 
-   // Khi chọn xã
    const handleWardChange = (wardId) => {
       setSelectedWard(wardId);
-      onSelect({
-         province: selectedProvince,
-         district: selectedDistrict,
-         ward: wardId
-      });
+      onSelect({ province: selectedProvince, district: selectedDistrict, ward: wardId });
    };
 
-   // Khi có giá trị mặc định, tự động lấy danh sách huyện và xã tương ứng
-   useEffect(() => {
-      if (defaultValue?.province) {
-         handleProvinceChange(defaultValue.province);
-      }
-   }, [defaultValue?.province]);
-
-   useEffect(() => {
-      if (defaultValue?.district) {
-         handleDistrictChange(defaultValue.district);
-      }
-   }, [defaultValue?.district]);
-
-   useEffect(() => {
-      if (defaultValue?.ward) {
-         handleWardChange(defaultValue.ward);
-      }
-   }, [defaultValue?.ward]);
-
    const adminUnitMap = {
-      1: "Thành phố",
-      2: "Tỉnh",
-      3: "Thành phố thuộc TP",
-      4: "Thành phố thuộc tỉnh",
-      5: "Quận",
-      6: "Thị xã",
-      7: "Huyện",
-      8: "Phường",
-      9: "Thị trấn",
-      10: "Xã",
+      1: "Thành phố", 2: "Tỉnh", 3: "Thành phố thuộc TP", 4: "Thành phố thuộc tỉnh",
+      5: "Quận", 6: "Thị xã", 7: "Huyện", 8: "Phường", 9: "Thị trấn", 10: "Xã",
    };
 
    return (
@@ -129,6 +116,7 @@ export function AddressSelector({ defaultValue, onSelect }) {
       </div>
    );
 }
+
 
 export const AddressFetcher = async (provinceCode, districtCode, wardCode) => {
    try {
