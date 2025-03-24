@@ -28,14 +28,14 @@ export const createFoolballField = async (req, res) => {
       }
 
       // Lấy các tệp ảnh và tạo danh sách đường dẫn
-      const images = req.files ? req.files.map(file => `/image/uploads/${file.filename}`) : [];
+      // const images = req.files ? req.files.map(file => `/image/uploads/${file.filename}`) : [];
 
       // Gọi service để lưu vào database
       const result = await createFoolballFieldService({
          name,
          size,
          price,
-         images,
+         // images,
          idProvince,
          idDistrict,
          idWard,

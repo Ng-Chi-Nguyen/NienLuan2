@@ -19,7 +19,8 @@ const upload = multer({ storage });
 
 // API tạo sân bóng (hỗ trợ upload nhiều ảnh)
 foolbalFieldRouter
-   .post("/", upload.array("images", 5), createFoolballField)
+   .post("/", upload.none(), createFoolballField)
+   // .post("/", upload.array("images", 5), createFoolballField)
    .get("/:id", getAllFoolbalField)
    .post("/:id", updateFootballField)
    .delete("/:id", deleteFootballField)

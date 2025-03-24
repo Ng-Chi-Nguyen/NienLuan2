@@ -7,7 +7,7 @@ export function AddressSelector({ defaultValue, onSelect }) {
    const [districts, setDistricts] = useState([]);
    const [wards, setWards] = useState([]);
 
-   const [selectedProvince, setSelectedProvince] = useState(null);
+   const [selectedProvince, setSelectedProvince] = useState("");
    const [selectedDistrict, setSelectedDistrict] = useState(null);
    const [selectedWard, setSelectedWard] = useState(null);
 
@@ -17,7 +17,6 @@ export function AddressSelector({ defaultValue, onSelect }) {
          .catch(error => console.error("Lỗi lấy danh sách tỉnh:", error));
    }, []);
 
-   // Gộp chung xử lý `defaultValue`
    useEffect(() => {
       if (defaultValue?.province) {
          setSelectedProvince(defaultValue.province);
@@ -36,6 +35,13 @@ export function AddressSelector({ defaultValue, onSelect }) {
                }
             })
             .catch(error => console.error("Lỗi khi tải địa chỉ:", error));
+      } else {
+         // Nếu defaultValue rỗng, reset toàn bộ
+         setSelectedProvince("");
+         setSelectedDistrict("");
+         setSelectedWard("");
+         setDistricts([]);
+         setWards([]);
       }
    }, [defaultValue]);
 
@@ -70,6 +76,8 @@ export function AddressSelector({ defaultValue, onSelect }) {
       1: "Thành phố", 2: "Tỉnh", 3: "Thành phố thuộc TP", 4: "Thành phố thuộc tỉnh",
       5: "Quận", 6: "Thị xã", 7: "Huyện", 8: "Phường", 9: "Thị trấn", 10: "Xã",
    };
+
+
 
    return (
       <div className="address-selector">

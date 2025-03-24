@@ -1,5 +1,5 @@
 import { useLocation, useParams } from "react-router-dom";
-
+import Header from "../../components/Header/Header";
 export default function BookingBusiness() {
    const { id } = useParams(); // Lấy id từ URL
    const location = useLocation();
@@ -10,12 +10,8 @@ export default function BookingBusiness() {
 
    return (
       <>
-         <h1>Thông tin sân bóng</h1>
-         <p>ID: {id}</p>
-         <p>Tên: {sanBong.name || "Không có dữ liệu"}</p>
-         <p>Kích thước: {sanBong.size}</p>
-         <p>Giá: {sanBong.price}</p>
-         <p>Địa chỉ: {sanBong.address}</p>
+         <Header />
+         <h4>Lich đặt sân của sân bóng {sanBong.name}</h4>
       </>
    );
 }

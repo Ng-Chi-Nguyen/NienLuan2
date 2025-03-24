@@ -4,10 +4,10 @@ let createFoolballFieldService = async (fieldData) => {
    // console.log("Dữ liệu nhận được trong service:", fieldData);
 
    try {
-      const { name, size, price, status, idProvince, idDistrict, idWard, address, idBusiness, images } = fieldData;
+      const { name, size, price, status, idProvince, idDistrict, idWard, address, idBusiness } = fieldData;
 
       // Kiểm tra dữ liệu đầu vào
-      if (!name || !size || !price || status == null || !address || !idBusiness || !images || images.length === 0) {
+      if (!name || !size || !price || status == null || !address || !idBusiness) {
          return { success: false, error: "Thiếu thông tin cần thiết!" };
       }
 
@@ -41,7 +41,7 @@ let createFoolballFieldService = async (fieldData) => {
                idWard,
                address,
                idBusiness,
-               image: images,  // Chuyển đổi mảng thành chuỗi JSON nếu cột là text
+               // image: images,  // Chuyển đổi mảng thành chuỗi JSON nếu cột là text
             }
          ])
          .select('*')

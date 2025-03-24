@@ -3,8 +3,13 @@ import { AddressSelector } from "../../components/Address/Address";
 
 import Header from "../../components/Header/Header";
 import "./Schedule.scss";
-import { FaPhoneAlt, FaMapMarkedAlt } from "react-icons/fa";
-import { Pagination } from "antd";
+
+// import { FaPhoneAlt, FaMapMarkedAlt } from "react-icons/fa";
+// import { Pagination } from "antd";
+
+import { FaUser } from "react-icons/fa";
+import { PiMoneyWavyDuotone } from "react-icons/pi";
+
 import { useState, useEffect } from "react";
 
 export default function Schedule() {
@@ -14,26 +19,15 @@ export default function Schedule() {
       ward: "",
    });
 
-   const [currentPage, setCurrentPage] = useState(1);
-   const itemsPerPage = 8; // Số lượng sân hiển thị mỗi trang
+   // const [currentPage, setCurrentPage] = useState(1);
+   // const itemsPerPage = 8; // Số lượng sân hiển thị mỗi trang
 
    // State lưu danh sách sân bóng
-   const [stadiums, setStadiums] = useState([]);
+   // const [stadiums, setStadiums] = useState([]);
 
-   // Fake API lấy dữ liệu sân bóng
-   useEffect(() => {
-      const fakeStadiums = Array.from({ length: 23 }, (_, index) => ({
-         id: index + 1,
-         name: `Sân Bóng Việt Hùng Đông Hương ${index + 1}`,
-         phone: "012346789",
-         address: "Cần Thơ",
-      }));
-      setStadiums(fakeStadiums);
-   }, []);
-
-   // Lấy danh sách sân hiển thị trên trang hiện tại
-   const startIndex = (currentPage - 1) * itemsPerPage;
-   const paginatedStadiums = stadiums.slice(startIndex, startIndex + itemsPerPage);
+   // // Lấy danh sách sân hiển thị trên trang hiện tại
+   // const startIndex = (currentPage - 1) * itemsPerPage;
+   // const paginatedStadiums = stadiums.slice(startIndex, startIndex + itemsPerPage);
 
    return (
       <>
@@ -54,32 +48,26 @@ export default function Schedule() {
                      </div>
                      <h2 className="text-center">Bãi sân</h2>
                      <div className="row">
-                        {paginatedStadiums.map((stadium) => (
-                           <div className="Box" key={stadium.id}>
-                              <div className="name">{stadium.name}</div>
-                              <div className="phone">
-                                 <span>
-                                    <FaPhoneAlt />
-                                 </span>{" "}
-                                 <p>{stadium.phone}</p>
+                        <div className="Box">
+                           <div className="name"> Sân bóng đá Kim Quý</div>
+                           <div className="row">
+                              <div className="size">
+                                 <p>Sân 7</p> <span><FaUser /></span>
                               </div>
-                              <div className="address">
-                                 <span>
-                                    <FaMapMarkedAlt />
-                                 </span>
-                                 <p>{stadium.address}</p>
-                              </div>
-                              <div className="btn_add_FF">
-                                 <BtnAdd name="Chi tiết" />
+                              <div className="price">
+                                 <p>Giá: 200</p>
+                                 <span><PiMoneyWavyDuotone /></span>
+                                 <p>/1h</p>
                               </div>
                            </div>
-                        ))}
+                           <div className="address">Địa chỉ: xã Phước Long, huyện Phước Long, Bạc Liêu</div>
+                        </div>
                      </div>
                   </div>
                </div>
 
                {/* Phân trang */}
-               <div className="Pagination">
+               {/* <div className="Pagination">
                   <Pagination
                      align="end"
                      current={currentPage}
@@ -87,7 +75,7 @@ export default function Schedule() {
                      total={stadiums.length}
                      onChange={(page) => setCurrentPage(page)}
                   />
-               </div>
+               </div> */}
             </div>
          </div>
       </>

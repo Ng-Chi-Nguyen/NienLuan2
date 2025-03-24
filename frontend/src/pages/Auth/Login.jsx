@@ -70,7 +70,7 @@ export default function Login() {
       try {
          setLoading(true);
          console.log("formData Buness:", formData)
-         const response = await axios.post("/api/buness/", formData);
+         const response = await axios.post("/api/business/", formData);
          console.log("Phản hồi từ backend:", response.data);
          setFormData({
             name: "",

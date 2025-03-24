@@ -61,8 +61,11 @@
                   &:hover{
                      color: #3F6DFF;
                   }
+                  z-index: 5;
                }
-               
+               &:nth-child(9){
+                  z-index: 5;
+               }
             }
          }
          .action{

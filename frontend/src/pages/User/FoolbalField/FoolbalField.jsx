@@ -30,10 +30,6 @@ export default function FoolbalField({ user }) {
       ward: "",
    });
 
-   // const [size, setSize] = useState("5");
-   // const [status, setStatus] = useState("true");
-   // const [price, setPrice] = useState(1);
-
    const [selectedImages, setSelectedImages] = useState([]);
    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
@@ -149,26 +145,46 @@ export default function FoolbalField({ user }) {
       setIsModalOpen(false);
    };
 
+   const handleCancelEditModal = () => {
+      setIsModalEdit(false);
+
+      // Reset các state về giá trị mặc định
+      setName("");
+      setSize("5");
+      setPrice(1);
+      setStatus("true");
+      setAddressDetail("");
+      setSelectedFiles([]);
+      setProvinceCode("");
+      setDistrictCode("");
+      setWardCode("");
+      setAddress({
+         province: "",
+         district: "",
+         ward: "",
+      });
+   };
+
    let hangCreateFollbalField = (e) => {
       e.preventDefault();
       showModal();
    };
 
    // Xử lý khi chọn file
-   const handleFileChange = (event) => {
-      const files = Array.from(event.target.files);
-      const newFileObjects = files.map(file => ({
-         file,
-         preview: URL.createObjectURL(file)
-      }));
-      setSelectedFiles(prevFiles => [...prevFiles, ...newFileObjects]);
-   };
+   // const handleFileChange = (event) => {
+   //    const files = Array.from(event.target.files);
+   //    const newFileObjects = files.map(file => ({
+   //       file,
+   //       preview: URL.createObjectURL(file)
+   //    }));
+   //    setSelectedFiles(prevFiles => [...prevFiles, ...newFileObjects]);
+   // };
 
-   // Xóa file
-   const handleRemoveFile = (event, index) => {
-      event.preventDefault();
-      setSelectedFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
-   };
+   // // Xóa file
+   // const handleRemoveFile = (event, index) => {
+   //    event.preventDefault();
+   //    setSelectedFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
+   // };
 
    useEffect(() => {
       console.log("🔹 Sau khi reset các trường địa chỉ:", {
@@ -183,40 +199,41 @@ export default function FoolbalField({ user }) {
       e.preventDefault();
       setLoading(true);
 
-      const formData = new FormData(e.target);
-      formData.delete("price");
-      formData.append("price", price);
+      const formData = new FormData();
 
+      // Append all required fields
+      formData.append("name", name);
       formData.append("size", size);
-      formData.append("status", status ?? true);
+      formData.append("price", price);
+      formData.append("status", status === "true");
       formData.append("idBusiness", user.id);
-
       formData.append("idProvince", provinceCode);
       formData.append("idDistrict", districtCode);
       formData.append("idWard", wardCode);
+      formData.append("address", addressDetail);
 
-      selectedFiles.forEach(fileObj => {
-         formData.append("images", fileObj.file);
-      });
-
+      // Append any files if you have them
+      // selectedFiles.forEach(fileObj => {
+      //   formData.append("images", fileObj.file);
+      // });
       try {
          let response = await axios.post(`/api/foolbalField/`, formData);
 
          if (response.data.success) {
             setData(prevData => [
                ...prevData,
-               { ...response.data.data, key: response.data.data.id || Math.random().toString(36).substr(2, 9) }
+               {
+                  ...response.data.data,
+                  key: response.data.data.id || Math.random().toString(36).substr(2, 9)
+               }
             ]);
 
-            // Reset các trường sau khi tạo sân bóng thành công
+            // Reset form fields
             setName("");
             setSize("5");
             setPrice(1);
             setStatus("true");
             setAddressDetail("");
-            setSelectedFiles([]);
-
-            // Reset các trường địa chỉ
             setProvinceCode("");
             setDistrictCode("");
             setWardCode("");
@@ -226,8 +243,6 @@ export default function FoolbalField({ user }) {
                ward: "",
             });
 
-            console.log("🔹 Đang reset các trường địa chỉ...");
-
             setIsModalOpen(false);
             setSelectedFiles([]);
          } else {
@@ -236,6 +251,7 @@ export default function FoolbalField({ user }) {
          setLoading(false);
       } catch (error) {
          console.error("Lỗi kết nối API:", error);
+         setLoading(false);
       }
    };
 
@@ -268,10 +284,11 @@ export default function FoolbalField({ user }) {
       }
 
       try {
+         setLoading(true)
          const response = await axios.post(`/api/foolbalField/${selectedFF.id}`, selectedFF);
 
          if (response.data.success) {
-            console.log("✅ Cập nhật thành công:", response);
+            console.log("Cập nhật thành công:", response);
 
             // Cập nhật state mà không cần reload
             setData(prevData => prevData.map(item =>
@@ -280,11 +297,12 @@ export default function FoolbalField({ user }) {
 
             setIsModalEdit(false);
          } else {
-            console.error("❌ Lỗi khi cập nhật:", response.data.message);
+            console.error("Lỗi khi cập nhật:", response.data.message);
             alert("Lỗi khi cập nhật: " + response.data.message);
          }
+         setLoading(false)
       } catch (error) {
-         console.error("❌ Lỗi hệ thống:", error);
+         console.error("Lỗi hệ thống:", error);
          alert("Lỗi hệ thống khi cập nhật sân bóng!");
       }
    };
@@ -392,7 +410,7 @@ export default function FoolbalField({ user }) {
                   <label>Địa chỉ cụ thể</label>
                   <Input name='address' value={addressDetail} onChange={(e) => setAddressDetail(e.target.value)} required />
                </div>
-               <div className="item">
+               {/* <div className="item">
                   <label>Ảnh mô tả</label>
                   <label htmlFor="upload" className="custom-file-upload">
                      Chọn ảnh
@@ -418,7 +436,7 @@ export default function FoolbalField({ user }) {
                         <p>Chưa chọn tệp nào</p>
                      )}
                   </div>
-               </div>
+               </div> */}
                <div className="submit">
                   <button type='submit'>{loading ? "Đang xử lý..." : "Thêm mới"}</button>
                </div>
@@ -463,25 +481,34 @@ export default function FoolbalField({ user }) {
                   {data && Array.isArray(data) && data.length > 0 ? (
                      data.map((item) => (
                         <tr key={item.id} onClick={() => handleBookingClickPage(item)}>
-                           <td className='text-center'>{item.id}</td>
+                           <td className="text-center">{item.id}</td>
                            <td>{item.name}</td>
-                           <td className='text-center'>{item.size}</td>
+                           <td className="text-center">{item.size}</td>
                            <td>{item.price}</td>
                            <td>
                               {addressData?.[item.id] ? (
                                  `${item.address}, ${addressData[item.id]?.ward}, ${addressData[item.id]?.district}, ${addressData[item.id]?.province}`
                               ) : ""}
                            </td>
-                           <td>{(item.status) ? (<FaRegCheckCircle />) : (<CiNoWaitingSign />)}</td>
-                           <td className='text-center' onClick={() => handleShowImages(item.image)}>
+                           <td>{item.status ? <FaRegCheckCircle /> : <CiNoWaitingSign />}</td>
+                           <td className="text-center" onClick={(e) => {
+                              e.stopPropagation(); // Chặn sự kiện click vào <tr>
+                              handleShowImages(item.image);
+                           }}>
                               Xem ảnh
                            </td>
-                           <td className='text-center'>{new Date(item.created_at).toLocaleDateString("vi-VN")}</td>
-                           <td className='action'>
-                              <button onClick={(e) => hangEditFollbalField(e, item)}>
+                           <td className="text-center">{new Date(item.created_at).toLocaleDateString("vi-VN")}</td>
+                           <td className="action">
+                              <button onClick={(e) => {
+                                 e.stopPropagation(); // Chặn sự kiện click vào <tr>
+                                 hangEditFollbalField(e, item);
+                              }}>
                                  <FaRegEdit />
                               </button>
-                              <button onClick={() => handleDeleteFF(item.id)}>
+                              <button onClick={(e) => {
+                                 e.stopPropagation(); // Chặn sự kiện click vào <tr>
+                                 handleDeleteFF(item.id);
+                              }}>
                                  <MdOutlineDeleteOutline />
                               </button>
                            </td>
@@ -493,10 +520,11 @@ export default function FoolbalField({ user }) {
                      </tr>
                   )}
                </tbody>
+
                <Modal
                   title="CẬP NHẬT SÂN BÓNG"
                   open={isModalEdit}
-                  onCancel={() => setIsModalEdit(false)}
+                  onCancel={handleCancelEditModal}
                   footer={null}
                   maskClosable={true}
                   className="modelEditFF"
@@ -585,40 +613,12 @@ export default function FoolbalField({ user }) {
                         />
                      </div>
 
-                     {/* Ảnh mô tả */}
-                     <div className="item">
-                        <label>Ảnh mô tả</label>
-                        <input
-                           id="upload"
-                           type="file"
-                           accept="image/*"
-                           multiple
-                           onChange={handleFileChange}
-                        />
-                        <div className="image-preview-container">
-                           {selectedFF?.image && Array.isArray(selectedFF.image) ? (
-                              selectedFF.image.map((img, index) => (
-                                 <div key={index} className="file-item">
-                                    <img src={img} alt={`Ảnh ${index + 1}`} className="preview-image" />
-                                    <button className="btn-del-file" onClick={(e) => handleRemoveFile(e, index)}>
-                                       <IoMdClose />
-                                    </button>
-                                 </div>
-                              ))
-                           ) : (
-                              <p>Không có ảnh nào</p>
-                           )}
-                        </div>
-                     </div>
-
                      {/* Nút cập nhật */}
                      <div className="submit">
                         <button type="submit">{loading ? "Đang xử lý..." : "Cập nhật"}</button>
                      </div>
                   </form>
                </Modal>
-
-
             </table>
          </div>
       </div>
