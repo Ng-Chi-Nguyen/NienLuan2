@@ -5,7 +5,6 @@ import { FaRegCheckCircle, FaRegEdit } from "react-icons/fa";
 import { IoAddOutline } from "react-icons/io5";
 import { CiNoWaitingSign } from "react-icons/ci";
 import { MdOutlineDeleteOutline } from "react-icons/md";
-import { IoMdClose } from "react-icons/io";
 import { Modal, InputNumber, Select, Input } from 'antd';
 
 import { AddressSelector, AddressFetcher } from '../../../components/Address/Address';
@@ -155,16 +154,18 @@ export default function FoolbalField({ user }) {
       setStatus("true");
       setAddressDetail("");
       setSelectedFiles([]);
-      setProvinceCode("");
-      setDistrictCode("");
-      setWardCode("");
-      setAddress({
-         province: "",
-         district: "",
-         ward: "",
-      });
+      setProvinceCode(null);
+      setDistrictCode(null);
+      setWardCode(null);
+      setTimeout(() => {
+         setProvinceCode("");
+         setDistrictCode("");
+         setWardCode("");
+      }, 0);
    };
-
+   console.log("After reset - provinceCode:", provinceCode);
+   console.log("After reset - districtCode:", districtCode);
+   console.log("After reset - wardCode:", wardCode);
    let hangCreateFollbalField = (e) => {
       e.preventDefault();
       showModal();
@@ -234,14 +235,6 @@ export default function FoolbalField({ user }) {
             setPrice(1);
             setStatus("true");
             setAddressDetail("");
-            setProvinceCode("");
-            setDistrictCode("");
-            setWardCode("");
-            setAddress({
-               province: "",
-               district: "",
-               ward: "",
-            });
 
             setIsModalOpen(false);
             setSelectedFiles([]);
@@ -256,16 +249,17 @@ export default function FoolbalField({ user }) {
    };
 
    // Xử lý xem ảnh
-   const handleShowImages = (images) => {
-      try {
-         const imageArray = typeof images === "string" ? JSON.parse(images.replace(/{|}/g, "[").replace(/,/g, '","')) : images;
-         setSelectedImages(imageArray);
-         setIsImageModalOpen(true);
-      } catch (error) {
-         console.error("Lỗi chuyển đổi ảnh:", error);
-         setSelectedImages([]);
-         setIsImageModalOpen(true);
-      }
+   const handleShowImages = () => {
+      // try {
+      //    const imageArray = typeof images === "string" ? JSON.parse(images.replace(/{|}/g, "[").replace(/,/g, '","')) : images;
+      //    setSelectedImages(imageArray);
+      //    setIsImageModalOpen(true);
+      // } catch (error) {
+      //    console.error("Lỗi chuyển đổi ảnh:", error);
+      //    setSelectedImages([]);
+      //    setIsImageModalOpen(true);
+      // }
+      setIsImageModalOpen(true);
    };
 
 
@@ -484,7 +478,7 @@ export default function FoolbalField({ user }) {
                            <td className="text-center">{item.id}</td>
                            <td>{item.name}</td>
                            <td className="text-center">{item.size}</td>
-                           <td>{item.price}</td>
+                           <td className="text-center">{item.price}</td>
                            <td>
                               {addressData?.[item.id] ? (
                                  `${item.address}, ${addressData[item.id]?.ward}, ${addressData[item.id]?.district}, ${addressData[item.id]?.province}`
@@ -493,7 +487,7 @@ export default function FoolbalField({ user }) {
                            <td>{item.status ? <FaRegCheckCircle /> : <CiNoWaitingSign />}</td>
                            <td className="text-center" onClick={(e) => {
                               e.stopPropagation(); // Chặn sự kiện click vào <tr>
-                              handleShowImages(item.image);
+                              handleShowImages();
                            }}>
                               Xem ảnh
                            </td>
