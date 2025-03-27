@@ -62,7 +62,9 @@ export default function User() {
                <div className="table-booking">
                   <h4 className="title-table">Lịch đặt sân của tui</h4>
                </div>
-               <FoolbalField user={user} />
+               {user.type === "business" ? (
+                  <FoolbalField user={user} />
+               ) : (<></>)}
             </div>
 
          </div >

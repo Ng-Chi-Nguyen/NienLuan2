@@ -1,11 +1,9 @@
-import { BtnAdd, Search } from "../../components/Button/Button";
-import { AddressSelector } from "../../components/Address/Address";
-
+import { Search } from "../../components/Button/Button";
+import { AddressSelector, AddressFetcher } from "../../components/Address/Address";
+import { Pagination } from "antd";
 import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
 import "./Schedule.scss";
-
-// import { FaPhoneAlt, FaMapMarkedAlt } from "react-icons/fa";
-// import { Pagination } from "antd";
 
 import { FaUser } from "react-icons/fa";
 import { PiMoneyWavyDuotone } from "react-icons/pi";
@@ -13,21 +11,79 @@ import { PiMoneyWavyDuotone } from "react-icons/pi";
 import { useState, useEffect } from "react";
 
 export default function Schedule() {
-   const [address, setAddress] = useState({
+   const [, setAddress] = useState({
       province: "",
       district: "",
       ward: "",
    });
+   const [data, setData] = useState([]);
+   const [currentPage, setCurrentPage] = useState(1);
 
-   // const [currentPage, setCurrentPage] = useState(1);
-   // const itemsPerPage = 8; // Số lượng sân hiển thị mỗi trang
+   const [addressData, setAddressData] = useState();
 
-   // State lưu danh sách sân bóng
-   // const [stadiums, setStadiums] = useState([]);
 
-   // // Lấy danh sách sân hiển thị trên trang hiện tại
-   // const startIndex = (currentPage - 1) * itemsPerPage;
-   // const paginatedStadiums = stadiums.slice(startIndex, startIndex + itemsPerPage);
+   const itemsPerPage = 8; // Số lượng sân hiển thị mỗi trang
+
+   // Lấy danh sách sân hiển thị trên trang hiện tại
+   const startIndex = (currentPage - 1) * itemsPerPage;
+   const paginatedData = data.slice(startIndex, startIndex + itemsPerPage);
+
+   const fetchFootballFields = async () => {
+      try {
+         const response = await fetch(`/api/foolbalField/`);
+         const result = await response.json();
+         console.log("API Response:", result);
+         if (result.success) {
+            const DataFootball = result.data.map((item, index) => ({
+               ...item,
+               key: item.id || index.toString(),
+            }));
+            setData(DataFootball);
+         } else {
+            console.error("Lỗi:", result.message);
+         }
+      } catch (error) {
+         console.error("Lỗi kết nối API:", error);
+      }
+   };
+
+   useEffect(() => {
+      fetchFootballFields();
+   }, []);
+
+   useEffect(() => {
+      const fetchAddressData = async () => {
+         const newAddressData = {};
+         for (const item of data) {
+            // console.log(`Đang fetch địa chỉ cho sân ID: ${item.id}`); // Debug ID sân
+            if (item.idProvince && item.idDistrict && item.idWard) {
+               const { province, district, ward } = await AddressFetcher(
+                  item.idProvince,
+                  item.idDistrict,
+                  item.idWard
+               );
+               // console.log(`Kết quả cho ID ${item.id}:`, { province, district, ward }); // Debug kết quả
+               newAddressData[item.id] = { province, district, ward };
+            }
+         }
+         setAddressData(newAddressData);
+         // console.log("Dữ liệu địa chỉ sau khi fetch:", newAddressData); // Debug toàn bộ dữ liệu
+      };
+
+      if (data.length > 0) {
+         fetchAddressData();
+      }
+   }, [data]);
+
+
+   const formatNumber = (n) => {
+      return new Intl.NumberFormat("en-US", {
+         style: "decimal",
+         minimumFractionDigits: 0,
+      }).format(n);
+   };
+
+   console.log(data)
 
    return (
       <>
@@ -48,36 +104,46 @@ export default function Schedule() {
                      </div>
                      <h2 className="text-center">Bãi sân</h2>
                      <div className="row">
-                        <div className="Box">
-                           <div className="name"> Sân bóng đá Kim Quý</div>
-                           <div className="row">
-                              <div className="size">
-                                 <p>Sân 7</p> <span><FaUser /></span>
+                        {paginatedData.length > 0 ? (
+                           paginatedData.map((item) => (
+                              <div className="Box" key={item.id}>
+                                 <div className="name">{item.name}</div>
+                                 <div className="size">
+                                    <p>Sân {item.size}</p> <span><FaUser /></span>
+                                 </div>
+                                 <div className="price">
+                                    <p>Giá: {formatNumber(item.price)}</p>
+                                    <span><PiMoneyWavyDuotone /></span>
+                                    <p>/{item.size === 11 ? ("90") : ("60")}p</p>
+                                 </div>
+                                 <div className="address">
+                                    Địa chỉ: {item.address}
+                                    {addressData && addressData[item.id] && (
+                                       `, ${addressData[item.id].ward}, ${addressData[item.id].district}, ${addressData[item.id].province}`
+                                    )}
+                                 </div>
                               </div>
-                              <div className="price">
-                                 <p>Giá: 200</p>
-                                 <span><PiMoneyWavyDuotone /></span>
-                                 <p>/1h</p>
-                              </div>
-                           </div>
-                           <div className="address">Địa chỉ: xã Phước Long, huyện Phước Long, Bạc Liêu</div>
-                        </div>
+                           ))
+                        ) : (
+                           <div>Không có sân bóng nào!</div>
+                        )}
                      </div>
                   </div>
                </div>
 
                {/* Phân trang */}
-               {/* <div className="Pagination">
+               <div className="Pagination">
                   <Pagination
                      align="end"
                      current={currentPage}
                      pageSize={itemsPerPage}
-                     total={stadiums.length}
+                     total={data.length}
                      onChange={(page) => setCurrentPage(page)}
                   />
-               </div> */}
+               </div>
             </div>
          </div>
+         <Footer />
       </>
    );
 }

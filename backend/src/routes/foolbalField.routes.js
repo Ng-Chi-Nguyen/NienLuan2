@@ -1,28 +1,28 @@
 import express from "express";
-import multer from "multer";
-import path from "path";
-import { createFoolballField, getAllFoolbalField, updateFootballField, deleteFootballField } from "../controllers/foolbalField.controller.js";
+import { multerConfig } from '../config/uploadFile.js'; // Import multerConfig
+
+import {
+   createFoolballField,
+   getAllFoolbalFieldById,
+   updateFootballField,
+   deleteFootballField,
+   getAllFoolbalField,
+   updateFootballFieldImage,
+   displayFootballFieldImage
+} from "../controllers/foolbalField.controller.js";
+
+// Dùng trực tiếp `multerConfig`
+const upload = multerConfig;
 
 const foolbalFieldRouter = express.Router();
 
-// Cấu hình Multer để lưu file vào thư mục `public/image/uploads/`
-const storage = multer.diskStorage({
-   destination: (req, file, cb) => {
-      cb(null, "public/image/uploads/");
-   },
-   filename: (req, file, cb) => {
-      cb(null, Date.now() + path.extname(file.originalname)); // Đổi tên file tránh trùng
-   },
-});
-
-const upload = multer({ storage });
-
-// API tạo sân bóng (hỗ trợ upload nhiều ảnh)
 foolbalFieldRouter
-   .post("/", upload.none(), createFoolballField)
-   // .post("/", upload.array("images", 5), createFoolballField)
-   .get("/:id", getAllFoolbalField)
+   .post("/", upload.array("images", 5), createFoolballField) // Nhận tối đa 5 ảnh
+   .get("/", getAllFoolbalField)
+   .get("/:id", getAllFoolbalFieldById)
    .post("/:id", updateFootballField)
    .delete("/:id", deleteFootballField)
+   .post("/:id/images", upload.array("images", 5), updateFootballFieldImage)
+   .get("/:id/images", displayFootballFieldImage);
 
 export default foolbalFieldRouter;

@@ -8,11 +8,11 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import path from "path";
 
-
 dotenv.config();
 
 
 const app = express();
+
 
 app.use(cors());
 // Middleware để đọc dữ liệu từ form HTML

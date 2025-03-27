@@ -45,7 +45,6 @@
          .size{
             display: flex;
             align-items: center;
-            width: 35%;
             padding-right: 0;
             span{
                margin-left: 5px;
@@ -53,12 +52,13 @@
             }
          }
          .price{
-            width: 60%;
+            padding-top: 10px;
             display: flex;
             align-items: center;
             span{
                font-size: 16px;
                margin: 0 3px;
+               color: #12b152;
             }
          }
          .address{
