@@ -8,7 +8,7 @@ import { multerConfig } from '../config/uploadFile.js'; // Import multerConfig
 
 const uploadRouter = express.Router();
 
-// ✅ Kiểm tra và tạo thư mục nếu chưa tồn tại
+// Kiểm tra và tạo thư mục nếu chưa tồn tại
 const upload = multerConfig;
 
 

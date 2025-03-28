@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Modal, Input, Select, InputNumber, Upload, Button, Image, TimePicker } from "antd";
 import { AddressSelector } from '../Address/Address';
 import { UploadOutlined } from "@ant-design/icons";
@@ -345,11 +345,13 @@ export function FootballFieldImages({
    const [fileList, setFileList] = useState([]);
    const [loading, setLoading] = useState(false);
 
-   const fetchImages = async () => {
+
+   const fetchImages = useCallback(async () => {
       if (!fieldId) return;
+
       try {
          const response = await axios.get(`/api/foolbalField/${fieldId}/images`);
-         console.log(response.data)
+         // console.log(response.data);
          if (response.data.success) {
             setImages(response.data.image || []);
          } else {
@@ -358,7 +360,7 @@ export function FootballFieldImages({
       } catch (error) {
          setImages([]);
       }
-   };
+   }, [fieldId]); // Chỉ thay đổi khi fieldId thay đổi
 
    const handleUpload = ({ fileList }) => {
       // Giới hạn tối đa 5 ảnh
@@ -421,7 +423,7 @@ export function FootballFieldImages({
          setFileList([]); // Xóa danh sách file
          fetchImages();   // Lấy ảnh mới từ API
       }
-   }, [fieldId, isImageModalOpen]);
+   }, [fieldId, isImageModalOpen, fetchImages]);
 
    return (
       <Modal
@@ -469,36 +471,32 @@ export function FootballFieldImages({
 }
 
 
-export function BookingModel({
-   isModalOpen,
-   handleCancel, bookingData
-}) {
+export function BookingModel({ isModalOpen, handleCancel, bookingData }) {
 
-   const [endTime, setEndTime] = useState(null);
+   const [endTime, setEndTime] = useState(0);
    const [business, setBusiness] = useState(null)
 
    const startTime = dayjs(bookingData.time, "HH:mm");
    const pricePerHour = bookingData.football.price;
-
    // Xử lý chọn thời gian kết thúc
    const handleTimeChange = (time) => {
       setEndTime(time);
    };
-
    // Tính tổng giá dựa trên số giờ đặt
    const calculatePrice = () => {
       if (!endTime) return 0;
-
-      const diffInMinutes = endTime.diff(startTime, "minute"); // Tính số phút
-      const hours = diffInMinutes / 60; // Quy đổi thành giờ
+      const diffInMinutes = endTime.diff(startTime, "minute");
+      const hours = diffInMinutes / 60;
       return pricePerHour * hours;
    };
+
    const formatNumber = (n) => {
       return new Intl.NumberFormat("en-US", {
          style: "decimal",
          minimumFractionDigits: 0,
       }).format(n);
    };
+
    useEffect(() => {
       const BusinessGetById = async (id) => {
          if (!id) {
@@ -520,71 +518,102 @@ export function BookingModel({
       }
    }, [bookingData.football?.idBusiness]);
    // console.log("business:", business[0].owner_name)
-   let handleBooking = () => {
-      const formData = {
-         name: bookingData.user?.owner_name || "",
-         footballName: bookingData.football?.name || "",
-         ownerName: business && business.length > 0 ? business[0].owner_name : "",
-         date: bookingData.date || "",
-         time: bookingData.time || "",
-         endTime: endTime ? endTime.format("HH:mm") : "",
-         price: calculatePrice()
-      };
 
-      console.log("Dữ liệu đặt sân:", formData);
-   }
+   let handleSubmit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+
+      // Chuyển date từ "DD-MM" thành "YYYY-MM-DD"
+      let [day, month] = data.date.split("-");
+      let today = new Date();
+      let year = today.getFullYear(); // Lấy năm hiện tại
+      let formattedDate = `${year}-${month}-${day}`; // Định dạng YYYY-MM-DD
+
+      data.date = formattedDate; // Cập nhật lại data trước khi gửi
+      formData.set("date", formattedDate); // Nếu gửi FormData
+
+      // Lấy type từ localStorage
+      const userData = localStorage.getItem("user");
+      if (userData) {
+         const user = JSON.parse(userData);
+         data.userType = user.type; // Thêm vào object data
+         formData.set("userType", user.type); // Thêm vào FormData
+      }
+
+      // console.log("Dữ liệu gửi lên:", data);
+
+      try {
+         let response = await axios.post("/api/bookingUser/", data, {
+            headers: {
+               "Content-Type": "application/json",
+            },
+         });
+         console.log("✅ Phản hồi từ server:", response.data);
+         setEndTime(0);
+         handleCancel()
+      } catch (e) {
+         console.error("❌ Lỗi khi gửi dữ liệu:", e);
+      }
+   };
    return (
       <Modal
          title="Chi tiết đặt sân"
          open={isModalOpen}
          onCancel={handleCancel}
-         footer={[
-            <Button key="close" onClick={handleBooking}>
-               Đặt sân ngay
-            </Button>,
-         ]}
+         footer={null}
       >
-         <form className='formBooking'>
+         <form className='formBooking' onSubmit={handleSubmit}>
             <div className="item">
                <label>Tên khách hàng: <span>{bookingData.user?.owner_name}</span></label>
+               <input name='id_User' type="hidden" value={bookingData.user?.id} />
             </div>
             <div className="item">
                <label>Tên sân bóng : <span>{bookingData.football?.name}</span></label>
+               <input name='id_FF' type="hidden" value={bookingData.football?.id} />
             </div>
             <div className="item">
                <label>Tên chủ sân bóng: <span>{business && business.length > 0 ? business[0].owner_name : "Đang tải..."}</span></label>
+               <input name='id_Business' type="hidden" value={business?.[0]?.id || ""} />
             </div>
             <div className="item">
                <label>Ngày đặt sân bóng: {bookingData.date}</label>
+               <input name='date' type="hidden" value={bookingData.date} />
             </div>
             <div className="item">
                <label>Giờ đặt sân: {bookingData.time} <HiArrowLongRight /> </label>
                <TimePicker
-                  defaultOpenValue={startTime}
-                  disabledHours={() => {
-                     const startHour = startTime.hour();
-                     return [...Array(startHour + 1).keys()]; // Vô hiệu hóa giờ trước giờ đặt sân
-                  }}
-                  disabledMinutes={(selectedHour) => {
-                     const startHour = startTime.hour();
-                     const startMinutes = startTime.minute();
+                  value={endTime}
+                  disabledTime={() => ({
+                     disabledHours: () => {
+                        const startHour = startTime.hour();
+                        return [...Array(startHour + 1).keys()];
+                     },
+                     disabledMinutes: (selectedHour) => {
+                        const startHour = startTime.hour();
+                        const startMinutes = startTime.minute();
 
-                     if (selectedHour === startHour) {
-                        return [...Array(startMinutes + 30).keys()]; // Vô hiệu hóa phút trước
-                     }
-                     return [];
-                  }}
+                        if (selectedHour === startHour) {
+                           return [...Array(startMinutes + 30).keys()];
+                        }
+                        return [];
+                     },
+                  })}
                   format="HH:mm"
-                  minuteStep={30} // Chỉ cho phép chọn cách nhau 30 phút (00, 30)
+                  minuteStep={30}
                   showNow={false}
-                  onChange={handleTimeChange} // Cập nhật thời gian kết thúc
+                  onChange={handleTimeChange}
                />
+               <input name='timeStart' type="hidden" value={bookingData.time} />
+               <input name='timeEnd' type="hidden" value={endTime ? endTime.format("HH:mm") : ""} />
             </div>
             <div className="item">
                <label>
                   Giá: <span>{formatNumber(calculatePrice())} VND</span>
+                  <input name='price' type="hidden" value={(calculatePrice())} />
                </label>
             </div>
+            <button type='submit'>Đặt sân ngay</button>
          </form>
       </Modal >
    )

@@ -7,7 +7,6 @@ import { BookingModel } from "../../components/Model/Model";
 import { useNavigate } from "react-router-dom";
 export default function BookingBusiness() {
    const navigate = useNavigate();
-
    const [isModalVisible, setIsModalVisible] = useState(false);
    const [selectedBooking, setSelectedBooking] = useState([]);
    const [selectedCell, setSelectedCell] = useState(null);
@@ -24,7 +23,7 @@ export default function BookingBusiness() {
    };
 
    const handleCancel = () => {
-      setSelectedCell(null)
+      setSelectedCell(null);
       setIsModalVisible(false); // Đóng modal
    };
 
@@ -35,15 +34,10 @@ export default function BookingBusiness() {
 
       if (token && userData) {
          try {
-            // 🛠 Parse userData trước khi lưu
             const parsedUser = JSON.parse(userData);
-
-            // ✅ Lưu vào localStorage
             localStorage.setItem("token", token);
             localStorage.setItem("user", JSON.stringify(parsedUser));
-
             setUser(parsedUser);
-
             navigate("/User", { replace: true });
          } catch (error) {
             console.error("Lỗi parse userData:", error);
@@ -60,11 +54,10 @@ export default function BookingBusiness() {
       }
    }, [navigate]);
 
-   // HIEN THI NGAY THANG THU TRONG TUAN
    const getMonday = (date) => {
       let d = new Date(date);
-      let day = d.getDay(); // Lấy thứ trong tuần (0: Chủ nhật, 1: Thứ 2, ..., 6: Thứ 7)
-      let diff = day === 0 ? -6 : 1 - day; // Nếu Chủ nhật (0) thì lùi về Thứ 2 (-6), ngược lại lùi về đúng Thứ 2
+      let day = d.getDay();
+      let diff = day === 0 ? -6 : 1 - day;
       d.setDate(d.getDate() + diff);
       return d;
    };
@@ -99,14 +92,11 @@ export default function BookingBusiness() {
    };
 
    const weekDays = generateWeekDays();
-   // console.log(weekDays);
-
-   // HIEN THI H
 
    const generateTimeSlots = () => {
       let times = [];
-      let startTime = dayjs().hour(5).minute(0).second(0); // Bắt đầu từ 5:00 sáng
-      let endTime = dayjs().hour(23).minute(30); // Dừng tại 23:30
+      let startTime = dayjs().hour(5).minute(0).second(0);
+      let endTime = dayjs().hour(23).minute(30);
 
       while (startTime.isBefore(endTime)) {
          times.push(startTime.format("HH:mm"));
@@ -117,22 +107,10 @@ export default function BookingBusiness() {
    };
 
    const timeSlots = generateTimeSlots();
-   // console.log(timeSlots);
-
-   const bookings = [
-      { date: "24/03", timeStart: "07:00", timeEnd: "08:00" },
-      { date: "25/03", timeStart: "09:30", timeEnd: "10:30" },
-      { date: "26/03", timeStart: "15:00", timeEnd: "16:00" }
-   ];
-
-   const parseTimeToMinutes = (time) => {
-      const [hours, minutes] = time.split(":").map(Number);
-      return hours * 60 + minutes;
-   };
 
    const bookingData = {
-      user: user, // Dữ liệu người dùng đã lưu
-      football: sanBong, // Thông tin sân bóng
+      user: user,
+      football: sanBong,
       date: selectedBooking.date,
       time: selectedBooking.time,
    };
@@ -143,7 +121,6 @@ export default function BookingBusiness() {
          <div className="booking-container">
             <h4>Lịch đặt sân của sân bóng {sanBong.name}</h4>
             <div className="calendar-container">
-               {/* Cột ngày + thứ */}
                <div className="date-column">
                   {weekDays.map((day, index) => (
                      <div key={index} className="date-slot">
@@ -155,43 +132,27 @@ export default function BookingBusiness() {
                </div>
 
                <div className="main-calendar">
-                  {/* Hàng ngang hiển thị giờ */}
                   <div className="time-header">
                      {timeSlots.map((time, index) => (
                         <div key={index} className="time-slot">{time}</div>
                      ))}
                   </div>
-                  {/* Nội dung lịch đặt sân */}
                   <div className="calendar-container">
                      <div className="header-row">
-                        <div className="corner-box"></div> {/* Ô trống góc trái */}
+                        <div className="corner-box"></div>
                      </div>
-                     {timeSlots.map((time, timeIndex) => {
-                        const timeInMinutes = parseTimeToMinutes(time);
-
-                        return (
-                           <div key={timeIndex} className="time-row">
-                              {weekDays.map((day, dayIndex) => {
-                                 const bookingInfo = bookings.find(
-                                    (b) =>
-                                       b.date === day.date &&
-                                       timeInMinutes >= parseTimeToMinutes(b.timeStart) &&
-                                       timeInMinutes < parseTimeToMinutes(b.timeEnd)
-                                 );
-
-                                 return (
-                                    <div
-                                       key={dayIndex}
-                                       className={`content-booking ${bookingInfo ? "booked" : ""} ${selectedCell === `${day.date}-${time}` ? "selected" : ""}`}
-                                       onClick={() => handleClick(day.date, time)}
-                                    >
-                                       {bookingInfo ? `${bookingInfo.timeStart} - ${bookingInfo.timeEnd}` : ""}
-                                    </div>
-                                 );
-                              })}
-                           </div>
-                        );
-                     })}
+                     {timeSlots.map((time, timeIndex) => (
+                        <div key={timeIndex} className="time-row">
+                           {weekDays.map((day, dayIndex) => (
+                              <div
+                                 key={dayIndex}
+                                 className={`content-booking ${selectedCell === `${day.date}-${time}` ? "selected" : ""}`}
+                                 onClick={() => handleClick(day.date, time)}
+                              >
+                              </div>
+                           ))}
+                        </div>
+                     ))}
                      <BookingModel
                         isModalOpen={isModalVisible}
                         handleCancel={handleCancel}
