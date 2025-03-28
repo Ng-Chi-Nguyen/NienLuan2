@@ -4,6 +4,7 @@ import { Pagination } from "antd";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import "./Schedule.scss";
+import { useNavigate } from "react-router-dom";
 
 import { FaUser } from "react-icons/fa";
 import { PiMoneyWavyDuotone } from "react-icons/pi";
@@ -18,9 +19,10 @@ export default function Schedule() {
    });
    const [data, setData] = useState([]);
    const [currentPage, setCurrentPage] = useState(1);
-
    const [addressData, setAddressData] = useState();
+   const [images, setImages] = useState([]);
 
+   const navigate = useNavigate();
 
    const itemsPerPage = 8; // Số lượng sân hiển thị mỗi trang
 
@@ -28,28 +30,35 @@ export default function Schedule() {
    const startIndex = (currentPage - 1) * itemsPerPage;
    const paginatedData = data.slice(startIndex, startIndex + itemsPerPage);
 
-   const fetchFootballFields = async () => {
-      try {
-         const response = await fetch(`/api/foolbalField/`);
-         const result = await response.json();
-         console.log("API Response:", result);
-         if (result.success) {
-            const DataFootball = result.data.map((item, index) => ({
-               ...item,
-               key: item.id || index.toString(),
-            }));
-            setData(DataFootball);
-         } else {
-            console.error("Lỗi:", result.message);
-         }
-      } catch (error) {
-         console.error("Lỗi kết nối API:", error);
-      }
-   };
-
    useEffect(() => {
+      const fetchFootballFields = async () => {
+         try {
+            const response = await fetch(`/api/foolbalField/`);
+            const result = await response.json();
+            console.log("API Response:", result);
+
+            if (result.success) {
+               const DataFootball = result.data.map((item, index) => ({
+                  ...item,
+                  key: item.id || index.toString(),
+               }));
+               setData(DataFootball);
+
+               // Gọi fetchImages() cho từng sân bóng
+               DataFootball.forEach(field => {
+                  if (field.id) fetchImages(field.id);
+               });
+            } else {
+               console.error("Lỗi:", result.message);
+            }
+         } catch (error) {
+            console.error("Lỗi kết nối API:", error);
+         }
+      };
+
       fetchFootballFields();
    }, []);
+
 
    useEffect(() => {
       const fetchAddressData = async () => {
@@ -83,7 +92,35 @@ export default function Schedule() {
       }).format(n);
    };
 
-   console.log(data)
+   // console.log(data)
+
+   const fetchImages = async (fieldId) => {
+      if (!fieldId) {
+         console.warn("fieldId không hợp lệ:", fieldId);
+         return;
+      }
+      try {
+         const response = await fetch(`/api/foolbalField/${fieldId}/images`);
+         const result = await response.json();
+         // console.log(`Hình ảnh cho sân ID ${fieldId}:`, result);
+
+         if (result.success && result.image.length > 0) {
+            setImages((prevImages) => ({
+               ...prevImages,
+               [fieldId]: result.image[0].image_url, // Chỉ lấy ảnh đầu tiên
+            }));
+         } else {
+            setImages((prevImages) => ({ ...prevImages, [fieldId]: null }));
+         }
+      } catch (error) {
+         console.error("Lỗi tải ảnh:", error);
+      }
+   };
+
+   const handleBookingUserClickPage = (sanBong) => {
+      navigate(`/BookingUser/${sanBong.id}`, { state: sanBong });
+   };
+
 
    return (
       <>
@@ -106,21 +143,30 @@ export default function Schedule() {
                      <div className="row">
                         {paginatedData.length > 0 ? (
                            paginatedData.map((item) => (
-                              <div className="Box" key={item.id}>
-                                 <div className="name">{item.name}</div>
-                                 <div className="size">
-                                    <p>Sân {item.size}</p> <span><FaUser /></span>
-                                 </div>
-                                 <div className="price">
-                                    <p>Giá: {formatNumber(item.price)}</p>
-                                    <span><PiMoneyWavyDuotone /></span>
-                                    <p>/{item.size === 11 ? ("90") : ("60")}p</p>
-                                 </div>
-                                 <div className="address">
-                                    Địa chỉ: {item.address}
-                                    {addressData && addressData[item.id] && (
-                                       `, ${addressData[item.id].ward}, ${addressData[item.id].district}, ${addressData[item.id].province}`
+                              <div className="Box" key={item.id} onClick={() => handleBookingUserClickPage(item)}>
+                                 <div className="top">
+                                    {images[item.id] ? (
+                                       <img src={`${process.env.REACT_APP_API_URL}${images[item.id]}`} alt="Sân bóng" />
+                                    ) : (
+                                       <p>Chưa có ảnh</p>
                                     )}
+                                 </div>
+                                 <div className="bottom">
+                                    <div className="name">{item.name}</div>
+                                    <div className="size">
+                                       <p>Sân {item.size}</p> <span><FaUser /></span>
+                                    </div>
+                                    <div className="price">
+                                       <p>Giá: {formatNumber(item.price)}</p>
+                                       <span><PiMoneyWavyDuotone /></span>
+                                       <p>/{item.size === 11 ? ("90") : ("60")}p</p>
+                                    </div>
+                                    <div className="address">
+                                       Địa chỉ: {item.address}
+                                       {addressData && addressData[item.id] && (
+                                          `, ${addressData[item.id].ward}, ${addressData[item.id].district}, ${addressData[item.id].province}`
+                                       )}
+                                    </div>
                                  </div>
                               </div>
                            ))

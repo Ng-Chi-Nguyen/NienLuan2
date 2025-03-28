@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Modal, Input, Select, InputNumber, Upload, Button, Image } from "antd";
+import { Modal, Input, Select, InputNumber, Upload, Button, Image, TimePicker } from "antd";
 import { AddressSelector } from '../Address/Address';
 import { UploadOutlined } from "@ant-design/icons";
 import axios from 'axios';
 import './Model.scss';
+import dayjs from 'dayjs';
 import { RiCloseLargeLine } from "react-icons/ri";
-
+import { HiArrowLongRight } from "react-icons/hi2";
 
 export function CreateFootballField({
    user,
@@ -343,11 +344,9 @@ export function FootballFieldImages({
    const [images, setImages] = useState([]);
    const [fileList, setFileList] = useState([]);
    const [loading, setLoading] = useState(false);
-   const [uploading, setUploading] = useState(false);
 
    const fetchImages = async () => {
       if (!fieldId) return;
-      setLoading(true);
       try {
          const response = await axios.get(`/api/foolbalField/${fieldId}/images`);
          console.log(response.data)
@@ -358,21 +357,33 @@ export function FootballFieldImages({
          }
       } catch (error) {
          setImages([]);
-      } finally {
-         setLoading(false);
       }
    };
 
    const handleUpload = ({ fileList }) => {
+      // Giới hạn tối đa 5 ảnh
       if (fileList.length > 5) {
          fileList = fileList.slice(0, 5);
       }
-      const newFileList = fileList.map(file => ({
-         ...file,
-         preview: file.originFileObj ? URL.createObjectURL(file.originFileObj) : file.url
-      }));
-      setFileList(newFileList);
+
+      // Loại bỏ ảnh trùng
+      const uniqueFiles = [];
+      const fileMap = new Set();
+
+      fileList.forEach(file => {
+         const fileName = file.originFileObj?.name || file.url;
+         if (!fileMap.has(fileName)) {
+            fileMap.add(fileName);
+            uniqueFiles.push({
+               ...file,
+               preview: file.originFileObj ? URL.createObjectURL(file.originFileObj) : file.url
+            });
+         }
+      });
+
+      setFileList(uniqueFiles);
    };
+
 
    const handleDelete = (index) => {
       const newList = fileList.filter((_, i) => i !== index);
@@ -380,30 +391,35 @@ export function FootballFieldImages({
    };
 
    const handleUploadFiles = async () => {
-      // console.log("fieldId:", fieldId);
-      setLoading(true)
-
       if (!fieldId || fileList.length === 0) return;
+      setLoading(true);
+
       const formData = new FormData();
       fileList.forEach(file => {
          formData.append("images", file.originFileObj);
       });
-      setUploading(true);
+
       try {
          const response = await axios.post(`/api/foolbalField/${fieldId}/images`, formData);
          if (response.data.success) {
-            fetchImages(); // Cập nhật danh sách ảnh mới
-            setFileList([]); // Xóa danh sách file
-            setIsImageModalOpen(false); // 🔥 Đóng modal sau khi tải thành công
+            setFileList([]);    // Xóa danh sách file tạm thời
+            setImages([]);      // Reset images để tránh lỗi hiển thị cũ
+            await fetchImages(); // Lấy danh sách ảnh mới từ server
+            setIsImageModalOpen(false); // Đóng modal
          }
       } catch (error) {
          console.error("Lỗi tải ảnh:", error);
+      } finally {
+         setLoading(false);
       }
    };
 
+
    useEffect(() => {
       if (isImageModalOpen) {
-         fetchImages();
+         setImages([]);   // Xóa ảnh cũ
+         setFileList([]); // Xóa danh sách file
+         fetchImages();   // Lấy ảnh mới từ API
       }
    }, [fieldId, isImageModalOpen]);
 
@@ -443,11 +459,71 @@ export function FootballFieldImages({
             </div>
 
             <div className="submit">
-               <button onClick={handleUploadFiles} disabled={uploading || fileList.length === 0}>
-                  {uploading ? "Đang tải lên..." : "Tải ảnh lên"}
+               <button onClick={handleUploadFiles} disabled={loading || fileList.length === 0}>
+                  {loading ? "Đang tải lên..." : "Tải ảnh lên"}
                </button>
             </div>
          </div>
       </Modal>
    );
+}
+
+
+export function BookingModel({
+   isModalOpen,
+   handleCancel, bookingData
+}) {
+   console.log(bookingData)
+   return (
+      <Modal
+         title="Chi tiết đặt sân"
+         open={isModalOpen}
+         onCancel={handleCancel}
+         footer={[
+            <Button key="close" onClick={handleCancel}>
+               Đóng
+            </Button>,
+         ]}
+      >
+         <form className='formBooking'>
+            <div className="item">
+               <label>Tên khách hàng</label>
+               <Input name='name' value={bookingData.user?.owner_name || ""} required />
+            </div>
+            <div className="item">
+               <label>Tên sân bóng</label>
+               <Input name='name' value={bookingData.football?.name || ""} required />
+            </div>
+            <div className="item">
+               <label>Tên chủ sân bóng</label>
+               <Input name='name' value={bookingData.football?.name || ""} required />
+            </div>
+            <div className="item">
+               <label>Ngày đặt sân bóng: {bookingData.date}</label>
+            </div>
+            <div className="item">
+               <label>Giờ đặt sân: {bookingData.time} <HiArrowLongRight /> </label>
+               <TimePicker
+                  defaultOpenValue={dayjs(bookingData.time, 'HH:mm')}
+                  disabledHours={() => {
+                     const startHour = dayjs(bookingData.time, 'HH:mm').hour();
+                     return [...Array(startHour + 1).keys()]; // Vô hiệu hóa giờ trước giờ đặt sân
+                  }}
+                  disabledMinutes={(selectedHour) => {
+                     const startHour = dayjs(bookingData.time, 'HH:mm').hour();
+                     const startMinutes = dayjs(bookingData.time, 'HH:mm').minute();
+
+                     if (selectedHour === startHour) {
+                        return [...Array(startMinutes + 30).keys()]; // Vô hiệu hóa phút trước (nếu < 30 thì chặn hết)
+                     }
+                     return [];
+                  }}
+                  format="HH:mm"
+                  minuteStep={30} // Chỉ cho phép chọn cách nhau 30 phút (00, 30)
+                  showNow={false}
+               />
+            </div>
+         </form>
+      </Modal>
+   )
 }

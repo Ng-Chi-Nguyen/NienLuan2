@@ -19,17 +19,21 @@
          margin-top: 25px;
       }
       .Box{
-         background: 
-         url("../../assets/bautroi-schude.png") top center / cover no-repeat, /* Ảnh bầu trời */
-         url("../../assets/bg-sanco-schude.png") bottom -60px center / cover no-repeat; /* Dịch ảnh cỏ xuống */
          width: calc(25% - 20px);
          margin: 10px;
          box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.1), 
             0 2px 6px -1px rgba(0, 0, 0, 0.08), 
             0 3px 8px 0 rgba(0, 0, 0, 0.06);
-         padding: 80px 10px 10px 10px;
+         padding: 10px 10px 10px 10px;
          cursor: pointer;
-         height: 350px;
+         height: auto;
+         .top{
+            img{
+               width: 100%;
+               height: 150px;
+               object-fit: cover;
+            }
+         }
          p{
             margin: 0;
          }

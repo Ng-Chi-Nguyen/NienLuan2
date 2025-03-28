@@ -1,4 +1,4 @@
-import { createBusinessService, updateBusinessService } from "../services/buness.service.js";
+import { createBusinessService, updateBusinessService, displayBusinessService } from "../services/buness.service.js";
 
 export const createBuness = async (req, res) => {
 
@@ -55,4 +55,26 @@ export const updateBusiness = async (req, res) => {
       console.error("Lỗi hệ thống:", e);
       return res.status(500).json({ error: "Lỗi hệ thống" });
    }
+}
+
+export const displayBusiness = async (req, res) => {
+   let { id } = req.params;
+   // console.log(id)
+   if (!id) {
+      return res.json({
+         success: false,
+         message: `Không tìm thấy id ${id}`
+      })
+   }
+   let result = await displayBusinessService(id)
+   if (!result.success) {
+      return res.json({
+         success: result.success,
+         message: result.error
+      })
+   }
+   return res.json({
+      success: result.success,
+      data: result.data
+   })
 }

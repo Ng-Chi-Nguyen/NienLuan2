@@ -5,7 +5,6 @@ import { FaRegCheckCircle, FaRegEdit } from "react-icons/fa";
 import { IoAddOutline } from "react-icons/io5";
 import { CiNoWaitingSign } from "react-icons/ci";
 import { MdOutlineDeleteOutline } from "react-icons/md";
-import { Modal } from 'antd';
 import { AddressFetcher } from '../../../components/Address/Address';
 import { useNavigate } from "react-router-dom";
 import { CreateFootballField, EditFootballField, FootballFieldImages } from '../../../components/Model/Model';
@@ -18,7 +17,6 @@ export default function FoolbalField({ user }) {
    const [data, setData] = useState([]);
    const [addressData, setAddressData] = useState(null);
    const [selectedFF, setSelectedFF] = useState(null);
-   const [selectedImages,] = useState([]);
    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
    const [selectedFieldId, setSelectedFieldId] = useState(null);
 
@@ -109,7 +107,7 @@ export default function FoolbalField({ user }) {
       }
    };
 
-   const handleBookingClickPage = (sanBong) => {
+   const handleBookingBusinessClickPage = (sanBong) => {
       navigate(`/BookingBusiness/${sanBong.id}`, { state: sanBong });
    };
 
@@ -159,7 +157,7 @@ export default function FoolbalField({ user }) {
                <tbody>
                   {data && Array.isArray(data) && data.length > 0 ? (
                      data.map((item) => (
-                        <tr key={item.id} onClick={() => handleBookingClickPage(item)}>
+                        <tr key={item.id} onClick={() => handleBookingBusinessClickPage(item)}>
                            <td className="text-center">{item.id}</td>
                            <td>{item.name}</td>
                            <td className="text-center">{item.size}</td>

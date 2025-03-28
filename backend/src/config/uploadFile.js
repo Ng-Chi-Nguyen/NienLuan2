@@ -16,10 +16,11 @@ const storage = multer.diskStorage({
    },
    filename: (req, file, cb) => {
       const timestamp = Date.now();
+      const randomStr = Math.floor(Math.random() * 1000); // Tạo số ngẫu nhiên
       const extension = path.extname(file.originalname);
-      const fileName = `${timestamp}${extension}`;
+      const fileName = `${timestamp}_${randomStr}${extension}`;
       cb(null, fileName);
-   },
+   }
 });
 
 // Khởi tạo Multer với cấu hình

@@ -88,4 +88,27 @@ let updateBusinessService = async (id, businessData) => {
       return { success: false, error: "Lỗi server" };
    }
 }
-export { createBusinessService, updateBusinessService };
+
+let displayBusinessService = async (id) => {
+   try {
+      if (!id) {
+         return { success: false, error: "Thiếu id!" };
+      }
+      const { data, error } = await sql
+         .from('Business')
+         .select("*")
+         .eq("id", id)
+
+      if (error) {
+         return { success: false, message: error.message }
+      }
+      return {
+         success: true,
+         data: data
+      }
+   } catch (e) {
+      console.log(e)
+   }
+}
+
+export { createBusinessService, updateBusinessService, displayBusinessService };

@@ -1,5 +1,4 @@
 import { sql } from '../config/connect.js';
-import path from 'path';
 
 
 let createFoolballFieldService = async (fieldData) => {
@@ -26,7 +25,7 @@ let createFoolballFieldService = async (fieldData) => {
          return { success: false, error: "Trường bóng đá đã tồn tại!" };
       }
 
-      // ✅ Tạo sân bóng mới
+      // Tạo sân bóng mới
       const { data, error } = await sql
          .from('FoolbalField')
          .insert([
@@ -208,8 +207,6 @@ const getAllFoolbalFieldService = async () => {
 
 const updateFootballFieldImageService = async (id, imageUrls) => {
    try {
-      console.log("🏟 Cập nhật ảnh cho sân bóng ID:", id);
-
       // Kiểm tra xem sân bóng có tồn tại không
       const { data: currentData, error: fetchError } = await sql
          .from("FoolbalField")
@@ -221,19 +218,16 @@ const updateFootballFieldImageService = async (id, imageUrls) => {
          return { success: false, error: "Không tìm thấy sân bóng!" };
       }
 
-      // Nếu imageUrls không phải là mảng hoặc rỗng => Lỗi
+      // Kiểm tra imageUrls có hợp lệ không
       if (!Array.isArray(imageUrls) || imageUrls.length === 0) {
          return { success: false, error: "Không có ảnh hợp lệ để cập nhật!" };
       }
 
-      console.log("📸 Ảnh mới:", imageUrls);
-
-      // ❌ Xóa ảnh cũ trước khi thêm ảnh mới
+      // Xóa ảnh cũ
       await sql.from("FootballFieldImages").delete().eq("id_FField", id);
 
-      // ✅ Thêm ảnh mới vào bảng FootballFieldImages
+      // Thêm ảnh mới
       const imageData = imageUrls.map(url => ({ id_FField: id, image_url: url }));
-
       const { error: imageError } = await sql.from("FootballFieldImages").insert(imageData);
 
       if (imageError) {
@@ -250,7 +244,8 @@ const updateFootballFieldImageService = async (id, imageUrls) => {
 };
 
 
-export const getFootballFieldImageService = async (fieldId) => {
+
+const getFootballFieldImageService = async (fieldId) => {
    // console.log(fieldId)
    try {
       // Lấy danh sách ảnh từ bảng FootballFieldImages
@@ -260,10 +255,10 @@ export const getFootballFieldImageService = async (fieldId) => {
          .eq("id_FField", fieldId)
          .order("created_at", { ascending: true }) // Lấy ảnh cũ nhất làm ảnh mô tả anh nao cu se dung dau list
 
+      console.log(images)
       if (error || !images.length) {
          return { success: false, message: "Không tìm thấy ảnh!" };
       }
-
       // Chỉ lấy ảnh đầu tiên làm ảnh mô tả
       return { success: true, image: images };
    } catch (error) {
@@ -278,5 +273,6 @@ export {
    updateFootballFieldService,
    deleteFootballFieldService,
    getAllFoolbalFieldService,
-   updateFootballFieldImageService
+   updateFootballFieldImageService,
+   getFootballFieldImageService
 }
