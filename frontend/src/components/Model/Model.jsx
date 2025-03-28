@@ -473,30 +473,86 @@ export function BookingModel({
    isModalOpen,
    handleCancel, bookingData
 }) {
-   console.log(bookingData)
+
+   const [endTime, setEndTime] = useState(null);
+   const [business, setBusiness] = useState(null)
+
+   const startTime = dayjs(bookingData.time, "HH:mm");
+   const pricePerHour = bookingData.football.price;
+
+   // Xử lý chọn thời gian kết thúc
+   const handleTimeChange = (time) => {
+      setEndTime(time);
+   };
+
+   // Tính tổng giá dựa trên số giờ đặt
+   const calculatePrice = () => {
+      if (!endTime) return 0;
+
+      const diffInMinutes = endTime.diff(startTime, "minute"); // Tính số phút
+      const hours = diffInMinutes / 60; // Quy đổi thành giờ
+      return pricePerHour * hours;
+   };
+   const formatNumber = (n) => {
+      return new Intl.NumberFormat("en-US", {
+         style: "decimal",
+         minimumFractionDigits: 0,
+      }).format(n);
+   };
+   useEffect(() => {
+      const BusinessGetById = async (id) => {
+         if (!id) {
+            console.log(`Không tìm thấy ${id}`);
+            return;
+         }
+         try {
+            let response = await axios.get(`/api/business/${id}`);
+            if (response.data.success) {
+               setBusiness(response.data.data); // Lưu dữ liệu vào state
+            }
+         } catch (e) {
+            console.log("Lỗi khi lấy thông tin doanh nghiệp:", e);
+         }
+      };
+
+      if (bookingData.football?.idBusiness) {
+         BusinessGetById(bookingData.football.idBusiness);
+      }
+   }, [bookingData.football?.idBusiness]);
+   // console.log("business:", business[0].owner_name)
+   let handleBooking = () => {
+      const formData = {
+         name: bookingData.user?.owner_name || "",
+         footballName: bookingData.football?.name || "",
+         ownerName: business && business.length > 0 ? business[0].owner_name : "",
+         date: bookingData.date || "",
+         time: bookingData.time || "",
+         endTime: endTime ? endTime.format("HH:mm") : "",
+         price: calculatePrice()
+      };
+
+      console.log("Dữ liệu đặt sân:", formData);
+   }
    return (
       <Modal
          title="Chi tiết đặt sân"
          open={isModalOpen}
          onCancel={handleCancel}
          footer={[
-            <Button key="close" onClick={handleCancel}>
-               Đóng
+            <Button key="close" onClick={handleBooking}>
+               Đặt sân ngay
             </Button>,
          ]}
       >
          <form className='formBooking'>
             <div className="item">
-               <label>Tên khách hàng</label>
-               <Input name='name' value={bookingData.user?.owner_name || ""} required />
+               <label>Tên khách hàng: <span>{bookingData.user?.owner_name}</span></label>
             </div>
             <div className="item">
-               <label>Tên sân bóng</label>
-               <Input name='name' value={bookingData.football?.name || ""} required />
+               <label>Tên sân bóng : <span>{bookingData.football?.name}</span></label>
             </div>
             <div className="item">
-               <label>Tên chủ sân bóng</label>
-               <Input name='name' value={bookingData.football?.name || ""} required />
+               <label>Tên chủ sân bóng: <span>{business && business.length > 0 ? business[0].owner_name : "Đang tải..."}</span></label>
             </div>
             <div className="item">
                <label>Ngày đặt sân bóng: {bookingData.date}</label>
@@ -504,26 +560,32 @@ export function BookingModel({
             <div className="item">
                <label>Giờ đặt sân: {bookingData.time} <HiArrowLongRight /> </label>
                <TimePicker
-                  defaultOpenValue={dayjs(bookingData.time, 'HH:mm')}
+                  defaultOpenValue={startTime}
                   disabledHours={() => {
-                     const startHour = dayjs(bookingData.time, 'HH:mm').hour();
+                     const startHour = startTime.hour();
                      return [...Array(startHour + 1).keys()]; // Vô hiệu hóa giờ trước giờ đặt sân
                   }}
                   disabledMinutes={(selectedHour) => {
-                     const startHour = dayjs(bookingData.time, 'HH:mm').hour();
-                     const startMinutes = dayjs(bookingData.time, 'HH:mm').minute();
+                     const startHour = startTime.hour();
+                     const startMinutes = startTime.minute();
 
                      if (selectedHour === startHour) {
-                        return [...Array(startMinutes + 30).keys()]; // Vô hiệu hóa phút trước (nếu < 30 thì chặn hết)
+                        return [...Array(startMinutes + 30).keys()]; // Vô hiệu hóa phút trước
                      }
                      return [];
                   }}
                   format="HH:mm"
                   minuteStep={30} // Chỉ cho phép chọn cách nhau 30 phút (00, 30)
                   showNow={false}
+                  onChange={handleTimeChange} // Cập nhật thời gian kết thúc
                />
             </div>
+            <div className="item">
+               <label>
+                  Giá: <span>{formatNumber(calculatePrice())} VND</span>
+               </label>
+            </div>
          </form>
-      </Modal>
+      </Modal >
    )
 }
