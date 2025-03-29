@@ -55,6 +55,29 @@ let createBookingService = async (bookingData) => {
          };
       }
 
+      // ✅ **Kiểm tra xem khung giờ đã có ai đặt chưa**
+      const { data: existingBookings } = await sql
+         .from("Booking")
+         .select("id, timeStart, timeEnd")
+         .eq("id_FF", id_FF)
+         .eq("date", date);
+
+      const isConflict = existingBookings.some((booking) => {
+         return (
+            (timeStart >= booking.timeStart && timeStart < booking.timeEnd) || // Bắt đầu trong khoảng đã đặt
+            (timeEnd > booking.timeStart && timeEnd <= booking.timeEnd) || // Kết thúc trong khoảng đã đặt
+            (timeStart <= booking.timeStart && timeEnd >= booking.timeEnd) // Bao trùm toàn bộ khung giờ đã đặt
+         );
+      });
+
+      if (isConflict) {
+         return {
+            success: false,
+            message: "Khung giờ này đã có người đặt!"
+         };
+      }
+
+
       // Thêm vào bảng Booking
       const { data, error } = await sql
          .from("Booking")
@@ -83,4 +106,80 @@ let createBookingService = async (bookingData) => {
    }
 };
 
-export { createBookingService };
+let displayBokingService = async (idFF) => {
+   // console.log(idFF)
+   try {
+      const { data, error } = await sql
+         .from("Booking")
+         .select("*")
+         .eq("id_FF", idFF)
+
+      if (error) {
+         return {
+            success: false,
+            message: error
+         }
+      }
+      return {
+         success: true,
+         data
+      }
+   } catch (e) {
+      return {
+         success: false,
+         message: e
+      }
+   }
+}
+
+let displayBokingInfoUserService = async (idUser, type) => {
+   try {
+      if (type === "user") {
+         const { data, error } = await sql
+            .from("User")
+            .select("*")
+            .eq("id", idUser)
+            .single()
+         if (!data) {
+            return {
+               success: false,
+               message: "Người dùng không tồn tại" + error
+            }
+         }
+      } else if (type === business) {
+         const { data, error } = await sql
+            .from("Business")
+            .select("*")
+            .eq("id", idUser)
+            .single()
+         if (!data) {
+            return {
+               success: false,
+               message: "Người dùng không tồn tại" + error
+            }
+         }
+      }
+      const { data, error } = await sql
+         .from("Booking")
+         .select("*")
+         .eq("id_User", idUser)
+      if (error) {
+         return {
+            success: false,
+            message: error
+         }
+      }
+      return {
+         success: true,
+         data
+      }
+   } catch (e) {
+      console.log(e)
+      return {
+         success: false,
+         message: e
+      }
+   }
+}
+
+export { createBookingService, displayBokingService, displayBokingInfoUserService };

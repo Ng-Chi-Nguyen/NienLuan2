@@ -255,7 +255,6 @@ const getFootballFieldImageService = async (fieldId) => {
          .eq("id_FField", fieldId)
          .order("created_at", { ascending: true }) // Lấy ảnh cũ nhất làm ảnh mô tả anh nao cu se dung dau list
 
-      console.log(images)
       if (error || !images.length) {
          return { success: false, message: "Không tìm thấy ảnh!" };
       }

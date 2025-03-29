@@ -73,14 +73,33 @@
             border: 0.5px solid #ddd;
             padding: 0;
             &.selected  {
-               background-color: yellow; // Màu đỏ cho khung giờ đã đặt
+               background-color: gray;
                color: white;
                font-weight: bold;
                text-align: center;
+               border-left: 0;
+               &.selected:hover {
+                  background-color: gray !important; /* Giữ nguyên màu */
+                  color: white !important; /* Giữ nguyên chữ */
+                  cursor: not-allowed; /* Đổi con trỏ thành dấu cấm (tùy chọn) */
+                  pointer-events: none;
+               }
             }
             &:hover{
                background: #b4d6f8;
                cursor: pointer;
+            }
+            .content{
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 14px;
+
+            }
+            .past-time {
+               background-color: #d3d3d3 !important; // Màu xám nhạt
+               color: #888 !important;
+               pointer-events: none; // Không cho click vào
             }
          }
             

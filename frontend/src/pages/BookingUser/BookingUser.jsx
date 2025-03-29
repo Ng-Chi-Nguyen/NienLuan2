@@ -1,16 +1,18 @@
 import { useLocation } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import dayjs from "dayjs";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import './BookingUser.scss';
 import { BookingModel } from "../../components/Model/Model";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 export default function BookingBusiness() {
    const navigate = useNavigate();
    const [isModalVisible, setIsModalVisible] = useState(false);
    const [selectedBooking, setSelectedBooking] = useState([]);
    const [selectedCell, setSelectedCell] = useState(null);
    const [user, setUser] = useState([]);
+   const [bookings, setBookings] = useState([]);
 
    const location = useLocation();
    const sanBong = location.state || {}; // Nhận dữ liệu từ state
@@ -115,6 +117,43 @@ export default function BookingBusiness() {
       time: selectedBooking.time,
    };
 
+   // console.log(sanBong.id)
+   const getBookingInfo = useMemo(() => {
+      return (day, time) => {
+         return bookings.find(
+            (booking) =>
+               booking.date === day.date && // Kiểm tra ngày
+               booking.timeStart.slice(0, 5) === time // So sánh giờ (bỏ giây nếu có)
+         );
+      };
+   }, [bookings]); // Chỉ cập nhật khi bookings thay đổi
+
+   const fetchAPIBooking = async () => {
+      try {
+         let response = await axios.get(`/api/bookingUser/${sanBong.id}`)
+         if (response.data.success) {
+            const updatedBookings = response.data.data.map(booking => ({
+               ...booking,
+               date: dayjs(booking.date).format("DD-MM"), // Chuyển "2025-03-24" -> "24-03"
+               timeStart: booking.timeStart.slice(0, 5), // Chuyển "20:00:00+00" -> "20:00"
+               timeEnd: booking.timeEnd.slice(0, 5) // Chuyển "21:00:00+00" -> "21:00"
+            }));
+
+            setBookings(updatedBookings);
+         }
+      } catch (e) {
+         console.log(e)
+      }
+   };
+
+   // Gọi API khi `sanBong.id` thay đổi
+   useEffect(() => {
+      fetchAPIBooking();
+   }, [sanBong.id]);
+
+
+   console.log(bookings)
+
    return (
       <>
          <Header />
@@ -143,20 +182,43 @@ export default function BookingBusiness() {
                      </div>
                      {timeSlots.map((time, timeIndex) => (
                         <div key={timeIndex} className="time-row">
-                           {weekDays.map((day, dayIndex) => (
-                              <div
-                                 key={dayIndex}
-                                 className={`content-booking ${selectedCell === `${day.date}-${time}` ? "selected" : ""}`}
-                                 onClick={() => handleClick(day.date, time)}
-                              >
-                              </div>
-                           ))}
+                           {weekDays.map((day, dayIndex) => {
+                              const bookingInfo = getBookingInfo(day, time); // Tìm booking tương ứng
+
+                              return (
+                                 <div
+                                    key={dayIndex}
+                                    className={`content-booking 
+                                    ${selectedCell === `${day.date}-${time}` ? "selected" : ""} 
+                                    ${bookings.some(b =>
+                                       b.date === day.date &&
+                                       time >= b.timeStart.slice(0, 5) &&
+                                       time < b.timeEnd.slice(0, 5)) ? "selected" : ""}`}
+                                    onClick={() => handleClick(day.date, time)}
+                                 >
+                                    {bookings.some(b => b.date === day.date && time === b.timeStart.slice(0, 5)) ? (
+                                       <>
+                                          {bookings
+                                             .filter(b => b.date === day.date && time === b.timeStart.slice(0, 5))
+                                             .map((b, index) => (
+                                                <div key={index} className="content">
+                                                   <p>{b.id}{b.id_FF}{b.id_User || 0}{b.id_Business || 0}_{b.price}</p>
+                                                </div>
+                                             ))}
+                                       </>
+                                    ) : ""}
+                                 </div>
+                              );
+                           })}
                         </div>
                      ))}
+
+
                      <BookingModel
                         isModalOpen={isModalVisible}
                         handleCancel={handleCancel}
                         bookingData={bookingData}
+                        fetchAPIBooking={fetchAPIBooking}
                      />
                   </div>
                </div>

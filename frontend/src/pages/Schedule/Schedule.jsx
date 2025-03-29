@@ -35,7 +35,6 @@ export default function Schedule() {
          try {
             const response = await fetch(`/api/foolbalField/`);
             const result = await response.json();
-            console.log("API Response:", result);
 
             if (result.success) {
                const DataFootball = result.data.map((item, index) => ({

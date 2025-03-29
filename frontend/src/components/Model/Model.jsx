@@ -471,7 +471,7 @@ export function FootballFieldImages({
 }
 
 
-export function BookingModel({ isModalOpen, handleCancel, bookingData }) {
+export function BookingModel({ isModalOpen, handleCancel, bookingData, fetchAPIBooking }) {
 
    const [endTime, setEndTime] = useState(0);
    const [business, setBusiness] = useState(null)
@@ -549,8 +549,8 @@ export function BookingModel({ isModalOpen, handleCancel, bookingData }) {
                "Content-Type": "application/json",
             },
          });
-         console.log("✅ Phản hồi từ server:", response.data);
          setEndTime(0);
+         await fetchAPIBooking();
          handleCancel()
       } catch (e) {
          console.error("❌ Lỗi khi gửi dữ liệu:", e);
