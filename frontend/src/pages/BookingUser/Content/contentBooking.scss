@@ -1,0 +1,65 @@
+.ContentBooking{
+   display: flex;
+   .left{
+      width: 50%;
+      margin-top: 30px;
+      position: relative;
+      border-top: 2px solid #ddd;
+      border-radius: 3px;
+      padding-top: 30px;
+      p{
+         position: absolute;
+         top: -16px;
+         left: 26px;
+         background: #FFF;
+         padding: 0 5px;
+         font-size: 20px;
+      }
+      .image-container{
+         display: flex;
+         flex-wrap: wrap;
+         justify-content: space-between;
+         .field-image{
+            width: 49.5%;
+            height: auto;
+            object-fit: cover;
+            margin-bottom: 5px;
+         }
+      }
+   }
+   .right{
+      margin-top: 30px;
+      width: 50%;
+      margin-left: 40px;
+      .business-info{
+         position: relative;
+         p{
+            position: absolute;
+            top: -16px;
+            left: 26px;
+            background: #FFF;
+            padding: 0 5px;
+            font-size: 20px;
+         }
+         .content-info{
+            display: flex;
+            flex-wrap: wrap;
+            border: 2px solid #ddd;
+            padding: 20px;
+            border-radius: 3px;
+            .item{
+               color: #919191;
+               &:nth-child(1), &:nth-child(2), &:nth-child(3), &:nth-child(4), &:nth-child(5), &:nth-child(6){
+                  width: 50%;
+               }
+               &:nth-child(7){
+                  width: 100%;
+               }
+               span{
+                  color: #000 !important;
+               }
+            }
+         }
+      }
+   }
+}

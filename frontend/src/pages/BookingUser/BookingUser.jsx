@@ -1,11 +1,14 @@
 import { useLocation } from "react-router-dom";
 import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
+import ContentBooking from "./Content/contentBooking";
 import dayjs from "dayjs";
 import { useState, useEffect, useMemo } from "react";
 import './BookingUser.scss';
 import { BookingModel } from "../../components/Model/Model";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
 export default function BookingBusiness() {
    const navigate = useNavigate();
    const [isModalVisible, setIsModalVisible] = useState(false);
@@ -13,6 +16,7 @@ export default function BookingBusiness() {
    const [selectedCell, setSelectedCell] = useState(null);
    const [user, setUser] = useState([]);
    const [bookings, setBookings] = useState([]);
+   const [currentWeekOffset, setCurrentWeekOffset] = useState(0);
 
    const location = useLocation();
    const sanBong = location.state || {}; // Nhận dữ liệu từ state
@@ -77,13 +81,15 @@ export default function BookingBusiness() {
       return mapping[weekday] || weekday;
    };
 
-   const generateWeekDays = () => {
-      let startMonday = getMonday(new Date());
-      let days = [];
+   const generateWeekDays = (offset) => {
+      let startMonday = getMonday(new Date()); // Lấy thứ 2 của tuần hiện tại
+      startMonday.setDate(startMonday.getDate() + offset * 7); // Dịch tuần theo offset
 
-      for (let i = 0; i < 7; i++) {
+      let days = [];
+      for (let i = 0; i < 7; i++) { // Chỉ lấy 7 ngày của tuần hiện tại
          let date = new Date(startMonday);
          date.setDate(startMonday.getDate() + i);
+
          days.push({
             date: date.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" }).replace(/\./g, "/"),
             dayOfWeek: convertWeekday(date.toLocaleDateString("vi-VN", { weekday: "long" }))
@@ -93,7 +99,7 @@ export default function BookingBusiness() {
       return days;
    };
 
-   const weekDays = generateWeekDays();
+   const weekDays = useMemo(() => generateWeekDays(currentWeekOffset), [currentWeekOffset]);
 
    const generateTimeSlots = () => {
       let times = [];
@@ -152,13 +158,11 @@ export default function BookingBusiness() {
    }, [sanBong.id]);
 
 
-   console.log(bookings)
-
    return (
       <>
          <Header />
          <div className="booking-container">
-            <h4>Lịch đặt sân của sân bóng {sanBong.name}</h4>
+            <h4><span>{sanBong.name}</span></h4>
             <div className="calendar-container">
                <div className="date-column">
                   {weekDays.map((day, index) => (
@@ -212,8 +216,6 @@ export default function BookingBusiness() {
                            })}
                         </div>
                      ))}
-
-
                      <BookingModel
                         isModalOpen={isModalVisible}
                         handleCancel={handleCancel}
@@ -223,7 +225,14 @@ export default function BookingBusiness() {
                   </div>
                </div>
             </div>
+            <div className="booking-controls">
+               <button onClick={() => setCurrentWeekOffset(prev => prev - 1)}><FaArrowAltCircleLeft /></button>
+               <p>Tuần {currentWeekOffset === 0 ? "hiện tại" : `${currentWeekOffset + 1}`}</p>
+               <button onClick={() => setCurrentWeekOffset(prev => prev + 1)}><FaArrowAltCircleRight /></button>
+            </div>
+            <ContentBooking football={sanBong} />
          </div >
+         <Footer />
       </>
    );
 }

@@ -5,12 +5,13 @@ import {
    deleteFootballFieldService,
    getAllFoolbalFieldService,
    updateFootballFieldImageService,
-   getFootballFieldImageService
+   getFootballFieldImageService,
+   displayOneFoolbalFieldIdService
 } from "../services/foolballField.service.js";
 
 export const createFoolballField = async (req, res) => {
-   console.log("🔍 Dữ liệu nhận được từ client:", req.body);
-   console.log("🔍 Files nhận được từ client:", req.files);
+   // console.log("🔍 Dữ liệu nhận được từ client:", req.body);
+   // console.log("🔍 Files nhận được từ client:", req.files);
 
    const requestData = req.body;
 
@@ -198,3 +199,22 @@ export const displayFootballFieldImage = async (req, res) => {
    }
    res.json(result);
 };
+
+export const getByIdFootball = async (req, res) => {
+   let { id } = req.params;
+   try {
+
+      // console.log("idBusiness sau khi parse:", idBusiness);
+      if (!id) {
+         return res.json({ success: false, message: "Không thấy id doanh nghhiep" })
+      }
+      const result = await displayOneFoolbalFieldIdService(id);
+
+      if (!result.success) {
+         return res.json({ result })
+      }
+      return res.status(200).json(result);
+   } catch (e) {
+      console.log(e)
+   }
+}

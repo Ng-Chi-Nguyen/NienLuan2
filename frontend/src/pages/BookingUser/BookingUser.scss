@@ -1,5 +1,13 @@
 .booking-container {
    padding: 10px;
+   margin-top: 60px;
+   h4{
+      text-align: center;
+      text-transform: uppercase;
+      span{
+         color: #1E90FF;
+      }
+   }
    .calendar-container {
       display: flex;
       overflow-x: auto;
@@ -105,5 +113,27 @@
             
          }
       }
-
+      .booking-controls{
+         margin-bottom: 30px;
+         margin-top: 10px;
+         padding-left: 70px;
+         display: flex;
+         align-items: center;
+         button{
+            background: 0;
+            border: 0;
+            color: #1E90FF;
+            font-size: 27px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+         }
+         p{
+            margin: 0 5px;
+            font-size: 20px;
+            width: 120px;
+            text-align: center;
+         }
+      }
 }
+

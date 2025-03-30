@@ -5,7 +5,8 @@ import {
    getWards,
    getProvince,
    getDistrict,
-   getWard
+   getWard,
+   getAddress
 } from "../controllers/address.controler.js";
 const addressRouter = express.Router();
 
@@ -17,5 +18,7 @@ addressRouter
    .get("/province/:id", getProvince)
    .get("/district/:id", getDistrict)
    .get("/ward/:id", getWard)
+
+   .get("/:idProvince/:idDistrict/:idWard", getAddress);
 
 export default addressRouter; 

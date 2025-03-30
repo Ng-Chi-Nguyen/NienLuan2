@@ -4,7 +4,8 @@ import {
    getAllWards,
    getProvinceByIdService,
    getDistrictByIdService,
-   getWatdByIdService
+   getWatdByIdService,
+   getAddressById
 } from "../services/address.service.js";
 
 export const getProvinces = async (req, res) => {
@@ -109,3 +110,22 @@ export const getWard = async (req, res) => {
       return res.status(500).json({ success: false, message: "Lỗi hệ thống!" });
    }
 };
+
+export const getAddress = async (req, res) => {
+   try {
+      const { idProvince, idDistrict, idWard } = req.params;
+
+      // console.log(idProvince, idDistrict, idWard)
+
+      const address = await getAddressById(idProvince, idDistrict, idWard);
+
+      if (!address) {
+         return res.status(404).json({ success: false, message: "Không tìm thấy địa chỉ" });
+      }
+
+      return res.json({ success: true, data: address });
+   } catch (error) {
+      console.error("Lỗi khi lấy địa chỉ:", error);
+      res.status(500).json({ success: false, message: "Lỗi server" });
+   }
+}

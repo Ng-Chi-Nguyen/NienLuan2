@@ -95,6 +95,28 @@ let displayFoolbalFieldIdService = async (idBusiness) => {
    }
 }
 
+let displayOneFoolbalFieldIdService = async (id) => {
+   try {
+      if (!id) {
+         return { success: false, error: "Thiếu idBusiness!" };
+      }
+      const { data, error } = await sql
+         .from('FoolbalField')
+         .select("*")
+         .eq("id", id)
+
+      if (error) {
+         return { success: false, message: error.message }
+      }
+      return {
+         success: true,
+         data: data
+      }
+   } catch (e) {
+      console.log(e)
+   }
+}
+
 let updateFootballFieldService = async (id, updateData) => {
    try {
       // console.log("🔹 Dữ liệu nhận để cập nhật:", updateData);
@@ -243,8 +265,6 @@ const updateFootballFieldImageService = async (id, imageUrls) => {
    }
 };
 
-
-
 const getFootballFieldImageService = async (fieldId) => {
    // console.log(fieldId)
    try {
@@ -273,5 +293,6 @@ export {
    deleteFootballFieldService,
    getAllFoolbalFieldService,
    updateFootballFieldImageService,
-   getFootballFieldImageService
+   getFootballFieldImageService,
+   displayOneFoolbalFieldIdService
 }

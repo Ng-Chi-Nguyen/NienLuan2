@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { message } from "antd";
 import './Header.scss';
-import LogoAvatar from "../../assets/Logo.svg";
+import LogoAvatar from "../../assets/logo-sport.png";
 import { RiMenuUnfold4Line } from "react-icons/ri";
 
 import { CiMenuBurger } from "react-icons/ci";
@@ -89,7 +89,7 @@ export default function Header() {
                menuItems={menuLeft}
             />
             <div className="logo">
-               <img src={LogoAvatar} alt="Logo" />
+               <img src={LogoAvatar} alt="Logo" /> <span>BOOKING</span>
             </div>
          </div>
          <div className="Header-center">
@@ -106,9 +106,13 @@ export default function Header() {
             ) : (
                <Link to="/Login" className="btn-login">Đăng nhập</Link>
             )}
-            <div className="menu" onClick={() => { setOpenRight(true); setOpenLeft(false); }}>
-               <RiMenuUnfold4Line />
-            </div>
+            {isLoggedIn ? (
+               <div className="menu" onClick={() => { setOpenRight(true); setOpenLeft(false); }}>
+                  <RiMenuUnfold4Line />
+               </div>
+            ) : (
+               <></>
+            )}
             <MenuDrawer
                open={openRight}
                setOpen={setOpenRight}

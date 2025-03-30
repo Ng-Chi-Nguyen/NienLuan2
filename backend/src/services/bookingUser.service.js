@@ -1,9 +1,9 @@
 import { sql } from '../config/connect.js';
 
 let createBookingService = async (bookingData) => {
-   const { id_User, id_FF, date, timeStart, timeEnd, price, userType } = bookingData;
+   const { id_User, id_FF, date, timeStart, timeEnd, price, userType, id_Business } = bookingData;
 
-   if (!id_User || !id_FF || !date || !timeStart || !timeEnd || !price || !userType) {
+   if (!id_User || !id_FF || !date || !timeStart || !timeEnd || !price || !userType || !id_Business) {
       return {
          success: false,
          message: "Thiếu thông tin"
@@ -12,7 +12,7 @@ let createBookingService = async (bookingData) => {
 
    try {
       let userExists = null;
-      let insertData = { id_FF, date, timeStart, timeEnd, price, userType };
+      let insertData = { id_FF, date, timeStart, timeEnd, price, userType, id_Business };
 
       if (userType === "user") {
          // Kiểm tra người dùng trong bảng User
@@ -31,7 +31,7 @@ let createBookingService = async (bookingData) => {
             .eq("id", id_User)
             .single();
          userExists = data;
-         if (userExists) insertData.id_Business = id_User;
+         if (userExists) insertData.id_Business_BK = id_User;
       }
       // console.log(userExists)
 
@@ -55,7 +55,7 @@ let createBookingService = async (bookingData) => {
          };
       }
 
-      // ✅ **Kiểm tra xem khung giờ đã có ai đặt chưa**
+      // **Kiểm tra xem khung giờ đã có ai đặt chưa**
       const { data: existingBookings } = await sql
          .from("Booking")
          .select("id, timeStart, timeEnd")
@@ -146,7 +146,7 @@ let displayBokingInfoUserService = async (idUser, type) => {
                message: "Người dùng không tồn tại" + error
             }
          }
-      } else if (type === business) {
+      } else if (type === "business") {
          const { data, error } = await sql
             .from("Business")
             .select("*")
@@ -159,19 +159,38 @@ let displayBokingInfoUserService = async (idUser, type) => {
             }
          }
       }
-      const { data, error } = await sql
-         .from("Booking")
-         .select("*")
-         .eq("id_User", idUser)
-      if (error) {
-         return {
-            success: false,
-            message: error
+      if (type === "user") {
+         const { data, error } = await sql
+            .from("Booking")
+            .select("*")
+            .eq("id_User", idUser)
+         if (error) {
+            return {
+               success: false,
+               message: error
+            }
          }
-      }
-      return {
-         success: true,
-         data
+         console.log(data)
+         return {
+            success: true,
+            data
+         }
+      } else if (type === "business") {
+         const { data, error } = await sql
+            .from("Booking")
+            .select("*")
+            .eq("id_Business_BK", idUser)
+         if (error) {
+            return {
+               success: false,
+               message: error
+            }
+         }
+         // console.log(data)
+         return {
+            success: true,
+            data
+         }
       }
    } catch (e) {
       console.log(e)

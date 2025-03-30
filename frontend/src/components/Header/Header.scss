@@ -8,6 +8,10 @@
             0 2px 6px -1px rgba(0, 0, 0, 0.08), 
             0 3px 8px 0 rgba(0, 0, 0, 0.06);
    z-index: 999;
+   position: fixed !important;
+   top: 0;
+   left: 0;
+   width: 100%;
    &-left{
       display: flex;
       align-items: center;
@@ -17,9 +21,16 @@
       .logo{
          width: 300px;
          height: auto;
+         user-select: none;
          img{
-            width: 75%;
-            height: auto;
+            width: auto;
+            height: 60px;
+         }
+         span{
+            font-family: "Dancing Script", cursive;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
          }
       }
       .name{
@@ -95,6 +106,11 @@
          margin-bottom: 15px;
       }
    }
+}
+.ant-drawer-content{
+   height: calc(100% - 60px) !important;
+   transform: translateY(60px) !important;
+   z-index: 100;
 }
 @media (max-width: 1192px) {
    .Header-right {

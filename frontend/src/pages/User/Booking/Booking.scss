@@ -1,0 +1,66 @@
+.Booking{
+   .item-bk{
+      .table-responsive {
+         overflow-x: auto;
+         white-space: nowrap;
+         &::-webkit-scrollbar {
+            height: 6px; /* Giảm chiều cao */
+         }
+
+         &::-webkit-scrollbar-thumb {
+            background: #3F6DFF; /* Màu thanh kéo */
+            border-radius: 2px; /* Bo tròn */
+         }
+
+         &::-webkit-scrollbar-thumb:hover {
+            background: #0c42f5; 
+         }
+         .table{
+            border: 1px solid #ddd;
+            thead{
+               tr{
+                  background: linear-gradient(to left, #FFF, #1E90FF) !important;
+                  text-align: center;
+               }
+            }
+            tbody{
+               tr{
+                  border-top: 1px solid #ddd;
+                  td{
+                     height: 40px;
+                     &:nth-child(8){
+                        span{
+                           margin: 0;
+                        }
+                     }
+                     &:last-of-type{
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 0;
+                        height: 40px;
+                        border: 0;
+                        button{
+                           background: none;
+                           border: none;
+                           font-size: 19px;
+                           &:nth-child(1){
+                              color: orange;
+                           }
+                           &:nth-child(2){
+                              color: red;
+                           }
+                           &:nth-child(3){
+                              color: greenyellow;
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+
+         }
+      }
+   
+   }
+}

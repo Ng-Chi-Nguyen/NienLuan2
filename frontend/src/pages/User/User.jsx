@@ -55,7 +55,7 @@ export default function User() {
    console.log(user)
 
    const items = [
-      { key: '1', label: 'Lịch đặt sân của tôi', children: <BookingUser /> },
+      { key: '1', label: 'Lịch đặt sân của tôi', children: <BookingUser user={user} /> },
       { key: '2', label: user.type === "user" ? 'Nâng lên tài khoản doanh nghiệp' : "Lịch đắt sân bóng của tôi", children: user.type === "business" ? <BookingFootball /> : <NextLavel /> },
    ];
 

@@ -5,7 +5,7 @@ import {
 } from "../services/bookingUser.service.js";
 
 export let createBooking = async (req, res) => {
-   // console.log(req.body)
+   console.log(req.body)
    try {
       let result = await createBookingService(req.body);
 

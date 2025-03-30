@@ -20,11 +20,12 @@
    align-items: start;
    justify-content: space-between;
    flex-wrap: wrap;
+   margin-top: 60px;
    .table-booking{
       width: calc(60% - 35px);
+      box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.2);
       margin-left: 20px;
-      border: 1px solid blueviolet;
-      height: 400px;
+      height: 411px;
+      padding: 5px 15px;
    }
-   
 }
