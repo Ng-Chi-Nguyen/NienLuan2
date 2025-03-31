@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Modal, Input, Select, InputNumber, Upload, Button, Image, TimePicker } from "antd";
+import { Message } from '../../utils/message';
+import { Modal, Input, Select, InputNumber, Upload, Button, Image, TimePicker, notification } from "antd";
 import { AddressSelector } from '../Address/Address';
 import { UploadOutlined } from "@ant-design/icons";
 import axios from 'axios';
@@ -475,6 +476,7 @@ export function BookingModel({ isModalOpen, handleCancel, bookingData, fetchAPIB
 
    const [endTime, setEndTime] = useState(0);
    const [business, setBusiness] = useState(null)
+   const [loading, setLoading] = useState(false)
 
    const startTime = dayjs(bookingData.time, "HH:mm");
    const pricePerHour = bookingData.football.price;
@@ -521,6 +523,7 @@ export function BookingModel({ isModalOpen, handleCancel, bookingData, fetchAPIB
 
    let handleSubmit = async (e) => {
       e.preventDefault();
+      setLoading(true)
       const formData = new FormData(e.target);
       const data = Object.fromEntries(formData.entries());
 
@@ -549,12 +552,20 @@ export function BookingModel({ isModalOpen, handleCancel, bookingData, fetchAPIB
                "Content-Type": "application/json",
             },
          });
-         setEndTime(0);
-         await fetchAPIBooking();
-         handleCancel()
+         if (response.data.success) {
+            setEndTime(0);
+            await fetchAPIBooking();
+            handleCancel()
+            Message("Đặt sân thành công", response.data.message, "success");
+         } else {
+            handleCancel()
+            Message("Đặt sân thất bại", response.data.message, "error");
+         }
       } catch (e) {
          console.error("❌ Lỗi khi gửi dữ liệu:", e);
+         Message("Đặt sân thất bại", e, "error");
       }
+      setLoading(false)
    };
    return (
       <Modal
@@ -565,23 +576,23 @@ export function BookingModel({ isModalOpen, handleCancel, bookingData, fetchAPIB
       >
          <form className='formBooking' onSubmit={handleSubmit}>
             <div className="item">
-               <label>Tên khách hàng: <span>{bookingData.user?.owner_name}</span></label>
+               <label>Khách hàng: <span>{bookingData.user?.owner_name || bookingData.user?.name}</span></label>
                <input name='id_User' type="hidden" value={bookingData.user?.id} />
             </div>
             <div className="item">
-               <label>Tên sân bóng : <span>{bookingData.football?.name}</span></label>
+               <label>Sân bóng : <span>{bookingData.football?.name}</span></label>
                <input name='id_FF' type="hidden" value={bookingData.football?.id} />
             </div>
             <div className="item">
-               <label>Tên chủ sân bóng: <span>{business && business.length > 0 ? business[0].owner_name : "Đang tải..."}</span></label>
+               <label>Chủ sân: <span>{business && business.length > 0 ? business[0].owner_name : "Đang tải..."}</span></label>
                <input name='id_Business' type="hidden" value={business?.[0]?.id || ""} />
             </div>
             <div className="item">
-               <label>Ngày đặt sân bóng: {bookingData.date}</label>
+               <label>Ngày đặt sân bóng: <span>{bookingData.date}</span></label>
                <input name='date' type="hidden" value={bookingData.date} />
             </div>
             <div className="item">
-               <label>Giờ đặt sân: {bookingData.time} <HiArrowLongRight /> </label>
+               <label>Giờ đặt sân: <span>{bookingData.time}</span> <HiArrowLongRight /> </label>
                <TimePicker
                   value={endTime}
                   disabledTime={() => ({
@@ -609,11 +620,13 @@ export function BookingModel({ isModalOpen, handleCancel, bookingData, fetchAPIB
             </div>
             <div className="item">
                <label>
-                  Giá: <span>{formatNumber(calculatePrice())} VND</span>
+                  Giá: <span>{formatNumber(calculatePrice())}</span> VND
                   <input name='price' type="hidden" value={(calculatePrice())} />
                </label>
             </div>
-            <button type='submit'>Đặt sân ngay</button>
+            <div className="item">
+               <button type='submit'>{loading ? "Đang đặt sân" : "Đặt sân ngay"}</button>
+            </div>
          </form>
       </Modal >
    )

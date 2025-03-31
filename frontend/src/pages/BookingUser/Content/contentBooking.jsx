@@ -65,7 +65,7 @@ export default function ContentBooking({ football }) {
    }, [football]);
 
    // console.log(football)
-   console.log(address)
+   // console.log(address)
    return (
       <div className="container">
          <div className="ContentBooking">

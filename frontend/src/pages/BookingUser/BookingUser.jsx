@@ -9,6 +9,7 @@ import { BookingModel } from "../../components/Model/Model";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
+import { message } from "antd";
 export default function BookingBusiness() {
    const navigate = useNavigate();
    const [isModalVisible, setIsModalVisible] = useState(false);
@@ -137,6 +138,7 @@ export default function BookingBusiness() {
    const fetchAPIBooking = async () => {
       try {
          let response = await axios.get(`/api/bookingUser/${sanBong.id}`)
+         console.log(response)
          if (response.data.success) {
             const updatedBookings = response.data.data.map(booking => ({
                ...booking,
@@ -144,19 +146,18 @@ export default function BookingBusiness() {
                timeStart: booking.timeStart.slice(0, 5), // Chuyển "20:00:00+00" -> "20:00"
                timeEnd: booking.timeEnd.slice(0, 5) // Chuyển "21:00:00+00" -> "21:00"
             }));
-
+            let message = response.data.message
             setBookings(updatedBookings);
+         } else {
+            console.log(response.data.message)
          }
       } catch (e) {
          console.log(e)
       }
    };
-
-   // Gọi API khi `sanBong.id` thay đổi
    useEffect(() => {
       fetchAPIBooking();
    }, [sanBong.id]);
-
 
    return (
       <>

@@ -1,7 +1,7 @@
 import { sql } from '../config/connect.js';
 
 let createBookingService = async (bookingData) => {
-   const { id_User, id_FF, date, timeStart, timeEnd, price, userType, id_Business } = bookingData;
+   const { id_User, id_FF, date, timeStart, timeEnd, price, userType, id_Business, id_Business_BK } = bookingData;
 
    if (!id_User || !id_FF || !date || !timeStart || !timeEnd || !price || !userType || !id_Business) {
       return {
@@ -12,7 +12,7 @@ let createBookingService = async (bookingData) => {
 
    try {
       let userExists = null;
-      let insertData = { id_FF, date, timeStart, timeEnd, price, userType, id_Business };
+      let insertData = { id_FF, date, timeStart, timeEnd, price, userType, id_Business, id_Business_BK };
 
       if (userType === "user") {
          // Kiểm tra người dùng trong bảng User
@@ -62,11 +62,24 @@ let createBookingService = async (bookingData) => {
          .eq("id_FF", id_FF)
          .eq("date", date);
 
+      const toMinutes = (time) => {
+         const [hours, minutes] = time.split(":").map(Number);
+         return hours * 60 + minutes;
+      };
+
       const isConflict = existingBookings.some((booking) => {
+         const bookingStart = toMinutes(booking.timeStart);
+         const bookingEnd = toMinutes(booking.timeEnd);
+         const newStart = toMinutes(timeStart);
+         const newEnd = toMinutes(timeEnd);
+
+         console.log(`Booking đã có: ${bookingStart} - ${bookingEnd}`);
+         console.log(`Booking mới: ${newStart} - ${newEnd}`);
+
          return (
-            (timeStart >= booking.timeStart && timeStart < booking.timeEnd) || // Bắt đầu trong khoảng đã đặt
-            (timeEnd > booking.timeStart && timeEnd <= booking.timeEnd) || // Kết thúc trong khoảng đã đặt
-            (timeStart <= booking.timeStart && timeEnd >= booking.timeEnd) // Bao trùm toàn bộ khung giờ đã đặt
+            (newStart >= bookingStart && newStart < bookingEnd) ||  // Bắt đầu trong khoảng đã đặt
+            (newEnd > bookingStart && newEnd <= bookingEnd) ||      // Kết thúc trong khoảng đã đặt
+            (newStart <= bookingStart && newEnd >= bookingEnd)      // Bao trùm toàn bộ khung giờ đã đặt
          );
       });
 
