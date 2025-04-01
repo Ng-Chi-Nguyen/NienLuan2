@@ -1,6 +1,14 @@
 import { sql } from '../config/connect.js';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc.js';
+import timezone from 'dayjs/plugin/timezone.js';
 
 let createBookingService = async (bookingData) => {
+
+   // Kích hoạt các plugin
+   dayjs.extend(utc);
+   dayjs.extend(timezone);
+
    const { id_User, id_FF, date, timeStart, timeEnd, price, userType, id_Business, id_Business_BK } = bookingData;
 
    if (!id_User || !id_FF || !date || !timeStart || !timeEnd || !price || !userType || !id_Business) {
@@ -33,7 +41,6 @@ let createBookingService = async (bookingData) => {
          userExists = data;
          if (userExists) insertData.id_Business_BK = id_User;
       }
-      // console.log(userExists)
 
       if (!userExists) {
          return {
@@ -54,6 +61,30 @@ let createBookingService = async (bookingData) => {
             message: "Sân bóng không tồn tại"
          };
       }
+
+      // Lấy thời gian hiện tại tại Việt Nam
+      const vietnamTime = dayjs().tz('Asia/Ho_Chi_Minh');  // Lấy thời gian hiện tại ở Việt Nam
+      const bookingDate = dayjs(date).tz('Asia/Ho_Chi_Minh');  // Chuyển đổi ngày đặt sân sang múi giờ Việt Nam
+      const bookingTimeStart = dayjs(`${date} ${timeStart}`).tz('Asia/Ho_Chi_Minh'); // Chuyển đổi thời gian bắt đầu đặt sân
+
+      // Kiểm tra xem ngày đặt sân có phải là hôm nay hoặc ngày trong tương lai không
+      if (bookingDate.isBefore(vietnamTime, 'day')) {
+         return {
+            success: false,
+            message: "Không thể đặt sân cho ngày hôm qua hoặc trước đó!"
+         };
+      }
+
+      // Kiểm tra xem giờ đặt sân có trước giờ hiện tại không
+      if (bookingTimeStart.isBefore(vietnamTime, 'minute')) {
+         return {
+            success: false,
+            message: "Không thể đặt sân vào giờ trong quá khứ!"
+         };
+      }
+      // Kiểm tra và in ra thời gian sau khi chuyển đổi
+      console.log('Thời gian hiện tại tại Việt Nam:', vietnamTime.format()); // In ra thời gian ở Việt Nam
+      console.log("Ngày đặt sân:", bookingDate.format());
 
       // **Kiểm tra xem khung giờ đã có ai đặt chưa**
       const { data: existingBookings } = await sql
@@ -86,10 +117,9 @@ let createBookingService = async (bookingData) => {
       if (isConflict) {
          return {
             success: false,
-            message: "Khung giờ này đã có người đặt!"
+            message: `Đã có người đặt sân từ ${bookingStart} rồi!`
          };
       }
-
 
       // Thêm vào bảng Booking
       const { data, error } = await sql
@@ -107,7 +137,7 @@ let createBookingService = async (bookingData) => {
 
       return {
          success: true,
-         message: "Tạo thành công",
+         message: "Cám ơn bạn đã đặt sân của tôi! Nhớ ra sân đúng giờ nhé!",
          data
       };
 
@@ -214,4 +244,91 @@ let displayBokingInfoUserService = async (idUser, type) => {
    }
 }
 
-export { createBookingService, displayBokingService, displayBokingInfoUserService };
+let getBookingsForTodayByBusiness = async (id_Business) => {
+   dayjs.extend(utc);
+   dayjs.extend(timezone);
+   try {
+
+      // Lấy thời gian hiện tại tại Việt Nam
+      const todayStart = dayjs().tz('Asia/Ho_Chi_Minh').startOf('day').format();
+      const todayEnd = dayjs().tz('Asia/Ho_Chi_Minh').endOf('day').format();
+
+      // Truy vấn tất cả các lịch đặt sân của doanh nghiệp trong ngày hôm nay
+      const { data, error } = await sql
+         .from('Booking')
+         .select('*')
+         .eq('id_Business', id_Business)
+         .gte('date', todayStart)
+         .lte('date', todayEnd)
+         .order('timeStart', { ascending: true }); // Sắp xếp theo timeStart
+
+      if (error) {
+         throw new Error(error.message);
+      }
+
+      return {
+         success: true,
+         message: "Lấy lịch đặt sân thành công!",
+         data
+      };
+   } catch (e) {
+      return {
+         success: false,
+         message: "Lỗi hệ thống: " + e.message
+      };
+   }
+};
+
+let deleteBookingService = async (id) => {
+   try {
+      const { check, errorCheck } = await sql
+         .from("Booking")
+         .select("id")
+         .eq("id", id)
+
+      if (errorCheck) {
+         return {
+            success: false,
+            message: error
+         }
+      }
+      const { error, count } = await sql
+         .from("Booking")
+         .delete()
+         .eq("id", id)
+
+      if (error) {
+         return {
+            success: false,
+            message: "Lỗi khi xóa lịch đặt sân: " + error.message,
+         };
+      }
+
+      if (count === 0) {
+         return {
+            success: false,
+            message: "Không tìm thấy lịch bạn đặt để xóa",
+         };
+      }
+
+      return {
+         success: true,
+         message: "Xóa lịch đặt sân thành công",
+      };
+
+   } catch (e) {
+      console.log(e)
+      return {
+         success: false,
+         message: e
+      }
+   }
+}
+
+export {
+   createBookingService,
+   displayBokingService,
+   displayBokingInfoUserService,
+   getBookingsForTodayByBusiness,
+   deleteBookingService
+};

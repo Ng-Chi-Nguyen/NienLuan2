@@ -1,0 +1,26 @@
+
+.formBooking{
+   .item{
+      height: 30px;
+      span{
+         color: #1E90FF;
+      }
+      &:nth-child(6){
+         margin-top: 10px;
+         span{
+            font-size: 22px;
+         }
+      }
+      &:last-of-type{
+         text-align: end;
+         button{
+            padding: 5px 15px;
+            background: #1E90FF;
+            color: #fFF;
+            border: 0;
+            border-radius: 3px;
+            width: 150px;
+         }
+      }
+   }
+}

@@ -1,61 +1,47 @@
 import './FoolbalField.scss';
-import axios from "axios";
 import { useState, useEffect, useCallback } from 'react';
 import { FaRegCheckCircle, FaRegEdit } from "react-icons/fa";
 import { IoAddOutline } from "react-icons/io5";
 import { CiNoWaitingSign } from "react-icons/ci";
 import { MdOutlineDeleteOutline } from "react-icons/md";
-import { AddressFetcher } from '../../../components/Address/Address';
 import { useNavigate } from "react-router-dom";
-import { CreateFootballField, EditFootballField, FootballFieldImages } from '../../../components/Model/Model';
-
+import { CreateFootballField, EditFootballField, FootballFieldImages } from '../../../components/Model/Football/FootballModel';
+import { fetchFootballFieldsAPI, deleteFootballByID } from '../../../services/footballField.service';
+import { fetchAddress } from '../../../services/address.service';
+import { useModal } from "../../../components/hooks/useModel";
+import { Tag } from 'antd';
+import {
+   CheckCircleOutlined,
+   CloseCircleOutlined,
+} from '@ant-design/icons';
 export default function FoolbalField({ user }) {
    const navigate = useNavigate();
 
-   const [isModalOpen, setIsModalOpen] = useState(false);
-   const [isModalEdit, setIsModalEdit] = useState(false);
+   const modalCreate = useModal();
+   const modalEdit = useModal();
+   const modalImages = useModal();
+
    const [data, setData] = useState([]);
    const [addressData, setAddressData] = useState(null);
    const [selectedFF, setSelectedFF] = useState(null);
-   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
    const [selectedFieldId, setSelectedFieldId] = useState(null);
 
    const fetchFootballFields = useCallback(async () => {
-      try {
-         const response = await fetch(`/api/foolbalField/${user.id}`);
-         const result = await response.json();
-         if (result.success) {
-            const updatedData = result.data.map((item, index) => ({
-               ...item,
-               key: item.id || index.toString(),
-            }));
-            setData(updatedData);
-         } else {
-            console.error("Lỗi:", result.message);
-         }
-      } catch (error) {
-         console.error("Lỗi kết nối API:", error);
-      }
+      const updatedData = await fetchFootballFieldsAPI(user.id);
+      setData(updatedData);
    }, [user.id]);
-
-   useEffect(() => {
-      if (user.id) {
-         fetchFootballFields();
-      }
-   }, [user.id, fetchFootballFields]);
 
    useEffect(() => {
       const fetchAddressData = async () => {
          const newAddressData = {};
+
          for (const item of data) {
-            const { province, district, ward } = await AddressFetcher(
-               item.idProvince,
-               item.idDistrict,
-               item.idWard
-            );
-            newAddressData[item.id] = { province, district, ward };
+            if (!newAddressData[item.id]) { // Kiểm tra nếu địa chỉ chưa được lấy cho sân này
+               const address = await fetchAddress(item.idProvince, item.idDistrict, item.idWard);
+               newAddressData[item.id] = address; // Lưu địa chỉ vào object với key là ID của sân
+            }
          }
-         setAddressData(newAddressData);
+         setAddressData(prev => ({ ...prev, ...newAddressData }));
       };
 
       if (data.length > 0) {
@@ -63,53 +49,49 @@ export default function FoolbalField({ user }) {
       }
    }, [data]);
 
-   const showModal = () => {
-      setIsModalOpen(true);
-   };
+   useEffect(() => {
+      if (user.id) {
+         fetchFootballFields();
+      }
+   }, [user.id, fetchFootballFields]);
 
-   const handleCancel = () => {
-      setIsModalOpen(false);
-   };
 
-   const handleCancelEditModal = () => {
-      setIsModalEdit(false);
-   };
+   // Show model ket hop voi hook
 
    const hangCreateFollbalField = (e) => {
       e.preventDefault();
-      showModal();
-   };
-
-   const handleShowImages = (fieldId) => {
-      setSelectedFieldId(fieldId);
-      setIsImageModalOpen(true);
+      modalCreate.showModal();
    };
 
    const hangEditFollbalField = (e, field) => {
       e.preventDefault();
       setSelectedFF(field);
-      setIsModalEdit(true);
+      modalEdit.showModal();
    };
 
-   const handleDeleteFF = async (id) => {
-      if (!window.confirm("Bạn có chắc chắn muốn xóa sân bóng này không?")) return;
+   const handleShowImages = (fieldId) => {
+      setSelectedFieldId(fieldId);
+      modalImages.showModal();
+   };
 
-      try {
-         const response = await axios.delete(`/api/foolbalField/${id}`);
-         if (response.data.success) {
-            setData(prevData => prevData.filter(item => item.id !== id));
-         } else {
-            alert(`Lỗi: ${response.data.message}`);
-         }
-      } catch (error) {
-         console.error("Lỗi khi xóa sân bóng:", error);
-         alert("Lỗi hệ thống khi xóa sân bóng!");
+
+   // Xoa san bong
+   const DeleteFootball = async (id) => {
+      const confirmDelete = window.confirm("Bạn có chắc chắn muốn xóa sân bóng này không?");
+      if (!confirmDelete) return;
+
+      const isDeleted = await deleteFootballByID(id);
+      if (isDeleted) {
+         setData(prevData => prevData.filter(item => item.id !== id)); // Cập nhật danh sách sau khi xóa
       }
    };
+
 
    const handleBookingBusinessClickPage = (sanBong) => {
       navigate(`/BookingBusiness/${sanBong.id}`, { state: sanBong });
    };
+
+   console.log(addressData)
 
    return (
       <div className="FoolbalField">
@@ -117,28 +99,6 @@ export default function FoolbalField({ user }) {
          <div className="addFF" onClick={hangCreateFollbalField}>
             <button><IoAddOutline /></button><span>Thêm sân bóng</span>
          </div>
-
-         <CreateFootballField
-            user={user}
-            isModalOpen={isModalOpen}
-            handleCancel={handleCancel}
-            fetchFootballFields={fetchFootballFields}
-            setData={setData}
-         />
-
-         <FootballFieldImages
-            fieldId={selectedFieldId}
-            isImageModalOpen={isImageModalOpen}
-            setIsImageModalOpen={setIsImageModalOpen}
-         />
-
-         <EditFootballField
-            selectedFF={selectedFF}
-            isModalEdit={isModalEdit}
-            handleCancelEditModal={handleCancelEditModal}
-            setData={setData}
-         />
-
          <div className="table-container">
             <table>
                <thead>
@@ -148,7 +108,7 @@ export default function FoolbalField({ user }) {
                      <th>Loại</th>
                      <th>Giá</th>
                      <th>Địa chỉ sân</th>
-                     <th>TT</th>
+                     <th>Trạng thái</th>
                      <th>Ảnh mô tả</th>
                      <th>Ngày tạo</th>
                      <th>Action</th>
@@ -163,11 +123,19 @@ export default function FoolbalField({ user }) {
                            <td className="text-center">{item.size}</td>
                            <td className="text-center">{item.price}</td>
                            <td>
-                              {addressData?.[item.id] ? (
-                                 `${item.address}, ${addressData[item.id]?.ward}, ${addressData[item.id]?.district}, ${addressData[item.id]?.province}`
-                              ) : ""}
+                              {addressData?.[item.id] ? `${item.address}, ${addressData[item.id]}` : "Đang tải..."}
                            </td>
-                           <td>{item.status ? <FaRegCheckCircle /> : <CiNoWaitingSign />}</td>
+                           <td>
+                              {item.status ?
+                                 <Tag icon={<CheckCircleOutlined />} color="success">
+                                    Đang mở
+                                 </Tag>
+                                 :
+                                 <Tag icon={<CloseCircleOutlined />} color="error">
+                                    Đang đóng
+                                 </Tag>
+                              }
+                           </td>
                            <td className="text-center" onClick={(e) => {
                               e.stopPropagation();
                               handleShowImages(item.id);
@@ -184,7 +152,7 @@ export default function FoolbalField({ user }) {
                               </button>
                               <button onClick={(e) => {
                                  e.stopPropagation();
-                                 handleDeleteFF(item.id);
+                                 DeleteFootball(item.id);
                               }}>
                                  <MdOutlineDeleteOutline />
                               </button>
@@ -199,6 +167,26 @@ export default function FoolbalField({ user }) {
                </tbody>
             </table>
          </div>
+         <CreateFootballField
+            user={user}
+            isModalOpen={modalCreate.isOpen}
+            handleCancel={modalCreate.hideModal}
+            fetchFootballFields={fetchFootballFields}
+            setData={setData}
+         />
+
+         <FootballFieldImages
+            fieldId={selectedFieldId}
+            isImageModalOpen={modalImages.isOpen}
+            setIsImageModalOpen={modalImages.hideModal}
+         />
+
+         <EditFootballField
+            selectedFF={selectedFF}
+            isModalEdit={modalEdit.isOpen}
+            handleCancelEditModal={modalEdit.hideModal}
+            setData={setData}
+         />
       </div>
    );
 }

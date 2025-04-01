@@ -56,7 +56,7 @@ export default function User() {
 
    const items = [
       { key: '1', label: 'Lịch đặt sân của tôi', children: <BookingUser user={user} /> },
-      { key: '2', label: user.type === "user" ? 'Nâng lên tài khoản doanh nghiệp' : "Lịch đắt sân bóng của tôi", children: user.type === "business" ? <BookingFootball /> : <NextLavel /> },
+      { key: '2', label: user.type === "user" ? 'Nâng lên tài khoản doanh nghiệp' : "Lịch đắt sân bóng của tôi hôm nay", children: user.type === "business" ? <BookingFootball user={user} /> : <NextLavel /> },
    ];
 
    return (

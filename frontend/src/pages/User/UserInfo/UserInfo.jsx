@@ -1,8 +1,9 @@
 import './UserInfo.scss';
+
 import LogoUser from "../../../assets/logo-user.jpg";
 import LogoUserFemale from "../../../assets/avatar-user-female.png";
 import Avatar from "../../../assets/avatar-business.png";
-import axios from "axios";
+
 import { useState } from "react";
 
 import { CiUser } from "react-icons/ci";
@@ -16,25 +17,22 @@ import { HiOutlineCalendarDateRange } from "react-icons/hi2";
 import { AiOutlineSetting } from "react-icons/ai";
 import { EditOutlined, DeleteOutlined, KeyOutlined } from '@ant-design/icons';
 
-import { FloatButton, Modal } from 'antd';
+import { FloatButton } from 'antd';
 
+import { useModal } from '../../../components/hooks/useModel';
+
+import { UpdateBusinessModel, UpdateUserModel } from '../../../components/Model/User/UserModel';
 
 export default function UserInfo({ user }) {
 
+   const { showModal: openModalUser, hideModal: closeModalUser, isOpen: isModalOpenUser } = useModal();
+   const { showModal: openModalBusiness, hideModal: closeModalBusiness, isOpen: isModalOpenBusiness } = useModal();
+
    const [localUser, setLocalUser] = useState(user);
-   const [isModalOpen, setIsModalOpen] = useState(false);
-   const [loading, setLoading] = useState(false);
 
    const date = new Date(localUser.created_at).toLocaleDateString("vi-VN");
    const established_date = new Date(localUser.established_date).toLocaleDateString("vi-VN");
 
-   const showModal = () => {
-      setIsModalOpen(true);
-   };
-
-   const handleCancel = () => {
-      setIsModalOpen(false);
-   };
 
    const handleChange = (e) => {
       let { name, value } = e.target;
@@ -47,124 +45,6 @@ export default function UserInfo({ user }) {
       setLocalUser((prev) => ({ ...prev, [name]: value }));
    };
 
-   let handleUpdateUser = async (e) => {
-      e.preventDefault();
-      // console.log("Dữ liệu form trước khi gửi:", user);
-      // console.log("Token trước khi cập nhật:", localStorage.getItem("token"));
-      if (!localUser.id) {
-         console.error("Lỗi: Không có ID người dùng!");
-         return;
-      }
-      setLoading(true);
-
-      try {
-         let id = localUser.id;
-         let response = await axios.post(`/api/user/${id}`, {
-            name: localUser.name || "",
-            phone: localUser.phone || "",
-            email: localUser.email || "",
-            address: localUser.address || "",
-            gender: localUser.gender ?? null
-         });
-
-         // console.log("Dữ liệu trả về từ API:", response.data);
-
-         if (response.data.success) {
-            // Lấy dữ liệu cũ để giữ lại các thuộc tính không thay đổi
-            const oldUserData = JSON.parse(localStorage.getItem("user")) || {};
-
-            // Dữ liệu mới từ API
-            const updatedUser = response.data.data;
-
-            // Gộp dữ liệu cũ + mới
-            const mergedUser = { ...oldUserData, ...updatedUser };
-
-            // Xóa dữ liệu cũ và thay bằng user mới
-            // localStorage.removeItem("user");
-            localStorage.setItem("user", JSON.stringify(mergedUser));
-
-            // console.log("User sau khi cập nhật:", mergedUser);
-
-            // Kiểm tra & cập nhật token nếu có
-            if (response.data.token) {
-               // console.log("Token mới từ API:", response.data.token);
-               localStorage.setItem("token", response.data.token);
-            }
-
-            // console.log("Token sau khi cập nhật:", localStorage.getItem("token"));
-
-            // Cập nhật state để re-render
-            setLocalUser(mergedUser);
-
-            // Gọi lại API để chắc chắn dữ liệu mới đã cập nhật
-            handleCancel();
-         } else {
-            console.error("Lỗi cập nhật:", response.data.error);
-         }
-      } catch (e) {
-         console.error("Lỗi khi cập nhật user:", e);
-      }
-      setLoading(false);
-   };
-
-   let handleUpdateBusiness = async (e) => {
-      e.preventDefault();
-      // console.log("Dữ liệu form trước khi gửi:", user);
-      // console.log("Token trước khi cập nhật:", localStorage.getItem("token"));
-      if (!localUser.id) {
-         console.error("Lỗi: Không có ID người dùng!");
-         return;
-      }
-      setLoading(true);
-      try {
-         let id = localUser.id;
-         let response = await axios.post(`/api/business/${id}`, {
-            name: localUser.name || "",
-            phone: localUser.phone || "",
-            email: localUser.email || "",
-            owner_name: localUser.owner_name || "",
-            address: localUser.address || "",
-         });
-
-         // console.log("Dữ liệu trả về từ API:", response.data);
-
-         if (response.data.success) {
-            // Lấy dữ liệu cũ để giữ lại các thuộc tính không thay đổi
-            const oldUserData = JSON.parse(localStorage.getItem("user")) || {};
-
-            // Dữ liệu mới từ API
-            const updatedUser = response.data.data;
-
-            // Gộp dữ liệu cũ + mới
-            const mergedUser = { ...oldUserData, ...updatedUser };
-
-            // Xóa dữ liệu cũ và thay bằng user mới
-            // localStorage.removeItem("user");
-            localStorage.setItem("user", JSON.stringify(mergedUser));
-
-            // console.log("User sau khi cập nhật:", mergedUser);
-
-            // Kiểm tra & cập nhật token nếu có
-            if (response.data.token) {
-               // console.log("Token mới từ API:", response.data.token);
-               localStorage.setItem("token", response.data.token);
-            }
-
-            // console.log("Token sau khi cập nhật:", localStorage.getItem("token"));
-
-            // Cập nhật state để re-render
-            setLocalUser(mergedUser);
-
-            // Gọi lại API để chắc chắn dữ liệu mới đã cập nhật
-            handleCancel();
-         } else {
-            console.error("Lỗi cập nhật:", response.data.error);
-         }
-      } catch (e) {
-         console.error("Lỗi khi cập nhật user:", e);
-      }
-      setLoading(false);
-   }
 
    // console.log(localUser.gender)
 
@@ -187,7 +67,7 @@ export default function UserInfo({ user }) {
                   <FloatButton
                      icon={<EditOutlined className="co-orange" />}
                      tooltip="Sửa"
-                     onClick={showModal}
+                     onClick={localUser.type === "user" ? openModalUser : openModalBusiness}
                   />
                   <FloatButton icon={<DeleteOutlined className="co-red" />} tooltip="Xóa" />
                   <FloatButton icon={<KeyOutlined />} tooltip="Đổi mật khẩu" />
@@ -259,131 +139,23 @@ export default function UserInfo({ user }) {
          </div>
          {user.type === "user" ? (
             <div>
-               <Modal
-                  title="CẬP NHẬT THÔNG TIN NGƯỜI DÙNG"
-                  open={isModalOpen}
-                  onCancel={handleCancel} // Cho phép bấm ra ngoài để tắt modal
-                  footer={null} // Ẩn nút OK và Cancel
-                  maskClosable={true} // Cho phép click bên ngoài để đóng
-               >
-                  <form onSubmit={handleUpdateUser}>
-                     <div className="row model-edit">
-                        <div className="item">
-                           <label>Tên người dùng</label>
-                           <input
-                              type="text"
-                              name="name"
-                              placeholder="Tên người dùng"
-                              value={localUser.name}
-                              onChange={handleChange}
-                           />
-                        </div>
-                        <div className="item">
-                           <label>Số điện thoại</label>
-                           <input
-                              type="tel"
-                              name="phone"
-                              placeholder="Số điện thoại"
-                              value={localUser.phone}
-                              onChange={handleChange}
-                           />
-                        </div>
-                        <div className="item">
-                           <label>Địa chỉ</label>
-                           <input
-                              type="text"
-                              name="address"
-                              placeholder="Địa chỉ"
-                              value={localUser.address}
-                              onChange={handleChange}
-                           />
-                        </div>
-                        <div className="item">
-                           <label>Giới tính</label>
-                           <select name="gender" onChange={handleChange} value={localUser.gender === null ? "unset" : localUser.gender.toString()}>
-                              <option value="unset" disabled>Chưa cập nhật</option>
-                              <option value="true">Nam</option>
-                              <option value="false">Nữ</option>
-                           </select>
-
-                        </div>
-                        <div className="submit">
-                           <button type="submit" className="btn-submit" disabled={loading}>
-                              {loading ? "Đang cập nhật..." : "Cập nhật"}
-                           </button>
-                        </div>
-                     </div>
-                  </form>
-               </Modal>
+               <UpdateUserModel
+                  isModalOpenUser={isModalOpenUser}
+                  closeModalUser={closeModalUser}
+                  localUser={localUser}
+                  handleChange={handleChange}
+                  setLocalUser={setLocalUser}
+               />
             </div>
          ) : (
             <div className="modelUpdateBusiness">
-               <Modal
-                  title="CẬP NHẬT THÔNG TIN DOANH NGHIỆP"
-                  open={isModalOpen}
-                  onCancel={handleCancel} // Cho phép bấm ra ngoài để tắt modal
-                  footer={null} // Ẩn nút OK và Cancel
-                  maskClosable={true} // Cho phép click bên ngoài để đóng
-               >
-                  <form onSubmit={handleUpdateBusiness}>
-                     <div className="row model-edit model-edit-business">
-                        <div className="item">
-                           <label>Tên chủ doanh nghiệp</label>
-                           <input
-                              type="text"
-                              name="name"
-                              placeholder="Tên chủ doanh nghiệp"
-                              value={localUser.name}
-                              onChange={handleChange}
-                           />
-                        </div>
-                        <div className="item">
-                           <label>Số điện thoại</label>
-                           <input
-                              type="tel"
-                              name="phone"
-                              placeholder="Số điện thoại"
-                              value={localUser.phone}
-                              onChange={handleChange}
-                           />
-                        </div>
-                        <div
-                           className="item"
-                           style={{
-                              width: localUser.type === "business" ? "calc(100%  - 10px)" : "",
-                           }}
-                        >
-                           <label>Tên doanh nghiệp</label>
-                           <input
-                              type="text"
-                              name="owner_name"
-                              placeholder="Tên doanh nghiệp"
-                              value={localUser.owner_name}
-                              onChange={handleChange}
-                           />
-                        </div>
-                        <div className="item"
-                           style={{
-                              width: localUser.type === "business" ? "calc(100%  - 10px)" : "",
-                           }}
-                        >
-                           <label>Địa chỉ</label>
-                           <input
-                              type="text"
-                              name="address"
-                              placeholder="Địa chỉ"
-                              value={localUser.address}
-                              onChange={handleChange}
-                           />
-                        </div>
-                        <div className="submit">
-                           <button type="submit" className="btn-submit" disabled={loading}>
-                              {loading ? "Đang cập nhật..." : "Cập nhật"}
-                           </button>
-                        </div>
-                     </div>
-                  </form>
-               </Modal>
+               <UpdateBusinessModel
+                  isModalOpenBusiness={isModalOpenBusiness}
+                  closeModalBusiness={closeModalBusiness}
+                  localUser={localUser}
+                  handleChange={handleChange}
+                  setLocalUser={setLocalUser}
+               />
             </div>
          )}
       </>

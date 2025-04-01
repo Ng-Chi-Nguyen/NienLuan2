@@ -5,11 +5,10 @@ import ContentBooking from "./Content/contentBooking";
 import dayjs from "dayjs";
 import { useState, useEffect, useMemo } from "react";
 import './BookingUser.scss';
-import { BookingModel } from "../../components/Model/Model";
+import { BookingModel } from "../../components/Model/Booking/BookingModel";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
-import { message } from "antd";
 export default function BookingBusiness() {
    const navigate = useNavigate();
    const [isModalVisible, setIsModalVisible] = useState(false);
@@ -146,7 +145,6 @@ export default function BookingBusiness() {
                timeStart: booking.timeStart.slice(0, 5), // Chuyển "20:00:00+00" -> "20:00"
                timeEnd: booking.timeEnd.slice(0, 5) // Chuyển "21:00:00+00" -> "21:00"
             }));
-            let message = response.data.message
             setBookings(updatedBookings);
          } else {
             console.log(response.data.message)

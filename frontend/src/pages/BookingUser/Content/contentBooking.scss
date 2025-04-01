@@ -37,11 +37,32 @@
             position: absolute;
             top: -16px;
             left: 26px;
-            background: #FFF;
+            background: #D9E8FF;
+            border-top: 2px solid #ddd;
             padding: 0 5px;
             font-size: 20px;
+            border-radius: 3px;
+            &::before{
+               content: "";
+               position: absolute;
+               left: 0;
+               top: 0;
+               height: 50%; /* Chiều cao border-left */
+               width: 2px; /* Độ rộng border */
+               background-color: #ddd; /* Màu border */
+            }
+            &::after{
+               content: "";
+               position: absolute;
+               right: 0;
+               top: 0;
+               height: 50%; /* Chiều cao border-left */
+               width: 2px; /* Độ rộng border */
+               background-color: #ddd; /* Màu border */
+            }
          }
          .content-info{
+            background: #D9E8FF;
             display: flex;
             flex-wrap: wrap;
             border: 2px solid #ddd;

@@ -45,13 +45,10 @@
                            border: none;
                            font-size: 19px;
                            &:nth-child(1){
-                              color: orange;
-                           }
-                           &:nth-child(2){
                               color: red;
                            }
-                           &:nth-child(3){
-                              color: greenyellow;
+                           &:nth-child(2){
+                              color: #27C375;
                            }
                         }
                      }

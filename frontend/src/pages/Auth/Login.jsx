@@ -7,6 +7,8 @@ import { IoBusinessOutline } from "react-icons/io5";
 import { Tabs } from 'antd';
 import { FaGoogle, FaFacebookF } from "react-icons/fa";
 import axios from "axios";
+import { createUser } from "../../services/user.service";
+import { createBusiness } from "../../services/business.service";
 export default function Login() {
 
    const navigate = useNavigate();
@@ -42,9 +44,13 @@ export default function Login() {
       e.preventDefault();
       try {
          setLoading(true);
-         console.log("formData User:", formData)
-         const response = await axios.post("/api/user/", formData);
-         console.log("Phản hồi từ backend:", response.data);
+         console.log("formData User:", formData);
+
+         // Gọi hàm createUser từ service
+         const response = await createUser(formData);
+         console.log("Phản hồi từ backend:", response);
+
+         // Reset formData
          setFormData({
             name: "",
             phone: "",
@@ -56,22 +62,28 @@ export default function Login() {
             license_number: "",
             tax_code: "",
             established_date: ""
-         })
+         });
+
          setLoading(false);
-         setLogin(!login)
+         setLogin(!login); // Toggle login state sau khi đăng ký thành công
       } catch (error) {
          console.error("Lỗi đăng ký:", error.response?.data || error.message);
          alert("Đăng ký thất bại! Chi tiết lỗi: " + JSON.stringify(error.response?.data || error.message));
+         setLoading(false); // Đảm bảo set lại loading khi xảy ra lỗi
       }
    };
 
-   const handleCreateBuness = async (e) => {
-      e.preventDefault()
+   const handleCreateBusiness = async (e) => {
+      e.preventDefault();
       try {
          setLoading(true);
-         console.log("formData Buness:", formData)
-         const response = await axios.post("/api/business/", formData);
-         console.log("Phản hồi từ backend:", response.data);
+         console.log("formData Business:", formData);
+
+         // Gọi hàm createBusiness từ service
+         const response = await createBusiness(formData);
+         console.log("Phản hồi từ backend:", response);
+
+         // Reset formData
          setFormData({
             name: "",
             phone: "",
@@ -83,14 +95,16 @@ export default function Login() {
             license_number: "",
             tax_code: "",
             established_date: ""
-         })
+         });
+
          setLoading(false);
-         setLogin(!login)
+         setLogin(!login); // Toggle login state sau khi đăng ký thành công
       } catch (error) {
-         console.error("Lỗi đăng ký:", error.response?.data || error.message);
+         console.error("Lỗi đăng ký doanh nghiệp:", error.response?.data || error.message);
          alert("Đăng ký thất bại! Chi tiết lỗi: " + JSON.stringify(error.response?.data || error.message));
+         setLoading(false); // Đảm bảo set lại loading khi xảy ra lỗi
       }
-   }
+   };
 
    const handleLogin = async (e) => {
       e.preventDefault();
@@ -198,7 +212,7 @@ export default function Login() {
                   </button>
                </div>
                <p className="text-center">Hoặc tạo tài khoản</p>
-               <form onSubmit={handleCreateBuness}>
+               <form onSubmit={handleCreateBusiness}>
                   <div className="row">
                      <input
                         type="text"

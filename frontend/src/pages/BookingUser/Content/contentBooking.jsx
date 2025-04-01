@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import "./contentBooking.scss";
 import axios from "axios";
 import dayjs from "dayjs";
+import { formatNumber } from "../../../utils/utils";
+import { fetchAddress } from "../../../services/address.service";
 
 export default function ContentBooking({ football }) {
    const [images, setImages] = useState([]); // Lưu danh sách hình ảnh
@@ -34,20 +36,20 @@ export default function ContentBooking({ football }) {
          console.error("Lỗi khi lấy hình ảnh:", error);
       }
    }
-
-   const fetchAddress = async () => {
+   const fetchAddressData = async () => {
       try {
-         const response = await axios.get(`/api/address/${football.idProvince}/${football.idDistrict}/${football.idWard}`);
-         console.log(response)
-         if (response.data.success) {
-            setAddress(response.data.data);
+         // Gọi hàm fetchAddress từ service để lấy địa chỉ
+         const address = await fetchAddress(football.idProvince, football.idDistrict, football.idWard);
+
+         if (address) { // Kiểm tra xem đã có địa chỉ hay chưa
+            setAddress(address);
          }
       } catch (error) {
          console.error("Lỗi khi lấy địa chỉ:", error);
          setAddress("Không thể tải địa chỉ");
       }
    };
-
+   console.log(address)
    useEffect(() => {
       if (football?.id) {
          fetchImages();
@@ -59,12 +61,10 @@ export default function ContentBooking({ football }) {
    }, [football]);
 
    useEffect(() => {
-      if (football?.idProvince && football?.idDistrict && football?.idWard) {
-         fetchAddress();
-      }
-   }, [football]);
+      fetchAddressData(); // Gọi hàm trong useEffect
+   }, [football.idProvince, football.idDistrict, football.idWard]);
 
-   // console.log(football)
+   console.log(football)
    // console.log(address)
    return (
       <div className="container">
@@ -101,13 +101,13 @@ export default function ContentBooking({ football }) {
                         Loại sân:  <span>{football.size} người</span>
                      </div>
                      <div className="item">
-                        Giá:  <span>{football.price} / 1h</span>
+                        Giá:  <span>{formatNumber(football.price)} / 1h</span>
                      </div>
                      <div className="item">
                         Địa chỉ doanh nghiệp: <span>{business[0]?.address || "Chưa có thông tin"}</span>
                      </div>
                      <div className="item">
-                        Địa chỉ sân bóng: <span>{address}</span>
+                        Địa chỉ sân bóng: <span>{football.address}, {address}</span>
                      </div>
                      <div className="item">
                         Ngày thành lập doanh nghiệp: <span>{dayjs(football.created_at).format("DD/MM/YYYY")}</span>

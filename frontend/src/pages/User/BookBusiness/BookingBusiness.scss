@@ -74,7 +74,7 @@
          .body{
             display: flex;
          }
-         .content-booking{
+         .content-booking-business{
             display: grid;
             width: 140px;
             height: 60px;
@@ -86,16 +86,6 @@
                font-weight: bold;
                text-align: center;
                border-left: 0;
-               &.selected:hover {
-                  background-color: #ccc !important; /* Giữ nguyên màu */
-                  
-                  cursor: not-allowed; /* Đổi con trỏ thành dấu cấm (tùy chọn) */
-                  pointer-events: none;
-               }
-            }
-            &:hover{
-               background: #b4d6f8;
-               cursor: pointer;
             }
             .content{
                display: flex;
