@@ -12,11 +12,11 @@ import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
 export default function BookingBusiness() {
    const navigate = useNavigate();
    const [isModalVisible, setIsModalVisible] = useState(false);
-   const [selectedBooking, setSelectedBooking] = useState([]);
-   const [selectedCell, setSelectedCell] = useState(null);
+   const [selectedBooking, setSelectedBooking] = useState([]); // Lưu ngày và giờ người dùng chọn
+   const [selectedCell, setSelectedCell] = useState(null); // Lưu ô lịch được chọn
    const [user, setUser] = useState([]);
    const [bookings, setBookings] = useState([]);
-   const [currentWeekOffset, setCurrentWeekOffset] = useState(0);
+   const [currentWeekOffset, setCurrentWeekOffset] = useState(0); // Dịch tuần (tuần hiện tại là 0, tuần sau là +1, tuần trước là -1)
 
    const location = useLocation();
    const sanBong = location.state || {}; // Nhận dữ liệu từ state
@@ -60,9 +60,11 @@ export default function BookingBusiness() {
       }
    }, [navigate]);
 
+   // Ham tra ve thu 2
    const getMonday = (date) => {
       let d = new Date(date);
-      let day = d.getDay();
+      let day = d.getDay(); // getDay() trả về số nguyên từ 0 đến 6 tương ứng với ngày trong tuần 0:CN
+
       let diff = day === 0 ? -6 : 1 - day;
       d.setDate(d.getDate() + diff);
       return d;

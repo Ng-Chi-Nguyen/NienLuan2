@@ -159,4 +159,77 @@ let handleGoogleLogin = async (googleUser) => {
    }
 };
 
-export { loginUserService, handleGoogleLogin };
+// Hàm xử lý login với Facebook
+let handleFacebookLogin = async (facebookUser) => {
+   // Nhận email, tên và ảnh đại diện từ Facebook
+   const { email, name, picture } = facebookUser;
+
+   try {
+      // data: Chứa dữ liệu của user nếu tìm thấy
+      let { data: existingUser, error } = await sql
+         .from("User")
+         .select("*")
+         .eq("email", email)
+         .single();
+
+      if (error || !existingUser) {
+         // Nếu chưa có tài khoản, tạo tài khoản mới
+         let newUser = {
+            UID: uuidv4(),
+            name: name,
+            email: email,
+            avatar_url: picture.data.url, // Lấy ảnh đại diện từ Facebook
+            gender: true,  // Bạn có thể thay đổi giá trị này theo yêu cầu
+            phone: null,
+            address: "Chưa cập nhật",
+            created_at: new Date(),
+         };
+
+         let { data: insertedUser, error: insertError } = await sql
+            .from("User")
+            .insert([newUser])
+            .select()
+            .single();
+
+         if (insertError) {
+            console.error("Lỗi khi tạo tài khoản:", insertError);
+            return { success: false, error: "Lỗi khi tạo tài khoản" };
+         }
+
+         existingUser = insertedUser;
+      }
+
+      // Tạo token với type: "user"
+      const token = jwt.sign(
+         { id: existingUser.id, email: existingUser.email, type: "user" },
+         SECRET_KEY,
+         { expiresIn: "7d" }
+      );
+
+      // Trả về thông tin user kèm type: "user"
+      let responseUser = {
+         id: existingUser.id,
+         name: existingUser.name,
+         email: existingUser.email,
+         address: existingUser.address || "Chưa cập nhật",
+         phone: existingUser.phone,
+         gender: existingUser.gender,
+         avatar_url: existingUser.avatar_url,
+         created_at: existingUser.created_at,
+         type: "user", // Không cần lưu trong CSDL, chỉ gửi đi trong response
+      };
+
+      return {
+         success: true,
+         message: "Đăng nhập thành công!",
+         token,
+         user: responseUser,
+      };
+
+   } catch (e) {
+      console.error("Lỗi hệ thống:", e);
+      return { success: false, error: "Lỗi hệ thống" };
+   }
+};
+
+export { loginUserService, handleGoogleLogin, handleFacebookLogin };

@@ -113,11 +113,10 @@ let createBookingService = async (bookingData) => {
             (newStart <= bookingStart && newEnd >= bookingEnd)      // Bao trùm toàn bộ khung giờ đã đặt
          );
       });
-
       if (isConflict) {
          return {
             success: false,
-            message: `Đã có người đặt sân từ ${bookingStart} rồi!`
+            message: `Giờ mà bạn đã có người đặt rồi 😞! Chọn giờ khác nhé`
          };
       }
 

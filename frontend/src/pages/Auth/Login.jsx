@@ -1,11 +1,12 @@
+
 import Header from "../../components/Header/Header";
 import './Login.scss';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CiUser } from "react-icons/ci";
 import { IoBusinessOutline } from "react-icons/io5";
 import { Tabs } from 'antd';
-import { FaGoogle, FaFacebookF } from "react-icons/fa";
+import { FaGoogle, FaFacebookF, FaEye, FaEyeSlash } from "react-icons/fa";
 import axios from "axios";
 import { createUser } from "../../services/user.service";
 import { createBusiness } from "../../services/business.service";
@@ -14,6 +15,7 @@ export default function Login() {
    const navigate = useNavigate();
 
    const [loading, setLoading] = useState(false); // Loading o dang ky
+   const [message, setMessage] = useState("")
 
 
    const [formData, setFormData] = useState({
@@ -40,8 +42,40 @@ export default function Login() {
       setFormData({ ...formData, [name]: value });
    };
 
+   // const togglePasswordVisibility = () => {
+   //    setShowPassword(!showPassword);
+   // };
+
+   const isValidPassword = (password) => {
+      if (password.length < 6) {
+         setMessage("Mật khẩu phải có ít nhất 6 ký tự")
+         return false;
+      }
+      if (!/[A-Z]/.test(password)) {
+         setMessage("Mật khẩu phải chứa ít nhất 1 chữ hoa")
+         return false;
+      }
+      if (!/[a-z]/.test(password)) {
+         setMessage("Mật khẩu phải chứa ít nhất 1 chữ thường")
+         return false;
+      }
+      if (!/[0-9]/.test(password)) {
+         setMessage("Mật khẩu phải chứa ít nhất 1 số")
+         return false;
+      }
+      if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+         setMessage("Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt")
+         return false;
+      }
+      return true;
+   };
+
    const handleCreateUser = async (e) => {
       e.preventDefault();
+      // Kiểm tra mật khẩu
+      if (!isValidPassword(formData.password)) {
+         return; // Nếu mật khẩu không hợp lệ, không tiếp tục xử lý
+      }
       try {
          setLoading(true);
          console.log("formData User:", formData);
@@ -75,6 +109,10 @@ export default function Login() {
 
    const handleCreateBusiness = async (e) => {
       e.preventDefault();
+      // Kiểm tra mật khẩu
+      if (!isValidPassword(formData.password)) {
+         return; // Nếu mật khẩu không hợp lệ, không tiếp tục xử lý
+      }
       try {
          setLoading(true);
          console.log("formData Business:", formData);
@@ -115,7 +153,8 @@ export default function Login() {
             email: formData.email,
             password: formData.password
          });
-
+         console.log(response.data.message)
+         setMessage(response.data.message)
          console.log("Đăng nhập thành công:", response.data);
 
          // Lưu token vào localStorage hoặc state (tùy vào cách bạn xử lý đăng nhập)
@@ -124,8 +163,15 @@ export default function Login() {
 
          navigate("/User");
          setLoading(false);
-      } catch (e) {
-         console.log(e)
+      } catch (error) {
+         if (error.response) {
+            // Lấy thông báo lỗi từ API
+            console.error("Lỗi đăng nhập:", error.response.data.message);
+            setMessage(error.response.data.message); // Hiển thị thông báo lỗi
+         } else {
+            console.error("Lỗi không xác định:", error.message);
+            setMessage("Có lỗi xảy ra, vui lòng thử lại!");
+         }
          setLoading(false);
       }
    };
@@ -178,13 +224,16 @@ export default function Login() {
                         onChange={handleChange}
                         value={formData.password}
                      />
+
                      <select name="gender" onChange={handleChange} value={formData.gender}>
                         <option value="true">Nam</option>
                         <option value="false">Nữ</option>
                      </select>
+                     <span className="error">{message}</span>
                      <input
                         type="text"
                         name="address"
+                        className="address-input-user"
                         placeholder="Địa chỉ"
                         onChange={handleChange}
                         value={formData.address}
@@ -242,6 +291,7 @@ export default function Login() {
                         onChange={handleChange}
                         value={formData.password}
                      />
+                     <span className="error">{message}</span>
                      <input
                         type="text"
                         name="address"
@@ -287,6 +337,7 @@ export default function Login() {
 
    const [login, setLogin] = useState(false)
 
+   console.log(message)
 
 
    return (
@@ -300,9 +351,9 @@ export default function Login() {
                   centered="true"
                />
                <p className="text-center">Bạn đã có tài khoản?
-                  <span className="btn-switch" onClick={() => setLogin(!login)}> Đăng nhập</span>
+                  <span className="btn-switch" onClick={() => { setLogin(!login); setMessage("") }}> Đăng nhập</span>
                </p>
-            </div>
+            </div >
          ) : (
             <div className="LoginPage">
                <div className="cardLogin loginFalse">
@@ -334,15 +385,17 @@ export default function Login() {
                            onChange={handleChange}
                            value={formData.password}
                         />
+                        <span className="error">{message}</span>
                         <button type="submit" disabled={loading}>{loading ? "Đang xử lý..." : "Đăng nhập"}</button>
                      </div>
                   </form>
                   <p className="text-center">Bạn chưa có tài khoản?
-                     <span className="btn-switch" onClick={() => setLogin(!login)}> Đăng ký</span>
+                     <span className="btn-switch" onClick={() => { setLogin(!login); setMessage("") }}> Đăng ký</span>
                   </p>
                </div>
             </div>
-         )}
+         )
+         }
       </>
    );
 }

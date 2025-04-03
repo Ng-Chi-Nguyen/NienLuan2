@@ -1,4 +1,4 @@
-import { loginUserService, handleGoogleLogin } from "../services/auth.service.js";
+import { loginUserService, handleGoogleLogin, handleFacebookLogin } from "../services/auth.service.js";
 import { sql } from '../config/connect.js';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
@@ -38,6 +38,29 @@ export const googleCallback = (req, res, next) => {
 
       const googleUser = user._json;
       const result = await handleGoogleLogin(googleUser);
+
+      if (!result.success) {
+         return res.redirect("http://localhost:3000/Login?error=" + encodeURIComponent(result.error));
+      }
+
+      const token = generateToken(result.user);
+      const userData = encodeURIComponent(JSON.stringify(result.user));
+
+      // Chuyển hướng về `/User` với token và thông tin user
+      res.redirect(`http://localhost:3000/User?token=${token}&user=${userData}`);
+   })(req, res, next);
+};
+
+// Bắt đầu quá trình xác thực với Facebook - Yêu cầu quyền truy cập email
+export const facebookAuth = passport.authenticate("facebook", { scope: ["email"] });
+
+export const facebookCallback = (req, res, next) => {
+   passport.authenticate("facebook", { session: false }, async (err, user, info) => {
+      if (err) return next(err);
+      if (!user) return res.redirect("http://localhost:3000/Login?error=facebook_failed");
+
+      const facebookUser = user._json;
+      const result = await handleFacebookLogin(facebookUser);
 
       if (!result.success) {
          return res.redirect("http://localhost:3000/Login?error=" + encodeURIComponent(result.error));

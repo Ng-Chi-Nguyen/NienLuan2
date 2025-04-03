@@ -7,6 +7,7 @@ import Footer from "../../components/Footer/Footer";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookingUser, BookingFootball, NextLavel } from "./Booking/Booking";
+import Statistical from "./Statistical/Statistical";
 
 
 
@@ -77,8 +78,11 @@ export default function User() {
                {user.type === "business" ? (
                   <FoolbalField user={user} />
                ) : (<></>)}
+               <div className="Statistical">
+                  <h2 className="title">Thống kê</h2>
+                  <Statistical user={user} />
+               </div>
             </div>
-
          </div >
          <Footer />
       </>

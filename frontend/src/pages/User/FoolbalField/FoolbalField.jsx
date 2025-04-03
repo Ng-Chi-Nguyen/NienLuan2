@@ -1,19 +1,16 @@
 import './FoolbalField.scss';
 import { useState, useEffect, useCallback } from 'react';
-import { FaRegCheckCircle, FaRegEdit } from "react-icons/fa";
+import { FaRegEdit } from "react-icons/fa";
 import { IoAddOutline } from "react-icons/io5";
-import { CiNoWaitingSign } from "react-icons/ci";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { CreateFootballField, EditFootballField, FootballFieldImages } from '../../../components/Model/Football/FootballModel';
 import { fetchFootballFieldsAPI, deleteFootballByID } from '../../../services/footballField.service';
 import { fetchAddress } from '../../../services/address.service';
 import { useModal } from "../../../components/hooks/useModel";
+import { Message } from '../../../utils/utils';
 import { Tag } from 'antd';
-import {
-   CheckCircleOutlined,
-   CloseCircleOutlined,
-} from '@ant-design/icons';
+import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 export default function FoolbalField({ user }) {
    const navigate = useNavigate();
 
@@ -84,6 +81,7 @@ export default function FoolbalField({ user }) {
       if (isDeleted) {
          setData(prevData => prevData.filter(item => item.id !== id)); // Cập nhật danh sách sau khi xóa
       }
+      Message("Xóa thành công", "Sân bóng đã dược xóa khỏi hệ thống", "success")
    };
 
 
@@ -91,7 +89,7 @@ export default function FoolbalField({ user }) {
       navigate(`/BookingBusiness/${sanBong.id}`, { state: sanBong });
    };
 
-   console.log(addressData)
+   // console.log(addressData)
 
    return (
       <div className="FoolbalField">

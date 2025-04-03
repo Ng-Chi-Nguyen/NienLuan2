@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import { CiEdit } from "react-icons/ci";
 import { RiDeleteBin2Line } from "react-icons/ri";
 import { MdOutlinePayments } from "react-icons/md";
-import { Tag } from 'antd';
+import { Tag, Pagination } from 'antd';
 import { getBusinessById } from "../../../services/business.service";
 import { getBookingsByUser, getBookingsForTodayByBusiness, deleteBooking } from "../../../services/booking.service";
 import { getFootballFieldById } from "../../../services/footballField.service";
@@ -13,6 +13,7 @@ export function BookingUser({ user }) {
    const [booking, setBookings] = useState([])
    const [businessMap, setBusinessMap] = useState({});
    const [footballFieldMap, setFootballFieldMap] = useState({});
+   const [currentPage, setCurrentPage] = useState(1);
 
    const fetchAPIBooking = useCallback(async () => {
       const updatedBookings = await getBookingsByUser(user?.id, user?.type);
@@ -49,7 +50,7 @@ export function BookingUser({ user }) {
             BusinessGetById(item.id_Business);
          }
       });
-   }, [booking, BusinessGetById]);
+   }, [businessMap, booking, BusinessGetById]);
 
    useEffect(() => {
       booking.forEach(item => {
@@ -57,7 +58,7 @@ export function BookingUser({ user }) {
             FootballFieldGetById(item.id_FF);
          }
       });
-   }, [booking, FootballFieldGetById]);
+   }, [booking, businessMap, FootballFieldGetById, footballFieldMap]);
 
 
    let handleDeleteBooking = async (id) => {
@@ -68,6 +69,12 @@ export function BookingUser({ user }) {
          setBookings(prevData => prevData.filter(item => item.id !== id)); // Cập nhật danh sách sau khi xóa
       }
    }
+
+   const itemsPerPage = 5; // Số lượng mục trên mỗi trang
+   // Tính toán danh sách hiển thị
+   const indexOfLastItem = currentPage * itemsPerPage;
+   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+   const currentBookings = booking.slice(indexOfFirstItem, indexOfLastItem);
 
    return (
       <>
@@ -89,8 +96,8 @@ export function BookingUser({ user }) {
                         </tr>
                      </thead>
                      <tbody>
-                        {booking.length > 0 ? (
-                           booking.map((item, index) => (
+                        {currentBookings.length > 0 ? ( // Dùng currentBookings thay vì booking
+                           currentBookings.map((item, index) => (
                               <tr key={index}>
                                  <td>{footballFieldMap[item.id_FF]?.[0]?.name || "Đang tải..."}</td>
                                  <td>{businessMap[item.id_Business]?.[0]?.name || "Đang tải..."}</td>
@@ -124,6 +131,15 @@ export function BookingUser({ user }) {
                      </tbody>
                   </table>
                </div>
+               <Pagination
+                  align="end"
+                  current={currentPage}
+                  pageSize={itemsPerPage}
+                  total={booking.length}
+                  onChange={(page) => setCurrentPage(page)}
+                  showSizeChanger={false} // Không cho phép chọn số item mỗi trang
+                  style={{ textAlign: "center", marginTop: "20px" }}
+               />
             </div>
          </div>
       </>
@@ -139,7 +155,7 @@ export function BookingFootball({ user }) {
    const fetchAPIBooking = useCallback(async () => {
       const updatedBookings = await getBookingsForTodayByBusiness(user?.id);
       setBookings(updatedBookings);
-   }, [user?.id, user?.type]);
+   }, [user?.id]);
 
    const BusinessGetById = useCallback(async (id_Business) => {
       const businessData = await getBusinessById(id_Business);
@@ -171,7 +187,7 @@ export function BookingFootball({ user }) {
             BusinessGetById(item.id_Business);
          }
       });
-   }, [booking, BusinessGetById]);
+   }, [booking, businessMap, BusinessGetById]);
 
    useEffect(() => {
       booking.forEach(item => {
@@ -179,9 +195,9 @@ export function BookingFootball({ user }) {
             FootballFieldGetById(item.id_FF);
          }
       });
-   }, [booking, FootballFieldGetById]);
+   }, [booking, footballFieldMap, FootballFieldGetById]);
 
-   console.log(booking)
+   // console.log(booking)
    return (
       <>
          <div className="Booking">

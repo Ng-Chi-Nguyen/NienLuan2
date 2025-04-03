@@ -3,6 +3,7 @@ import { Modal, Input, Select, InputNumber, Upload, Button, Image } from "antd";
 import { AddressSelector } from '../../Address/Address';
 import { UploadOutlined } from "@ant-design/icons";
 import axios from 'axios';
+import { Message } from '../../../utils/utils';
 import './FootballModel.scss';
 
 import { RiCloseLargeLine } from "react-icons/ri";
@@ -93,6 +94,7 @@ export function CreateFootballField({
             setFileList([]);
 
             handleCancel();
+            Message("Hoàn thành", "Tạo sân bóng thành công", "success")
          } else {
             alert(`Lỗi: ${response.data.message}`);
          }
@@ -231,6 +233,7 @@ export function EditFootballField({
             console.error("Lỗi khi cập nhật:", response.data.message);
             alert("Lỗi khi cập nhật: " + response.data.message);
          }
+         Message("Hoàn thành", "Cập nhật sân bóng thành công", "success")
       } catch (error) {
          console.error("Lỗi hệ thống:", error);
          alert("Lỗi hệ thống khi cập nhật sân bóng!");
