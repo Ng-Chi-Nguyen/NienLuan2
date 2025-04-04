@@ -11,6 +11,7 @@ import { useModal } from "../../../components/hooks/useModel";
 import { Message } from '../../../utils/utils';
 import { Tag } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { formatNumber } from '../../../utils/utils';
 export default function FoolbalField({ user }) {
    const navigate = useNavigate();
 
@@ -104,7 +105,7 @@ export default function FoolbalField({ user }) {
                      <th>ID</th>
                      <th>Tên sân</th>
                      <th>Loại</th>
-                     <th>Giá</th>
+                     <th>Giá (vnđ)</th>
                      <th>Địa chỉ sân</th>
                      <th>Trạng thái</th>
                      <th>Ảnh mô tả</th>
@@ -119,7 +120,7 @@ export default function FoolbalField({ user }) {
                            <td className="text-center">{item.id}</td>
                            <td>{item.name}</td>
                            <td className="text-center">{item.size}</td>
-                           <td className="text-center">{item.price}</td>
+                           <td className="text-center">{formatNumber(item.price)}</td>
                            <td>
                               {addressData?.[item.id] ? `${item.address}, ${addressData[item.id]}` : "Đang tải..."}
                            </td>

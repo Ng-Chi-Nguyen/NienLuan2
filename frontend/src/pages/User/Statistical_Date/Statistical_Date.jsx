@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import './Statistical.scss';
+import './Statistical_Date.scss';
 import { Pie } from "react-chartjs-2";
 import {
    Chart as ChartJS,
@@ -16,7 +16,7 @@ import { formatNumber } from "../../../utils/utils.js";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 
-export default function Statistical({ user }) {
+export default function Statistical_Date({ user }) {
    const [chartData, setChartData] = useState(null); // Lưu dữ liệu cho biểu đồ
    const [selectedDate, setSelectedDate] = useState(null); // Lưu ngày đã chọn
    const [sumPrice, setSumPrice] = useState(0)
@@ -52,7 +52,7 @@ export default function Statistical({ user }) {
    const fetchData = async (date) => {
       try {
          const data = await DisplayByBusinessDate(user.id, date); // Gọi hàm fetchChartData từ service
-         console.log(data)
+         // console.log(data)
          // Dữ liệu trả về có trong data.data
          if (data && Array.isArray(data.data)) {
             const chartLabels = data.data.map(item => item.dateStart); // Lấy ngày từ dữ liệu

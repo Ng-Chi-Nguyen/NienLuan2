@@ -7,8 +7,8 @@ import Footer from "../../components/Footer/Footer";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookingUser, BookingFootball, NextLavel } from "./Booking/Booking";
-import Statistical from "./Statistical/Statistical";
-
+import Statistical_Date from "./Statistical_Date/Statistical_Date";
+import Statistical_Month from "./Statistical_Month/Statistical_Month";
 
 
 export default function User() {
@@ -80,7 +80,8 @@ export default function User() {
                ) : (<></>)}
                <div className="Statistical">
                   <h2 className="title">Thống kê</h2>
-                  <Statistical user={user} />
+                  <Statistical_Date user={user} />
+                  <Statistical_Month user={user} />
                </div>
             </div>
          </div >
