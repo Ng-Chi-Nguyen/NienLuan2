@@ -10,6 +10,10 @@
       text-align: center;
    }
    .cardLogin{
+      -webkit-user-select: none;  /* Safari */
+      -moz-user-select: none;     /* Firefox */
+      -ms-user-select: none;      /* IE10+/Edge */
+      user-select: none;          /* Tiêu chuẩn */
       .social-login{
          display: flex;
          justify-content: center;
@@ -58,6 +62,39 @@
       }
       .w-100{
          width: 100%;
+      }
+      .item{
+         padding: 0;
+         &.pass{
+            position: relative;
+            width: 100% !important;
+            span{
+               position: absolute;
+               top: -2px;
+               right: 15px;
+               font-size: 20px;
+               opacity: 0.7;
+               cursor: pointer;
+            }
+         }
+      }
+      .pass{
+         position: relative;
+         margin-top: 10px;
+         padding: 0;
+         width: 75%;
+         margin-bottom: 0;
+         input{
+            margin-bottom: 0 !important;
+         }
+            span{
+               position: absolute;
+               top: -2px;
+               right: 15px;
+               font-size: 20px;
+               opacity: 0.7;
+               cursor: pointer;
+            }
       }
       input{
          padding: 5px;

@@ -23,22 +23,19 @@
 }
 
 
-/* 🌟 iPad (từ 768px đến 1024px) → Chia thành 2 cột */
+/* iPad (từ 768px đến 1024px) → Chia thành 2 cột */
 @media (max-width: 1024px) {
    .Section4 .bodyContentFAQs{
       width: 80%;
    }
    .Section4 .bodyImg a img{
-      width: 15px !important;
+      width: 50px !important;
    }
 }
 
-/* 🌟 Mobile (dưới 768px) → Chia thành 1 cột */
+/* Mobile (dưới 768px) → Chia thành 1 cột */
 @media (max-width: 768px) {
    .Section4 .bodyContentFAQs{
       width: 100%;
-   }
-   .Section4 .bodyImg a img{
-      width: 10px !important;
    }
 }

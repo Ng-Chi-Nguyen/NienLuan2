@@ -7,15 +7,15 @@ import Footer from "../../components/Footer/Footer";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookingUser, BookingFootball, NextLavel } from "./Booking/Booking";
-import Statistical_Date from "./Statistical_Date/Statistical_Date";
-import Statistical_Month from "./Statistical_Month/Statistical_Month";
+import StatisticalDate from "./Statistical_Date/Statistical_Date";
+import StatisticalMonth from "./Statistical_Month/Statistical_Month";
 
 
 export default function User() {
 
    const [user, setUser] = useState(null);
    const navigate = useNavigate();
-   const [alignValue, setAlignValue] = useState('center');
+   const [alignValue,] = useState('center');
 
    useEffect(() => {
       const params = new URLSearchParams(window.location.search);
@@ -76,13 +76,16 @@ export default function User() {
                   </div>
                </div>
                {user.type === "business" ? (
-                  <FoolbalField user={user} />
+                  <>
+                     <FoolbalField user={user} />
+                     <div className="Statistical">
+                        <h2 className="title">Thống kê</h2>
+                        <StatisticalDate user={user} />
+                        <StatisticalMonth user={user} />
+                     </div>
+                  </>
                ) : (<></>)}
-               <div className="Statistical">
-                  <h2 className="title">Thống kê</h2>
-                  <Statistical_Date user={user} />
-                  <Statistical_Month user={user} />
-               </div>
+
             </div>
          </div >
          <Footer />

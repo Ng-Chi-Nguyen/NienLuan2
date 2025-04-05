@@ -1,7 +1,7 @@
 
 import Header from "../../components/Header/Header";
 import './Login.scss';
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CiUser } from "react-icons/ci";
 import { IoBusinessOutline } from "react-icons/io5";
@@ -16,7 +16,7 @@ export default function Login() {
 
    const [loading, setLoading] = useState(false); // Loading o dang ky
    const [message, setMessage] = useState("")
-
+   const [showPassword, setShowPassword] = useState(false)
 
    const [formData, setFormData] = useState({
       name: "",
@@ -176,6 +176,10 @@ export default function Login() {
       }
    };
 
+   let handleSetPass = () => {
+      setShowPassword(!showPassword)
+   }
+   console.log(showPassword)
    const itemTabs = [
       {
          key: "1",
@@ -217,13 +221,16 @@ export default function Login() {
                         onChange={handleChange}
                         value={formData.email}
                      />
-                     <input
-                        type="password"
-                        name="password"
-                        placeholder="Mật khẩu"
-                        onChange={handleChange}
-                        value={formData.password}
-                     />
+                     <div className="pass">
+                        <input
+                           type={showPassword ? "text" : "password"}
+                           name="password"
+                           placeholder="Mật khẩu"
+                           onChange={handleChange}
+                           value={formData.password}
+                        />
+                        <span onClick={handleSetPass}>{showPassword ? <FaEyeSlash /> : <FaEye />}</span>
+                     </div>
 
                      <select name="gender" onChange={handleChange} value={formData.gender}>
                         <option value="true">Nam</option>
@@ -284,13 +291,16 @@ export default function Login() {
                         onChange={handleChange}
                         value={formData.email}
                      />
-                     <input
-                        type="password"
-                        name="password"
-                        placeholder="Mật khẩu"
-                        onChange={handleChange}
-                        value={formData.password}
-                     />
+                     <div className="item pass">
+                        <input
+                           type={showPassword ? "text" : "password"}
+                           name="password"
+                           placeholder="Mật khẩu"
+                           onChange={handleChange}
+                           value={formData.password}
+                        />
+                        <span onClick={handleSetPass}>{showPassword ? <FaEyeSlash /> : <FaEye />}</span>
+                     </div>
                      <span className="error">{message}</span>
                      <input
                         type="text"
@@ -339,7 +349,6 @@ export default function Login() {
 
    console.log(message)
 
-
    return (
       <>
          <Header />
@@ -371,20 +380,25 @@ export default function Login() {
                   <p className="text-center">Hoặc đăng nhập Email</p>
                   <form onSubmit={handleLogin}>
                      <div className="row">
-                        <input
-                           type="email"
-                           name="email"
-                           placeholder="Email"
-                           onChange={handleChange}
-                           value={formData.email}
-                        />
-                        <input
-                           type="password"
-                           name="password"
-                           placeholder="Mật khẩu"
-                           onChange={handleChange}
-                           value={formData.password}
-                        />
+                        <div className="item">
+                           <input
+                              type="email"
+                              name="email"
+                              placeholder="Email"
+                              onChange={handleChange}
+                              value={formData.email}
+                           />
+                        </div>
+                        <div className="item pass">
+                           <input
+                              type={showPassword ? "text" : "password"}
+                              name="password"
+                              placeholder="Mật khẩu"
+                              onChange={handleChange}
+                              value={formData.password}
+                           />
+                           <span onClick={handleSetPass}>{showPassword ? <FaEyeSlash /> : <FaEye />}</span>
+                        </div>
                         <span className="error">{message}</span>
                         <button type="submit" disabled={loading}>{loading ? "Đang xử lý..." : "Đăng nhập"}</button>
                      </div>

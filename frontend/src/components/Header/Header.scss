@@ -143,19 +143,21 @@
    }
 }
 @media (max-width: 768px) {
-   .Header-left .logo{
-      width: 200px;
-      height: auto;
-   }
    .Header-center .menuList{
       padding-left: 0;
    }
 }
 @media (max-width: 567px) {
-   .Header-left span{
-      display: inline;
-      margin-right: 20px;
-      cursor: pointer;
+   .Header-left {
+      width: 40% !important;
+      span{
+         display: inline;
+         margin-right: 20px;
+         cursor: pointer;
+      }
+      .logo{
+         width: 100% !important;
+      }
    }
    .Header-center{
       display: none;

@@ -84,3 +84,17 @@
       }
    }
 }
+
+@media (max-width: 1992px) {
+   .ContentBooking {
+      flex-wrap: wrap;
+      .left{
+         width: 100% !important;
+      }
+      .right{
+         margin-top: 30px !important;
+         width: 100% !important;
+      }
+   }
+
+}

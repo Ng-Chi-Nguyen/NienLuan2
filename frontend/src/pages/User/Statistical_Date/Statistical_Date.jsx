@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import './Statistical_Date.scss';
 import { Pie } from "react-chartjs-2";
 import {
@@ -16,7 +16,7 @@ import { formatNumber } from "../../../utils/utils.js";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 
-export default function Statistical_Date({ user }) {
+export default function StatisticalDate({ user }) {
    const [chartData, setChartData] = useState(null); // Lưu dữ liệu cho biểu đồ
    const [selectedDate, setSelectedDate] = useState(null); // Lưu ngày đã chọn
    const [sumPrice, setSumPrice] = useState(0)
@@ -49,14 +49,10 @@ export default function Statistical_Date({ user }) {
    };
 
    // Hàm fetch dữ liệu
-   const fetchData = async (date) => {
+   const fetchData = useCallback(async (date) => {
       try {
          const data = await DisplayByBusinessDate(user.id, date); // Gọi hàm fetchChartData từ service
-         // console.log(data)
-         // Dữ liệu trả về có trong data.data
          if (data && Array.isArray(data.data)) {
-            const chartLabels = data.data.map(item => item.dateStart); // Lấy ngày từ dữ liệu
-            // Kiểm tra xem có doanh thu hay không và thay thế giá trị nếu không có
             const chartValues = data.data.map(item => item.Total || 0); // Nếu không có doanh thu thì gán giá trị là 0
             const fieldNames = await fetchFootballFields(data.data);
             const colors = fieldNames.map(() => getRandomColor());
@@ -82,13 +78,13 @@ export default function Statistical_Date({ user }) {
       } catch (error) {
          console.error("Error fetching data:", error);
       }
-   };
+   }, [user.id]);
    // Lắng nghe sự kiện thay đổi ngày từ DatePicker
    useEffect(() => {
       const today = dayjs().format('YYYY-MM-DD'); // Lấy ngày hiện tại với dayjs
       setSelectedDate(today); // Set ngày hiện tại vào selectedDate
       fetchData(today); // Gọi hàm fetchData để lấy dữ liệu cho ngày hôm nay
-   }, []); // useEffect chỉ chạy khi component mount lần đầu tiên
+   }, [fetchData]); // useEffect chỉ chạy khi component mount lần đầu tiên
 
    // Hàm xử lý thay đổi ngày
    const handleDateChange = (date) => {

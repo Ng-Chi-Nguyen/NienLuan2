@@ -42,7 +42,7 @@ const processRevenueData = (data) => {
    return weeklyRevenue;
 };
 
-export default function Statistical_Month({ user }) {
+export default function StatisticalMonth({ user }) {
    const [revenueData, setRevenueData] = useState([]);
    const [date, setDate] = useState(dayjs().subtract(1, 'month').format("YYYY-MM"));
    const [fieldNames, setFieldNames] = useState({}); // Store the field names by idFF
