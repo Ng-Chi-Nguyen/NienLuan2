@@ -1,7 +1,7 @@
 
 import Header from "../../components/Header/Header";
 import './Login.scss';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CiUser } from "react-icons/ci";
 import { IoBusinessOutline } from "react-icons/io5";
@@ -10,7 +10,20 @@ import { FaGoogle, FaFacebookF, FaEye, FaEyeSlash } from "react-icons/fa";
 import axios from "axios";
 import { createUser } from "../../services/user.service";
 import { createBusiness } from "../../services/business.service";
+import { Message } from "../../utils/utils";
+import { useLocation } from "react-router-dom";
+
 export default function Login() {
+
+   const location = useLocation();
+   const messageBooking = location.state?.messageBooking;
+   useEffect(() => {
+      if (messageBooking) {
+         Message("Thông báo", messageBooking, "success");
+      }
+      // Reset state để không hiển thị lại khi reload
+      navigate(location.pathname, { replace: true, state: {} });
+   }, [messageBooking]);
 
    const navigate = useNavigate();
 
@@ -153,9 +166,9 @@ export default function Login() {
             email: formData.email,
             password: formData.password
          });
-         console.log(response.data.message)
+         // console.log(response.data.message)
          setMessage(response.data.message)
-         console.log("Đăng nhập thành công:", response.data);
+         // console.log("Đăng nhập thành công:", response.data);
 
          // Lưu token vào localStorage hoặc state (tùy vào cách bạn xử lý đăng nhập)
          localStorage.setItem("token", response.data.token);
@@ -179,7 +192,7 @@ export default function Login() {
    let handleSetPass = () => {
       setShowPassword(!showPassword)
    }
-   console.log(showPassword)
+   // console.log(showPassword)
    const itemTabs = [
       {
          key: "1",
@@ -192,10 +205,10 @@ export default function Login() {
                      <span><FaGoogle /></span>
                      <p>Đăng nhập Google</p>
                   </a>
-                  <button className="login-fb">
+                  {/* <button className="login-fb">
                      <span><FaFacebookF /></span>
                      <p>Đăng nhập Facebook</p>
-                  </button>
+                  </button> */}
                </div>
                <p className="text-center">Hoặc tạo tài khoản</p>
                <form onSubmit={handleCreateUser}>
@@ -262,10 +275,10 @@ export default function Login() {
                      <span><FaGoogle /></span>
                      <p>Đăng nhập Google</p>
                   </a>
-                  <button className="login-fb">
+                  {/* <button className="login-fb">
                      <span><FaFacebookF /></span>
                      <p>Đăng nhập Facebook</p>
-                  </button>
+                  </button> */}
                </div>
                <p className="text-center">Hoặc tạo tài khoản</p>
                <form onSubmit={handleCreateBusiness}>
@@ -347,7 +360,6 @@ export default function Login() {
 
    const [login, setLogin] = useState(false)
 
-   console.log(message)
 
    return (
       <>
@@ -372,10 +384,10 @@ export default function Login() {
                         <span><FaGoogle /></span>
                         <p>Đăng nhập Google</p>
                      </a>
-                     <button className="login-fb">
+                     {/* <button className="login-fb">
                         <span><FaFacebookF /></span>
                         <p>Đăng nhập Facebook</p>
-                     </button>
+                     </button> */}
                   </div>
                   <p className="text-center">Hoặc đăng nhập Email</p>
                   <form onSubmit={handleLogin}>

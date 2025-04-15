@@ -10,8 +10,8 @@ import {
 } from "../services/foolballField.service.js";
 
 export const createFoolballField = async (req, res) => {
-   // console.log("🔍 Dữ liệu nhận được từ client:", req.body);
-   // console.log("🔍 Files nhận được từ client:", req.files);
+   // console.log(" Dữ liệu nhận được từ client:", req.body);
+   // console.log(" Files nhận được từ client:", req.files);
 
    const requestData = req.body;
 
@@ -31,10 +31,10 @@ export const createFoolballField = async (req, res) => {
          });
       }
 
-      // 📌 Lấy danh sách ảnh từ `req.files`
+      // Lấy danh sách ảnh từ `req.files`
       const images = req.files ? req.files.map(file => `/image/uploads/${file.filename}`) : [];
 
-      // 📌 Gọi service để lưu sân bóng + ảnh vào database
+      // Gọi service để lưu sân bóng + ảnh vào database
       const result = await createFoolballFieldService({
          name,
          size,
@@ -55,7 +55,7 @@ export const createFoolballField = async (req, res) => {
       res.json({ success: result.success, message: result.message, data: result.data });
 
    } catch (e) {
-      console.error("❌ Lỗi server:", e);
+      console.error("Lỗi server:", e);
       res.status(500).json({ error: "Lỗi hệ thống!" });
    }
 };
@@ -83,7 +83,7 @@ export const getAllFoolbalFieldById = async (req, res) => {
 
 export const updateFootballField = async (req, res) => {
    try {
-      // console.log("🔹 Request body:", req.body);
+      // console.log("Request body:", req.body);
       const { id } = req.params;
 
       if (!id) {
@@ -101,7 +101,7 @@ export const updateFootballField = async (req, res) => {
          message: "Cập nhật thành công!"
       });
    } catch (e) {
-      console.error("❌ Lỗi cập nhật sân bóng:", e);
+      console.error("Lỗi cập nhật sân bóng:", e);
       res.status(500).json({ error: "Lỗi hệ thống!" });
    }
 };
@@ -165,7 +165,7 @@ export const updateFootballFieldImage = async (req, res) => {
    try {
       const { id } = req.params;
       const imageFiles = req.files ? req.files.map(file => `/image/uploads/${file.filename}`) : [];
-      console.log(imageFiles)
+      // console.log(imageFiles)
 
       if (!imageFiles || imageFiles.length === 0) {
          return res.status(400).json({ success: false, message: "Vui lòng tải lên ít nhất một ảnh!" });

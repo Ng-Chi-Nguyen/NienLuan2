@@ -12,9 +12,9 @@ export const BtnAdd = (props) => {
 };
 
 export const Search = (props) => {
-   const { name } = props;
+   const { name, onChange } = props;
    return <div className='search'>
-      <input type='text' placeholder={name} />
+      <input type='text' placeholder={name} onChange={onChange} />
       <span><CiSearch /></span>
    </div>;
 };

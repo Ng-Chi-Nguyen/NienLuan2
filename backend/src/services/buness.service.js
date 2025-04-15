@@ -33,7 +33,7 @@ let createBusinessService = async (businessData) => {
          .insert([{ name, email, password, phone, address, owner_name, license_number, tax_code, established_date }])
          .select("*");
 
-      console.log("Kết quả insert:", data, error);
+      // console.log("Kết quả insert:", data, error);
       if (error) {
          console.error("❌ Lỗi insert vào Supabase:", error);
          return { success: false, error };
@@ -76,7 +76,7 @@ let updateBusinessService = async (id, businessData) => {
          SECRET_KEY,
          { expiresIn: "7d" }
       );
-      console.log(businessData)
+      // console.log(businessData)
       return {
          success: true,
          data: businessData,

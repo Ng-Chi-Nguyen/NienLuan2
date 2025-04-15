@@ -24,7 +24,7 @@ export const getProvinceByIdService = async (idProvince) => {
          .single();
 
       if (error) {
-         return { uccess: false, message: error }
+         return { success: false, message: error }
       }
       return { success: true, data }
    } catch (e) {
@@ -77,7 +77,7 @@ export const getAllWards = async (idDistrict) => {
       if (error) {
          throw new Error(error.message);
       }
-      return { success: true, data };
+      return { success: true, data, message: "Lấy thành công danh sách xã" };
    } catch (error) {
       return { success: false, message: error.message };
    }

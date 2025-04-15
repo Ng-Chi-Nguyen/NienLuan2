@@ -32,6 +32,7 @@ export function BookingModel({ isModalOpen, handleCancel, bookingData, fetchAPIB
       const hours = diffInMinutes / 60;
       return pricePerHour * hours;
    };
+   console.log(formatNumber(calculatePrice()))
 
    useEffect(() => {
       const fetchBusinessData = async (id) => {
@@ -95,6 +96,7 @@ export function BookingModel({ isModalOpen, handleCancel, bookingData, fetchAPIB
       }
       setLoading(false)
    };
+
    return (
       <Modal
          title="Chi tiết đặt sân"

@@ -7,6 +7,7 @@ import uploadRouter from './upload.routes.js';
 import addressRouter from './address.routes.js';
 import bookingRouter from './bookingUser.routes.js';
 import chartRouter from './chart.route.js';
+import filterRouter from './filter.routes.js';
 
 const Routers = (app) => {
    app.use('/api/user/', userRouter);
@@ -17,6 +18,7 @@ const Routers = (app) => {
    app.use("/api/address/", addressRouter)
    app.use("/api/bookingUser/", bookingRouter)
    app.use("/api/chart/", chartRouter)
+   app.use("/api/filter/football/", filterRouter)
 };
 
 export default Routers;

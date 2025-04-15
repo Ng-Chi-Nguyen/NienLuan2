@@ -86,7 +86,11 @@ export const getWards = async (req, res) => {
          return res.status(400).json(result);
       }
 
-      res.status(200).json(result);
+      res.status(200).json({
+         success: result.success,
+         message: result.message,
+         data: result.data
+      });
    } catch (error) {
       console.error("Lỗi lấy danh sách huyện:", error);
       res.status(500).json({ success: false, message: "Lỗi server", error: error.message });

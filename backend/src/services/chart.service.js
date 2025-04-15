@@ -8,14 +8,14 @@ cron.schedule('0 23 * * *', async () => {
    const today = new Date().toISOString().split('T')[0]; // Lấy ngày hiện tại
 
    try {
-      // 📌 Lấy danh sách tất cả id_Business từ bảng Business
+      // Lấy danh sách tất cả id_Business từ bảng Business
       const { data: businesses, error } = await sql
          .from('Business')
          .select('id');
 
       if (error) throw new Error(error.message);
       if (!businesses.length) {
-         console.log('❌ Không có doanh nghiệp nào để thống kê!');
+         console.log('Không có doanh nghiệp nào để thống kê!');
          return;
       }
 
@@ -40,8 +40,8 @@ export const getRevenueByDateService = async (data) => {
 
       // Truy vấn dữ liệu từ bảng booking để tính doanh thu theo ngày cho từng sân
       const { data: bookingData, error: bookingError } = await sql
-         .from('Booking')  // Đảm bảo tên bảng đúng (chắc chắn không phải 'Booking')
-         .select('price, id_FF') // Lấy giá và idFF thay vì id_san
+         .from('Booking')
+         .select('price, id_FF') 
          .eq('date', dateStart)  // Lọc theo ngày bắt đầu
          .eq('id_Business', id_Business);  // Lọc theo id_Business
 
@@ -122,13 +122,10 @@ export const createRevenueMonthService = async (dateStart, id_Business) => {
          return adjustedDate;
       };
 
-      // Parse the input date correctly (assuming YYYY-MM-DD format)
       const [year, month, day] = dateStart.split('-').map(Number);
 
-      // Create date in LOCAL timezone (no time component)
       const localDateStart = new Date(year, month - 1, day);
 
-      // Get month boundaries in local time
       const firstDayOfMonth = new Date(
          localDateStart.getFullYear(),
          localDateStart.getMonth(),
@@ -140,12 +137,12 @@ export const createRevenueMonthService = async (dateStart, id_Business) => {
          0
       );
 
-      // Adjust dates to local midnight (00:00:00) to avoid timezone issues
+      // Hai dòng này dùng để điều chỉnh firstDayOfMonth và lastDayOfMonth về đúng nửa đêm (00:00:00) theo giờ địa phương
       const adjustedStartDate = adjustDateToLocalMidnight(firstDayOfMonth);
       const adjustedEndDate = adjustDateToLocalMidnight(lastDayOfMonth);
 
-      console.log(`Ngày bắt đầu tháng (local): ${adjustedStartDate.toLocaleDateString()}`);
-      console.log(`Ngày kết thúc tháng (local): ${adjustedEndDate.toLocaleDateString()}`);
+      // console.log(`Ngày bắt đầu tháng (local): ${adjustedStartDate.toLocaleDateString()}`);
+      // console.log(`Ngày kết thúc tháng (local): ${adjustedEndDate.toLocaleDateString()}`);
 
       // Calculate weeks
       const weeks = [];
@@ -171,7 +168,6 @@ export const createRevenueMonthService = async (dateStart, id_Business) => {
       for (const week of weeks) {
          const { startDate, endDate } = week;
 
-         // Format dates as YYYY-MM-DD without timezone conversion
          const formatDate = (date) => {
             return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
          };
@@ -204,7 +200,6 @@ export const createRevenueMonthService = async (dateStart, id_Business) => {
          });
       }
 
-      // Process remaining days if any
       const remainingDaysRevenue = {};
       const lastWeekEnd = weeks.length > 0 ? weeks[weeks.length - 1].endDate : adjustedStartDate;
       const remainingDaysStart = new Date(lastWeekEnd);

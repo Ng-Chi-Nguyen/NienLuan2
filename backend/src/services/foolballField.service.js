@@ -17,7 +17,7 @@ let createFoolballFieldService = async (fieldData) => {
          .eq("name", name);
 
       if (existingFieldsError) {
-         console.error("❌ Lỗi khi kiểm tra trường bóng đá:", existingFieldsError);
+         console.error("Lỗi khi kiểm tra trường bóng đá:", existingFieldsError);
          return { success: false, error: existingFieldsError.message };
       }
 
@@ -45,7 +45,7 @@ let createFoolballFieldService = async (fieldData) => {
          .single();
 
       if (error) {
-         console.error("❌ Lỗi insert vào Supabase:", error);
+         console.error("Lỗi insert vào Supabase:", error);
          return { success: false, error: error.message };
       }
 
@@ -60,7 +60,7 @@ let createFoolballFieldService = async (fieldData) => {
             .insert(imageData);
 
          if (imageError) {
-            console.error("❌ Lỗi khi lưu ảnh:", imageError);
+            console.error("Lỗi khi lưu ảnh:", imageError);
             return { success: false, error: "Lỗi khi lưu ảnh!" };
          }
       }
@@ -68,7 +68,7 @@ let createFoolballFieldService = async (fieldData) => {
       return { success: true, data };
 
    } catch (e) {
-      console.error("❌ Lỗi hệ thống:", e);
+      console.error("Lỗi hệ thống:", e);
       return { success: false, error: "Lỗi hệ thống!" };
    }
 };
@@ -119,7 +119,7 @@ let displayOneFoolbalFieldIdService = async (id) => {
 
 let updateFootballFieldService = async (id, updateData) => {
    try {
-      // console.log("🔹 Dữ liệu nhận để cập nhật:", updateData);
+      // console.log("Dữ liệu nhận để cập nhật:", updateData);
 
       // Lấy dữ liệu cũ trước khi cập nhật
       const { data: currentData, error: fetchError } = await sql
@@ -148,7 +148,7 @@ let updateFootballFieldService = async (id, updateData) => {
 
       return { success: true, data: updatedField };
    } catch (e) {
-      console.error("❌ Lỗi hệ thống:", e);
+      console.error("Lỗi hệ thống:", e);
       return { success: false, error: "Lỗi hệ thống!" };
    }
 };
@@ -253,14 +253,14 @@ const updateFootballFieldImageService = async (id, imageUrls) => {
       const { error: imageError } = await sql.from("FootballFieldImages").insert(imageData);
 
       if (imageError) {
-         console.error("❌ Lỗi khi lưu ảnh:", imageError);
+         console.error("Lỗi khi lưu ảnh:", imageError);
          return { success: false, error: "Lỗi khi lưu ảnh!" };
       }
 
       return { success: true, data: imageData };
 
    } catch (error) {
-      console.error("❌ Lỗi hệ thống:", error);
+      console.error("Lỗi hệ thống:", error);
       return { success: false, error: "Lỗi hệ thống!" };
    }
 };

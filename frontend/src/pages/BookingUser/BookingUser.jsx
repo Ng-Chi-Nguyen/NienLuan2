@@ -2,6 +2,7 @@ import { useLocation } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import ContentBooking from "./Content/contentBooking";
+import { getBusinessById } from "../../services/business.service";
 import dayjs from "dayjs";
 import { useState, useEffect, useMemo } from "react";
 import './BookingUser.scss';
@@ -15,13 +16,37 @@ export default function BookingBusiness() {
    const [selectedBooking, setSelectedBooking] = useState([]); // Lưu ngày và giờ người dùng chọn
    const [selectedCell, setSelectedCell] = useState(null); // Lưu ô lịch được chọn
    const [user, setUser] = useState([]);
+   const [business, setBusiness] = useState([]);
    const [bookings, setBookings] = useState([]);
    const [currentWeekOffset, setCurrentWeekOffset] = useState(0); // Dịch tuần (tuần hiện tại là 0, tuần sau là +1, tuần trước là -1)
 
    const location = useLocation();
    const sanBong = location.state || {}; // Nhận dữ liệu từ state
+   console.log("user", user)
+   const checkLogin = () => {
+      const userStored = localStorage.getItem("user");
+      return !!userStored; // trả về true nếu đã login
+   };
+   useEffect(() => {
+      const fetchBusinessInfo = async () => {
+         try {
+            const data = await getBusinessById(sanBong.idBusiness);
+            setBusiness(data); // Cập nhật thông tin doanh nghiệp
+         } catch (e) {
+            console.log(e)
+         }
+      };
 
+      if (sanBong.idBusiness) {
+         fetchBusinessInfo();
+      }
+   }, [sanBong.idBusiness]);
+   // console.log(business[0].phone)
    const handleClick = (date, time) => {
+      if (!checkLogin()) {
+         navigate("/Login", { state: { messageBooking: `Bạn không muốn đang nhập thì liên hệ ${business[0].phone} để đặt sân giúp nhé! Cám ơn bạn nhiều 😍` } });
+         return;
+      }
       console.log(`Bạn đã click vào ngày ${date} lúc ${time}`);
       setSelectedBooking({ date, time });
       setSelectedCell(`${date}-${time}`); // Lưu ô được chọn
@@ -139,13 +164,13 @@ export default function BookingBusiness() {
    const fetchAPIBooking = async () => {
       try {
          let response = await axios.get(`/api/bookingUser/${sanBong.id}`)
-         console.log(response)
+         // console.log(response)
          if (response.data.success) {
             const updatedBookings = response.data.data.map(booking => ({
                ...booking,
-               date: dayjs(booking.date).format("DD-MM"), // Chuyển "2025-03-24" -> "24-03"
-               timeStart: booking.timeStart.slice(0, 5), // Chuyển "20:00:00+00" -> "20:00"
-               timeEnd: booking.timeEnd.slice(0, 5) // Chuyển "21:00:00+00" -> "21:00"
+               date: dayjs(booking.date).format("DD-MM"), // Vd: chuyển "2025-03-24" -> "24-03"
+               timeStart: booking.timeStart.slice(0, 5), // vd: chuyển "20:00:00+00" -> "20:00"
+               timeEnd: booking.timeEnd.slice(0, 5)
             }));
             setBookings(updatedBookings);
          } else {

@@ -1,5 +1,5 @@
 import express from "express";
-import { multerConfig } from '../config/uploadFile.js'; // Import multerConfig
+import { multerConfig } from '../config/uploadFile.js';
 
 import {
    createFoolballField,

@@ -65,10 +65,11 @@ let createBookingService = async (bookingData) => {
       // Lấy thời gian hiện tại tại Việt Nam
       const vietnamTime = dayjs().tz('Asia/Ho_Chi_Minh');  // Lấy thời gian hiện tại ở Việt Nam
       const bookingDate = dayjs(date).tz('Asia/Ho_Chi_Minh');  // Chuyển đổi ngày đặt sân sang múi giờ Việt Nam
-      const bookingTimeStart = dayjs(`${date} ${timeStart}`).tz('Asia/Ho_Chi_Minh'); // Chuyển đổi thời gian bắt đầu đặt sân
+      const bookingTimeStart = dayjs(`${date} ${timeStart}`).tz('Asia/Ho_Chi_Minh'); // Chuyển đổi thời gian bắt đầu đặt sân, sẽ là thời điểm hiện tại tại Việt Nam (có giờ, phút, giây đầy đủ)
 
       // Kiểm tra xem ngày đặt sân có phải là hôm nay hoặc ngày trong tương lai không
       if (bookingDate.isBefore(vietnamTime, 'day')) {
+         // .isBefore() dùng để so sánh
          return {
             success: false,
             message: "Không thể đặt sân cho ngày hôm qua hoặc trước đó!"
@@ -83,8 +84,8 @@ let createBookingService = async (bookingData) => {
          };
       }
       // Kiểm tra và in ra thời gian sau khi chuyển đổi
-      console.log('Thời gian hiện tại tại Việt Nam:', vietnamTime.format()); // In ra thời gian ở Việt Nam
-      console.log("Ngày đặt sân:", bookingDate.format());
+      // console.log('Thời gian hiện tại tại Việt Nam:', vietnamTime.format()); // In ra thời gian ở Việt Nam
+      // console.log("Ngày đặt sân:", bookingDate.format());
 
       // **Kiểm tra xem khung giờ đã có ai đặt chưa**
       const { data: existingBookings } = await sql
@@ -93,8 +94,10 @@ let createBookingService = async (bookingData) => {
          .eq("id_FF", id_FF)
          .eq("date", date);
 
+      // Hàm chuyển thời gian sang phút
       const toMinutes = (time) => {
          const [hours, minutes] = time.split(":").map(Number);
+         // Ví dụ: "08:30" sẽ chuyển thành 8 * 60 + 30 = 510 phút
          return hours * 60 + minutes;
       };
 
@@ -104,8 +107,8 @@ let createBookingService = async (bookingData) => {
          const newStart = toMinutes(timeStart);
          const newEnd = toMinutes(timeEnd);
 
-         console.log(`Booking đã có: ${bookingStart} - ${bookingEnd}`);
-         console.log(`Booking mới: ${newStart} - ${newEnd}`);
+         // console.log(`Booking đã có: ${bookingStart} - ${bookingEnd}`);
+         // console.log(`Booking mới: ${newStart} - ${newEnd}`);
 
          return (
             (newStart >= bookingStart && newStart < bookingEnd) ||  // Bắt đầu trong khoảng đã đặt

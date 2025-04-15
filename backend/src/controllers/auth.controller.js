@@ -16,6 +16,7 @@ const generateToken = (user) => {
 };
 
 export const loginUser = async (req, res) => {
+
    const result = await loginUserService(req.body);
    // console.log("Login Service Result:", result);
 
@@ -23,20 +24,23 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ message: result.error });
    }
 
-   const token = generateToken(result.user);
+   // const token = generateToken(result.user);
    // console.log("Generated Token:", token);
 
-   res.json({ success: true, token, user: result.user });
+   res.json({ success: true, token: result.token, user: result.user });
 };
 // Bắt đầu quá trình xác thực -  Yêu cầu quyền truy cập thông tin cá nhân và email.
+// profile lấy thông tin cơ bản như tên, ảnh đại diện,...
+// email lấy email người dùng.
 export const googleAuth = passport.authenticate("google", { scope: ["profile", "email"] });
 
 export const googleCallback = (req, res, next) => {
+   // xử lý việc lấy thông tin người dùng từ Google.
    passport.authenticate("google", { session: false }, async (err, user, info) => {
       if (err) return next(err);
       if (!user) return res.redirect("http://localhost:3000/Login?error=google_failed");
 
-      const googleUser = user._json;
+      const googleUser = user._json; // là object chứa dữ liệu người dùng từ Google (tên, email,...).
       const result = await handleGoogleLogin(googleUser);
 
       if (!result.success) {
