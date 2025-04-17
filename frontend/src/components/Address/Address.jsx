@@ -18,6 +18,13 @@ export function AddressSelector({ defaultValue, onSelect }) {
    }, []);
 
    useEffect(() => {
+      /*
+         Nếu có defaultValue, nó sẽ:
+         Set giá trị tỉnh mặc định.
+         Gọi API để lấy danh sách huyện tương ứng với tỉnh.
+         Sau đó lấy danh sách xã nếu có defaultValue.district.
+         Nếu không có defaultValue, reset toàn bộ về trạng thái ban đầu.
+      */
       if (defaultValue?.province) {
          setSelectedProvince(defaultValue.province);
          axios.get(`/api/address/districts/${defaultValue.province}`)
@@ -73,7 +80,7 @@ export function AddressSelector({ defaultValue, onSelect }) {
    };
 
    const adminUnitMap = {
-      1: "Thành phố", 2: "Tỉnh", 3: "Thành phố thuộc TP", 4: "Thành phố thuộc tỉnh",
+      1: "Thành phố", 2: "Tỉnh", 3: "Thành phố", 4: "Thành phố",
       5: "Quận", 6: "Thị xã", 7: "Huyện", 8: "Phường", 9: "Thị trấn", 10: "Xã",
    };
 

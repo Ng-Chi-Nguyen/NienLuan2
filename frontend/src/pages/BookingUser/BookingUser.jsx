@@ -20,9 +20,9 @@ export default function BookingBusiness() {
    const [bookings, setBookings] = useState([]);
    const [currentWeekOffset, setCurrentWeekOffset] = useState(0); // Dịch tuần (tuần hiện tại là 0, tuần sau là +1, tuần trước là -1)
 
-   const location = useLocation();
+   const location = useLocation(); // Dùng để lấy thông tin về route hiện tại
    const sanBong = location.state || {}; // Nhận dữ liệu từ state
-   console.log("user", user)
+   // console.log("user", user)
    const checkLogin = () => {
       const userStored = localStorage.getItem("user");
       return !!userStored; // trả về true nếu đã login
@@ -47,7 +47,7 @@ export default function BookingBusiness() {
          navigate("/Login", { state: { messageBooking: `Bạn không muốn đang nhập thì liên hệ ${business[0].phone} để đặt sân giúp nhé! Cám ơn bạn nhiều 😍` } });
          return;
       }
-      console.log(`Bạn đã click vào ngày ${date} lúc ${time}`);
+      // console.log(`Bạn đã click vào ngày ${date} lúc ${time}`);
       setSelectedBooking({ date, time });
       setSelectedCell(`${date}-${time}`); // Lưu ô được chọn
       setIsModalVisible(true); // Mở modal

@@ -2,13 +2,11 @@ import './FoolbalField.scss';
 import { useState, useEffect, useCallback } from 'react';
 import { FaRegEdit } from "react-icons/fa";
 import { IoAddOutline } from "react-icons/io5";
-import { MdOutlineDeleteOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { CreateFootballField, EditFootballField, FootballFieldImages } from '../../../components/Model/Football/FootballModel';
-import { fetchFootballFieldsAPI, deleteFootballByID } from '../../../services/footballField.service';
+import { fetchFootballFieldsAPI } from '../../../services/footballField.service';
 import { fetchAddress } from '../../../services/address.service';
 import { useModal } from "../../../components/hooks/useModel";
-import { Message } from '../../../utils/utils';
 import { Tag } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { formatNumber } from '../../../utils/utils';
@@ -74,16 +72,16 @@ export default function FoolbalField({ user }) {
 
 
    // Xoa san bong
-   const DeleteFootball = async (id) => {
-      const confirmDelete = window.confirm("Bạn có chắc chắn muốn xóa sân bóng này không?");
-      if (!confirmDelete) return;
+   // const DeleteFootball = async (id) => {
+   //    const confirmDelete = window.confirm("Bạn có chắc chắn muốn xóa sân bóng này không?");
+   //    if (!confirmDelete) return;
 
-      const isDeleted = await deleteFootballByID(id);
-      if (isDeleted) {
-         setData(prevData => prevData.filter(item => item.id !== id)); // Cập nhật danh sách sau khi xóa
-      }
-      Message("Xóa thành công", "Sân bóng đã dược xóa khỏi hệ thống", "success")
-   };
+   //    const isDeleted = await deleteFootballByID(id);
+   //    if (isDeleted) {
+   //       setData(prevData => prevData.filter(item => item.id !== id)); // Cập nhật danh sách sau khi xóa
+   //    }
+   //    Message("Xóa thành công", "Sân bóng đã dược xóa khỏi hệ thống", "success")
+   // };
 
 
    const handleBookingBusinessClickPage = (sanBong) => {
@@ -149,12 +147,12 @@ export default function FoolbalField({ user }) {
                               }}>
                                  <FaRegEdit />
                               </button>
-                              <button onClick={(e) => {
+                              {/* <button onClick={(e) => {
                                  e.stopPropagation();
                                  DeleteFootball(item.id);
                               }}>
                                  <MdOutlineDeleteOutline />
-                              </button>
+                              </button> */}
                            </td>
                         </tr>
                      ))

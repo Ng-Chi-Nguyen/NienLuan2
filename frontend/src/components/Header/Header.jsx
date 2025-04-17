@@ -22,7 +22,9 @@ export default function Header() {
 
       if (token && storedUser) {
          try {
+            // Parse user từ string JSON thành object 
             const parsedUser = JSON.parse(storedUser);
+            // Nếu object hợp lệ
             if (parsedUser && parsedUser.name) {
                setUser(parsedUser);
                setIsLoggedIn(true);
@@ -40,9 +42,10 @@ export default function Header() {
          setIsLoggedIn(false);
       }
    };
-
+   // Chạy khi component render lần đầu (vì dependency rỗng)
    useEffect(() => {
       checkLogin();
+      // Lắng nghe sự kiện storage → khi có thay đổi localStorage (ở tab khác), sẽ tự cập nhật lại user.
       window.addEventListener("storage", checkLogin);
       return () => window.removeEventListener("storage", checkLogin);
    }, []);

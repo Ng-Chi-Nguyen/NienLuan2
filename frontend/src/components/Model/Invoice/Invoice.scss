@@ -1,0 +1,51 @@
+.invoice-modal{
+   .ant-modal-content {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      padding: 20px;
+      color: #000;
+      border-radius: 0;
+   }
+   .receipt {
+      width: 100%;
+
+      .title {
+         text-align: center;
+         font-weight: bold;
+         font-size: 16px;
+         margin-bottom: 10px;
+         text-transform: uppercase;
+         border-bottom: 1px solid #000;
+         padding-bottom: 5px;
+      }
+      
+      .info {
+         margin-bottom: 10px;
+         line-height: 1.4;
+      }
+      .summary {
+         line-height: 1.5;
+         margin-bottom: 10px;
+         hr {
+            margin: 8px 0;
+            border: none;
+            border-top: 1px dashed #000;
+         }
+      }
+      
+      
+      
+      .footer {
+         text-align: center;
+         font-size: 12px;
+         font-style: italic;
+         border-top: 1px dashed #000;
+         padding-top: 8px;
+      }
+      
+   }
+}
+
+
+
+

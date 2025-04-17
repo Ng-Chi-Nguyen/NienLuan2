@@ -3,6 +3,7 @@ import { Modal } from 'antd';
 import { useState } from 'react';
 import { updateBusiness } from '../../../services/business.service';
 import { updateUser } from '../../../services/user.service';
+
 export function UpdateUserModel({
    isModalOpenUser,
    closeModalUser,

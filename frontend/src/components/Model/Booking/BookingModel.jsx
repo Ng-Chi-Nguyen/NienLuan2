@@ -15,12 +15,15 @@ import { createBooking } from '../../../services/booking.service';
 
 export function BookingModel({ isModalOpen, handleCancel, bookingData, fetchAPIBooking }) {
 
-   const [endTime, setEndTime] = useState(0);
+   const [endTime, setEndTime] = useState(0); // lưu thời gian kết thúc khi người dùng chọn từ TimePicker
    const [business, setBusiness] = useState(null)
    const [loading, setLoading] = useState(false)
 
+   // startTime: chuyển bookingData.time thành đối tượng dayjs để dễ xử lý thời gian
    const startTime = dayjs(bookingData.time, "HH:mm");
+   // pricePerHour: giá thuê sân theo giờ
    const pricePerHour = bookingData.football.price;
+
    // Xử lý chọn thời gian kết thúc
    const handleTimeChange = (time) => {
       setEndTime(time);
@@ -30,9 +33,10 @@ export function BookingModel({ isModalOpen, handleCancel, bookingData, fetchAPIB
       if (!endTime) return 0;
       const diffInMinutes = endTime.diff(startTime, "minute");
       const hours = diffInMinutes / 60;
+      // Trả về tổng giá = đơn giá/giờ × số giờ đã tính
       return pricePerHour * hours;
    };
-   console.log(formatNumber(calculatePrice()))
+   // console.log(formatNumber(calculatePrice()))
 
    useEffect(() => {
       const fetchBusinessData = async (id) => {
@@ -58,12 +62,13 @@ export function BookingModel({ isModalOpen, handleCancel, bookingData, fetchAPIB
    let handleSubmit = async (e) => {
       e.preventDefault();
       setLoading(true)
+      // Lấy dữ liệu form → tạo object data chứa toàn bộ thông tin từ các ô input
       const formData = new FormData(e.target);
       const data = Object.fromEntries(formData.entries());
 
       // Chuyển date từ "DD-MM" thành "YYYY-MM-DD"
       let [day, month] = data.date.split("-");
-      let today = new Date();
+      let today = new Date(); // Lấy giờ hiện tại
       let year = today.getFullYear(); // Lấy năm hiện tại
       let formattedDate = `${year}-${month}-${day}`; // Định dạng YYYY-MM-DD
 
@@ -81,7 +86,7 @@ export function BookingModel({ isModalOpen, handleCancel, bookingData, fetchAPIB
       // console.log("Dữ liệu gửi lên:", data);
 
       try {
-         let response = await createBooking(data); // Gọi API từ service
+         let response = await createBooking(data);
          if (response.success) {
             setEndTime(0);
             await fetchAPIBooking();

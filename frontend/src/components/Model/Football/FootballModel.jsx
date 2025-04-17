@@ -32,6 +32,7 @@ export function CreateFootballField({
       }
 
       // Tạo URL xem trước ảnh
+      //  Ảnh chưa được upload lên server, nhưng ta muốn hiển thị trước (preview) chúng ra giao diện (như ảnh thu nhỏ)
       const newFileList = fileList.map(file => ({
          ...file,
          preview: file.originFileObj ? URL.createObjectURL(file.originFileObj) : file.url
@@ -41,6 +42,8 @@ export function CreateFootballField({
    };
 
    const handleDelete = (index) => {
+      // _ là giá trị hiện tại
+      // i là chỉ số trong mảng fileList
       const newList = fileList.filter((_, i) => i !== index);
       setFileList([...newList]); // Cập nhật danh sách mới
    };
@@ -216,7 +219,7 @@ export function EditFootballField({
       e.preventDefault();
 
       if (!localFF) {
-         console.log("🔹 Không có dữ liệu sân bóng để cập nhật.");
+         console.log("Không có dữ liệu sân bóng để cập nhật.");
          return;
       }
 

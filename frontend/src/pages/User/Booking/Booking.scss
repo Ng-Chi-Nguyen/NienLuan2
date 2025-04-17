@@ -44,10 +44,10 @@
                            background: none;
                            border: none;
                            font-size: 19px;
-                           &:nth-child(1){
+                           .co-red{
                               color: red;
                            }
-                           &:nth-child(2){
+                           .co-green{
                               color: #27C375;
                            }
                         }

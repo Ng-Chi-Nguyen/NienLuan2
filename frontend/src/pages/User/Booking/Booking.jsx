@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import './Booking.scss';
 import dayjs from "dayjs";
-import { CiEdit } from "react-icons/ci";
 import { RiDeleteBin2Line } from "react-icons/ri";
 import { MdOutlinePayments } from "react-icons/md";
 import { Tag, Pagination } from 'antd';
@@ -9,11 +8,14 @@ import { getBusinessById } from "../../../services/business.service";
 import { getBookingsByUser, getBookingsForTodayByBusiness, deleteBooking } from "../../../services/booking.service";
 import { getFootballFieldById } from "../../../services/footballField.service";
 import { formatNumber } from "../../../utils/utils";
+import { Invoice } from "../../../components/Model/Invoice/Invoice";
+import { useModal } from "../../../components/hooks/useModel";
 export function BookingUser({ user }) {
    const [booking, setBookings] = useState([])
    const [businessMap, setBusinessMap] = useState({});
    const [footballFieldMap, setFootballFieldMap] = useState({});
    const [currentPage, setCurrentPage] = useState(1);
+
 
    const fetchAPIBooking = useCallback(async () => {
       const updatedBookings = await getBookingsByUser(user?.id, user?.type);
@@ -25,7 +27,7 @@ export function BookingUser({ user }) {
       if (businessData) {
          setBusinessMap(prev => ({
             ...prev,
-            [id_Business]: businessData // Lưu theo ID doanh nghiệp
+            [id_Business]: businessData
          }));
       }
    }, []);
@@ -76,6 +78,7 @@ export function BookingUser({ user }) {
    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
    const currentBookings = booking.slice(indexOfFirstItem, indexOfLastItem);
 
+
    return (
       <>
          <div className="Booking">
@@ -96,7 +99,7 @@ export function BookingUser({ user }) {
                         </tr>
                      </thead>
                      <tbody>
-                        {currentBookings.length > 0 ? ( // Dùng currentBookings thay vì booking
+                        {currentBookings.length > 0 ? (
                            currentBookings.map((item, index) => (
                               <tr key={index}>
                                  <td>{footballFieldMap[item.id_FF]?.[0]?.name || "Đang tải..."}</td>
@@ -118,8 +121,7 @@ export function BookingUser({ user }) {
                                     )}
                                  </td>
                                  <td className="text-center">
-                                    <button><RiDeleteBin2Line onClick={() => handleDeleteBooking(item.id)} /></button>
-                                    <button><MdOutlinePayments /></button>
+                                    <button className="co-red"><RiDeleteBin2Line onClick={() => handleDeleteBooking(item.id)} /></button>
                                  </td>
                               </tr>
                            ))
@@ -150,6 +152,8 @@ export function BookingFootball({ user }) {
    const [booking, setBookings] = useState([])
    const [businessMap, setBusinessMap] = useState({});
    const [footballFieldMap, setFootballFieldMap] = useState({});
+   const [selectedInvoice, setSelectedInvoice] = useState(null);
+   const modelInvoice = useModal()
 
 
    const fetchAPIBooking = useCallback(async () => {
@@ -197,6 +201,12 @@ export function BookingFootball({ user }) {
       });
    }, [booking, footballFieldMap, FootballFieldGetById]);
 
+
+   const handleInvoice = (item) => {
+      setSelectedInvoice(item);
+      console.log(selectedInvoice)
+      modelInvoice.showModal();
+   };
    // console.log(booking)
    return (
       <>
@@ -240,9 +250,11 @@ export function BookingFootball({ user }) {
                                     )}
                                  </td>
                                  <td className="text-center">
-                                    <button><CiEdit /></button>
-                                    <button><RiDeleteBin2Line /></button>
-                                    <button><MdOutlinePayments /></button>
+                                    <button className="co-green">
+                                       <MdOutlinePayments
+                                          onClick={() => handleInvoice(item)}
+                                       />
+                                    </button>
                                  </td>
                               </tr>
                            ))
@@ -255,6 +267,12 @@ export function BookingFootball({ user }) {
                   </table>
                </div>
             </div>
+            <Invoice
+               open={modelInvoice.isOpen}
+               onClose={modelInvoice.hideModal}
+               data={selectedInvoice}
+            // businessData={businessData}
+            />
          </div>
       </>
    )
