@@ -1,0 +1,25 @@
+.HomePage {
+   position: relative;
+}
+
+.BackTop {
+   .ant-back-top {
+      bottom: 60px; /* Đổi vị trí của BackTop từ dưới lên */
+      right: 50px;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      font-size: 50px;
+      color: orange;
+      &:hover{
+         transform: translateY(-20px);
+         transition: 1.5s;
+      }
+      &:not(:hover){
+         transform: translateY(0);
+         transition: 1.5s;
+      }
+   }
+   .ant-back-top-hidden {
+      opacity: 0;
+      visibility: hidden;
+   }
+}

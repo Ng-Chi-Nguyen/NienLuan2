@@ -31,9 +31,10 @@ export function BookingModel({ isModalOpen, handleCancel, bookingData, fetchAPIB
    // Tính tổng giá dựa trên số giờ đặt
    const calculatePrice = () => {
       if (!endTime) return 0;
+      // Đây là phương thức của thư viện dayjs (hoặc có thể là moment.js) dùng để tính sự chênh lệch giữa hai thời điểm (endTime và startTime)
       const diffInMinutes = endTime.diff(startTime, "minute");
       const hours = diffInMinutes / 60;
-      // Trả về tổng giá = đơn giá/giờ × số giờ đã tính
+      // Trả về tổng giá
       return pricePerHour * hours;
    };
    // console.log(formatNumber(calculatePrice()))
@@ -64,15 +65,18 @@ export function BookingModel({ isModalOpen, handleCancel, bookingData, fetchAPIB
       setLoading(true)
       // Lấy dữ liệu form → tạo object data chứa toàn bộ thông tin từ các ô input
       const formData = new FormData(e.target);
+
+      // formData.entries() trả về mảng các cặp [key, value]
+      // Object.fromEntries() sẽ biến nó thành object.
       const data = Object.fromEntries(formData.entries());
 
       // Chuyển date từ "DD-MM" thành "YYYY-MM-DD"
-      let [day, month] = data.date.split("-");
+      let [day, month] = data.date.split("-"); // Tach thanh chuoi
       let today = new Date(); // Lấy giờ hiện tại
       let year = today.getFullYear(); // Lấy năm hiện tại
       let formattedDate = `${year}-${month}-${day}`; // Định dạng YYYY-MM-DD
 
-      data.date = formattedDate; // Cập nhật lại data trước khi gửi
+      data.date = formattedDate; // cập nhật thuộc tính date trong object data
       formData.set("date", formattedDate); // Nếu gửi FormData
 
       // Lấy type từ localStorage
@@ -131,9 +135,10 @@ export function BookingModel({ isModalOpen, handleCancel, bookingData, fetchAPIB
                <TimePicker
                   value={endTime}
                   disabledTime={() => ({
+                     // Dùng để giới hạn thời gian mà người dùng có thể chọn, không cho chọn giờ trước giờ bắt đầu
                      disabledHours: () => {
                         const startHour = startTime.hour();
-                        return [...Array(startHour + 1).keys()];
+                        return [...Array(startHour + 1).keys()]; //  tạo mảng [0, 1, 2, ..., startHour]
                      },
                      disabledMinutes: (selectedHour) => {
                         const startHour = startTime.hour();
@@ -146,8 +151,8 @@ export function BookingModel({ isModalOpen, handleCancel, bookingData, fetchAPIB
                      },
                   })}
                   format="HH:mm"
-                  minuteStep={30}
-                  showNow={false}
+                  minuteStep={30} // Mỗi bước chọn phút là 30 phút
+                  showNow={false} // Nut chon tg hien tai
                   onChange={handleTimeChange}
                />
                <input name='timeStart' type="hidden" value={bookingData.time} />

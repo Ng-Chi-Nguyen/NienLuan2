@@ -11,7 +11,9 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
 export default function BookingBusiness() {
+
    const navigate = useNavigate();
+
    const [isModalVisible, setIsModalVisible] = useState(false);
    const [selectedBooking, setSelectedBooking] = useState([]); // Lưu ngày và giờ người dùng chọn
    const [selectedCell, setSelectedCell] = useState(null); // Lưu ô lịch được chọn
@@ -58,6 +60,7 @@ export default function BookingBusiness() {
       setIsModalVisible(false); // Đóng modal
    };
 
+   // Dung cho truong hop dang nhap bang google
    useEffect(() => {
       const params = new URLSearchParams(window.location.search);
       const token = params.get("token");
@@ -65,7 +68,7 @@ export default function BookingBusiness() {
 
       if (token && userData) {
          try {
-            const parsedUser = JSON.parse(userData);
+            const parsedUser = JSON.parse(userData); // JSON -> Object
             localStorage.setItem("token", token);
             localStorage.setItem("user", JSON.stringify(parsedUser));
             setUser(parsedUser);
@@ -85,12 +88,18 @@ export default function BookingBusiness() {
       }
    }, [navigate]);
 
+   /*
+      getDay: Trả về số nguyên từ 0 đến 6 đại diện cho ngày trong tuần.
+      setDate(): Cập nhật ngày trong tháng của đối tượng Date, tự động điều chỉnh tháng và năm nếu cần.   
+      getDate(): Lấy ngày trong tháng (1-31) của đối tượng Date.
+   */
+
    // Ham tra ve thu 2
    const getMonday = (date) => {
-      let d = new Date(date);
+      let d = new Date(date); // Lay ra ngay hien tai
       let day = d.getDay(); // getDay() trả về số nguyên từ 0 đến 6 tương ứng với ngày trong tuần 0:CN
 
-      let diff = day === 0 ? -6 : 1 - day;
+      let diff = day === 0 ? -6 : 1 - day; // -5
       d.setDate(d.getDate() + diff);
       return d;
    };
@@ -125,7 +134,7 @@ export default function BookingBusiness() {
 
       return days;
    };
-
+   //useMemo: ghi nhớ giá trị đã tính toán, tránh tính lại không cần thiết khi component re-render
    const weekDays = useMemo(() => generateWeekDays(currentWeekOffset), [currentWeekOffset]);
 
    const generateTimeSlots = () => {
@@ -133,6 +142,7 @@ export default function BookingBusiness() {
       let startTime = dayjs().hour(5).minute(0).second(0);
       let endTime = dayjs().hour(23).minute(30);
 
+      // Chay khi start < end
       while (startTime.isBefore(endTime)) {
          times.push(startTime.format("HH:mm"));
          startTime = startTime.add(30, "minute");
@@ -156,10 +166,10 @@ export default function BookingBusiness() {
          return bookings.find(
             (booking) =>
                booking.date === day.date && // Kiểm tra ngày
-               booking.timeStart.slice(0, 5) === time // So sánh giờ (bỏ giây nếu có)
+               booking.timeStart.slice(0, 5) === time // Giả sử timeStart = "08:00:00" → .slice(0, 5) cắt ra "08:00"
          );
       };
-   }, [bookings]); // Chỉ cập nhật khi bookings thay đổi
+   }, [bookings]);
 
    const fetchAPIBooking = async () => {
       try {
@@ -180,6 +190,7 @@ export default function BookingBusiness() {
          console.log(e)
       }
    };
+
    useEffect(() => {
       fetchAPIBooking();
    }, [sanBong.id]);

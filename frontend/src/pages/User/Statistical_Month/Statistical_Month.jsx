@@ -18,7 +18,7 @@ import { getFootballFieldById } from "../../../services/footballField.service.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 // Nhãn trục X (tuần)
-const labels = ["Tuần 1", "Tuần 2", "Tuần 3", "Tuần 4", "3 ngày cuối"];
+const labels = ["Tuần 1", "Tuần 2", "Tuần 3", "Tuần 4", "Các ngày còn lại"];
 
 // Hàm xử lý dữ liệu API thành dạng biểu đồ
 const processRevenueData = (data) => {
@@ -32,7 +32,7 @@ const processRevenueData = (data) => {
          if (weeks >= 1 && weeks <= 4) {
             weeklyRevenue[idFF][weeks - 1] += Total; // Dồn doanh thu vào tuần
          } else {
-            weeklyRevenue[idFF][4] += Total; // 3 ngày cuối
+            weeklyRevenue[idFF][4] += Total; // cac ngày cuối
          }
       } else {
          console.warn(`idFF không hợp lệ trong dữ liệu: ${idFF}`);
@@ -45,7 +45,7 @@ const processRevenueData = (data) => {
 export default function StatisticalMonth({ user }) {
    const [revenueData, setRevenueData] = useState([]);
    const [date, setDate] = useState(dayjs().subtract(1, 'month').format("YYYY-MM"));
-   const [fieldNames, setFieldNames] = useState({}); // Store the field names by idFF
+   const [fieldNames, setFieldNames] = useState({});
 
    const fetchFootballFieldName = async (id_FF) => {
       const fieldData = await getFootballFieldById(id_FF);
@@ -86,14 +86,17 @@ export default function StatisticalMonth({ user }) {
       "rgba(255, 206, 86, 0.6)",
       "rgba(75, 192, 192, 0.6)",
       "rgba(153, 102, 255, 0.6)",
-      "rgba(255, 159, 64, 0.6)"
+      "rgba(255, 179, 204, 0.6)",
+      "rgba(255, 19, 164, 0.6)",
+      "rgba(25, 152, 64, 0.6)",
+      "rgba(25, 259, 64, 0.6)",
    ];
 
    // Fetch field names for each idFF in weeklyData (only once when data changes)
    useEffect(() => {
       const uniqueFieldIds = Object.keys(weeklyData);
       uniqueFieldIds.forEach(idFF => {
-         if (!fieldNames[idFF]) { // Only fetch if not already fetched
+         if (!fieldNames[idFF]) {
             fetchFootballFieldName(idFF);
          }
       });
@@ -101,13 +104,19 @@ export default function StatisticalMonth({ user }) {
 
    // Tạo dữ liệu cho biểu đồ
    const data = {
-      labels: labels,
+      labels: labels, // Nhãn trục X (Tuần)
+      // object chứa doanh thu từng sân theo tuần
+      // weeklyData = {
+      //    1: [100, 200, 150, 180, 90],
+      //    2: [80, 120, 160, 110, 100]
+      // };
       datasets: Object.keys(weeklyData).map((idFF, index) => {
+         // Số lượng sân vượt quá số lượng màu sắc trong mảng colors, nó sẽ quay lại sử dụng các màu đầu tiên
          const fieldColor = colors[index % colors.length];
          const fieldName = fieldNames[idFF] || `Sân ${idFF}`; // Use the field name from state or fallback
 
          return {
-            label: fieldName, // Correctly use the field name as the label
+            label: fieldName, // Nhan moi san
             data: weeklyData[idFF], // Doanh thu của sân theo tuần
             backgroundColor: fieldColor, // Màu sắc sân
          };
@@ -122,13 +131,13 @@ export default function StatisticalMonth({ user }) {
                label: (tooltipItem) => {
                   const datasetIndex = tooltipItem.datasetIndex;
                   const fieldName = data.datasets[datasetIndex].label;
-                  const revenue = tooltipItem.raw;
+                  const revenue = tooltipItem.raw; // Gia tri khi hover vao
                   return `${fieldName}: ${revenue.toLocaleString()} VNĐ`;
                }
             }
          }
       },
-      scales: {
+      scales: { // Cấu hình trục cho biểu đồ.
          x: {
             title: {
                display: true,
@@ -136,7 +145,7 @@ export default function StatisticalMonth({ user }) {
             }
          },
          y: {
-            beginAtZero: true,
+            beginAtZero: true, //  Đảm bảo trục Y bắt đầu từ 0, tránh có các giá trị âm
             title: {
                display: true,
                text: "Doanh thu (VNĐ)"

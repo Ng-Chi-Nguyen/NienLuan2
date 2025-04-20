@@ -209,13 +209,15 @@ let displayBokingInfoUserService = async (idUser, type) => {
             .from("Booking")
             .select("*")
             .eq("id_User", idUser)
+            .order("date", { ascending: false });
          if (error) {
             return {
                success: false,
                message: error
             }
          }
-         console.log(data)
+
+         // console.log(data)
          return {
             success: true,
             data
@@ -225,6 +227,7 @@ let displayBokingInfoUserService = async (idUser, type) => {
             .from("Booking")
             .select("*")
             .eq("id_Business_BK", idUser)
+            .order("date", { ascending: false });
          if (error) {
             return {
                success: false,

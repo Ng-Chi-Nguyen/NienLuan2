@@ -7,14 +7,13 @@ export const DisplayByBusinessDate = async (userId, date) => {
          url = `/api/chart/date/${userId}/?dateStart=${date}`; // Gửi ngày đã chọn vào query string
       }
 
-      const response = await axios.get(url); // axios automatically parses the response to JSON
-      const data = response.data; // Use response.data directly
-
+      const response = await axios.get(url);
+      const data = response.data;
       // Trả về dữ liệu cho component gọi
       return data;
    } catch (error) {
       console.error("Error fetching data:", error);
-      throw error; // Ném lỗi để xử lý tại component nếu cần
+      throw error;
    }
 };
 
@@ -25,13 +24,13 @@ export const DisplayByBusinessMonth = async (userId, date) => {
          url = `/api/chart/month/${userId}/?dateStart=${date}`; // Gửi ngày đã chọn vào query string
       }
 
-      const response = await axios.get(url); // axios automatically parses the response to JSON
-      const data = response.data; // Use response.data directly
+      const response = await axios.get(url);
+      const data = response.data;
 
       // Trả về dữ liệu cho component gọi
       return data;
    } catch (error) {
       console.error("Error fetching data:", error);
-      throw error; // Ném lỗi để xử lý tại component nếu cần
+      throw error;
    }
 };

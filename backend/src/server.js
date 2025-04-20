@@ -37,6 +37,7 @@ app.use(session({
    saveUninitialized: false, // Đổi từ `true` → `false` để tránh lưu session không cần thiết
    cookie: { secure: false } // Nếu dùng HTTPS, đổi `false` thành `true`
 }));
+
 app.use(passport.initialize());
 app.use(passport.session());
 

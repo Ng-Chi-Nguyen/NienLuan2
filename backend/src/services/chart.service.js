@@ -1,9 +1,9 @@
 import { sql } from '../config/connect.js';
 import cron from 'node-cron';
-
+import dayjs from 'dayjs';
 // Chạy thống kê doanh thu lúc 23:00 mỗi ngày
 cron.schedule('0 23 * * *', async () => {
-   console.log('Chạy thống kê doanh thu lúc 23:00...');
+   // console.log('Chạy thống kê doanh thu lúc 23:00...');
 
    const today = new Date().toISOString().split('T')[0]; // Lấy ngày hiện tại
 
@@ -24,7 +24,7 @@ cron.schedule('0 23 * * *', async () => {
          const id_Business = business.id;
          try {
             const result = await getRevenueByDateService({ dateStart: today, id_Business });
-            console.log(`Doanh thu của doanh nghiệp ${id_Business} đã được thống kê:`, result);
+            // console.log(`Doanh thu của doanh nghiệp ${id_Business} đã được thống kê:`, result);
          } catch (error) {
             console.error(`Lỗi khi thống kê doanh thu cho doanh nghiệp ${id_Business}:`, error.message);
          }
@@ -34,6 +34,7 @@ cron.schedule('0 23 * * *', async () => {
    }
 });
 
+
 export const getRevenueByDateService = async (data) => {
    try {
       const { dateStart, id_Business } = data; // Lấy ngày và id_Business từ dữ liệu
@@ -41,7 +42,7 @@ export const getRevenueByDateService = async (data) => {
       // Truy vấn dữ liệu từ bảng booking để tính doanh thu theo ngày cho từng sân
       const { data: bookingData, error: bookingError } = await sql
          .from('Booking')
-         .select('price, id_FF') 
+         .select('price, id_FF')
          .eq('date', dateStart)  // Lọc theo ngày bắt đầu
          .eq('id_Business', id_Business);  // Lọc theo id_Business
 
@@ -90,6 +91,7 @@ export const getRevenueByDateService = async (data) => {
       throw new Error('Có lỗi khi lấy dữ liệu doanh thu hoặc chèn dữ liệu vào Revenue_Day');
    }
 };
+
 
 export const displayRevenueByDateService = async (dateStart, id_Business) => {
    console.log(dateStart, " ", id_Business)
@@ -283,7 +285,7 @@ export const displayRevenueByMonthService = async (id_Business, dateStart) => {
       // Hàm format ngày local (không dùng ISO để tránh lệch múi giờ)
       const formatLocalDate = (date) => {
          const pad = num => num.toString().padStart(2, '0');
-         return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`;
+         return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
       };
 
       // Chuyển đổi dateStart thành Date object (xử lý đúng múi giờ)
@@ -293,7 +295,7 @@ export const displayRevenueByMonthService = async (id_Business, dateStart) => {
       // Tính ngày cuối tháng (local time)
       const lastDayOfMonth = new Date(
          startDate.getFullYear(),
-         startDate.getMonth() + 1, 
+         startDate.getMonth() + 1,
          0
       );
 

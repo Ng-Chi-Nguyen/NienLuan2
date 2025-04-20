@@ -11,7 +11,7 @@ export const createBooking = async (data) => {
       });
       return response.data; // Trả về dữ liệu nhận được
    } catch (e) {
-      console.error("❌ Lỗi khi gửi dữ liệu:", e);
+      console.error("Lỗi khi gửi dữ liệu:", e);
       throw e; // Ném lỗi để component xử lý
    }
 };

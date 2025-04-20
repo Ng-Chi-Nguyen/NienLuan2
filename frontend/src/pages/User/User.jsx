@@ -53,7 +53,7 @@ export default function User() {
       return <p>Loading user...</p>;
    }
 
-   console.log(user)
+   // console.log(user)
 
    const items = [
       { key: '1', label: 'Lịch đặt sân của tôi', children: <BookingUser user={user} /> },

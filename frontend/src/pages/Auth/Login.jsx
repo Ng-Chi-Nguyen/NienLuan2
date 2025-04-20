@@ -91,11 +91,11 @@ export default function Login() {
       }
       try {
          setLoading(true);
-         console.log("formData User:", formData);
+         // console.log("formData User:", formData);
 
          // Gọi hàm createUser từ service
          const response = await createUser(formData);
-         console.log("Phản hồi từ backend:", response);
+         // console.log("Phản hồi từ backend:", response);
 
          // Reset formData
          setFormData({

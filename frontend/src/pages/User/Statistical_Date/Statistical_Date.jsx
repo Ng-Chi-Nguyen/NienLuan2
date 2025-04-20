@@ -3,8 +3,8 @@ import './Statistical_Date.scss';
 import { Pie } from "react-chartjs-2";
 import {
    Chart as ChartJS,
-   ArcElement,
-   Tooltip,
+   ArcElement, // Bieu do tron
+   Tooltip, // phép hiển thị thông tin chi tiết khi người dùng di chuột vào
    Legend
 } from "chart.js";
 import dayjs from 'dayjs';
@@ -12,6 +12,7 @@ import { DatePicker } from 'antd';
 import { DisplayByBusinessDate } from "../../../services/chart.service.js";
 import { getFootballFieldById } from "../../../services/footballField.service.js";
 import { formatNumber } from "../../../utils/utils.js";
+
 // Đăng ký các thành phần cần thiết của Chart.js
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -21,6 +22,7 @@ export default function StatisticalDate({ user }) {
    const [selectedDate, setSelectedDate] = useState(null); // Lưu ngày đã chọn
    const [sumPrice, setSumPrice] = useState(0)
    // console.log(user)
+
    const fetchFootballFields = async (data) => {
       try {
          const idFFList = data.map(item => item.idFF); // Lấy danh sách idFF từ dữ liệu
@@ -51,9 +53,10 @@ export default function StatisticalDate({ user }) {
    // Hàm fetch dữ liệu
    const fetchData = useCallback(async (date) => {
       try {
-         const data = await DisplayByBusinessDate(user.id, date); // Gọi hàm fetchChartData từ service
-         if (data && Array.isArray(data.data)) {
-            const chartValues = data.data.map(item => item.Total || 0); // Nếu không có doanh thu thì gán giá trị là 0
+         const data = await DisplayByBusinessDate(user.id, date);
+         if (data && Array.isArray(data.data)) { // có phải là mảng Không
+            // chartValues chứa doanh thu từng sân
+            const chartValues = data.data.map(item => item.Total || 0); // Nếu k có doanh thu thì gán giá trị là 0
             const fieldNames = await fetchFootballFields(data.data);
             const colors = fieldNames.map(() => getRandomColor());
 
@@ -68,7 +71,7 @@ export default function StatisticalDate({ user }) {
                      label: "Doanh thu",
                      data: chartValues, // Dữ liệu các giá trị
                      backgroundColor: colors,
-                     hoverOffset: 4
+                     hoverOffset: 4 //  hover vào đẩy ra khỏi vị trí ban đầu 4px
                   }
                ]
             });

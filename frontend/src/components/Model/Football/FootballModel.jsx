@@ -13,7 +13,7 @@ export function CreateFootballField({
    user,
    isModalOpen,
    handleCancel,
-   setData
+   setData // Ds San bong
 }) {
    const [loading, setLoading] = useState(false);
    const [name, setName] = useState("");
@@ -58,7 +58,9 @@ export function CreateFootballField({
       e.preventDefault();
       setLoading(true);
 
-      const formData = new FormData();
+      const formData = new FormData(); // cho phép gửi dữ liệu văn bản và cả file (ảnh, video...)
+
+      // formData.append("key", value)
       formData.append("name", name);
       formData.append("size", size);
       formData.append("price", price);
@@ -77,6 +79,7 @@ export function CreateFootballField({
          let response = await axios.post(`/api/foolbalField/`, formData);
 
          if (response.data.success) {
+            //prevData:  dữ liệu cũ (hiện tại)
             setData(prevData => [
                ...prevData,
                {
@@ -85,7 +88,6 @@ export function CreateFootballField({
                }
             ]);
 
-            // Reset form fields
             setName("");
             setSize("5");
             setPrice(1);
@@ -99,7 +101,8 @@ export function CreateFootballField({
             handleCancel();
             Message("Hoàn thành", "Tạo sân bóng thành công", "success")
          } else {
-            alert(`Lỗi: ${response.data.message}`);
+            handleCancel();
+            Message("Lỗi", response.data.message, "error")
          }
       } catch (error) {
          console.error("Lỗi kết nối API:", error);
@@ -220,6 +223,7 @@ export function EditFootballField({
 
       if (!localFF) {
          console.log("Không có dữ liệu sân bóng để cập nhật.");
+         Message("Lỗi", "Không có dữ liệu sân bóng để cập nhật", "error")
          return;
       }
 
@@ -234,7 +238,7 @@ export function EditFootballField({
             handleCancelEditModal();
          } else {
             console.error("Lỗi khi cập nhật:", response.data.message);
-            alert("Lỗi khi cập nhật: " + response.data.message);
+            Message("Lỗi khi cập nhật", response.data.message, "error")
          }
          Message("Hoàn thành", "Cập nhật sân bóng thành công", "success")
       } catch (error) {
