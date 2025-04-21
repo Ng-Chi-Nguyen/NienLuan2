@@ -9,16 +9,18 @@
    .receipt {
       width: 100%;
 
-      .title {
+      .title_business {
          text-align: center;
          font-weight: bold;
-         font-size: 16px;
+         font-size: 19px;
          margin-bottom: 10px;
          text-transform: uppercase;
          border-bottom: 1px solid #000;
          padding-bottom: 5px;
       }
-      
+      .name_invoice{
+         font-size: 15px;
+      }
       .info {
          margin-bottom: 10px;
          line-height: 1.4;

@@ -34,7 +34,7 @@ export const displayRevenueByDate = async (req, res) => {
          dateStart = new Date().toISOString().split('T')[0]; // Định dạng ngày theo kiểu yyyy-MM-dd
       }
 
-      console.log("date:", dateStart, "id_Business:", id_Business);
+      // console.log("date:", dateStart, "id_Business:", id_Business);
 
       // Gọi service để lấy doanh thu
       const revenueByCourt = await displayRevenueByDateService(dateStart, id_Business);
@@ -70,7 +70,7 @@ export const createRevenueMonth = async (req, res) => {
          dateStart = today.toISOString().split('T')[0];
       }
 
-      console.log("dateStart:", dateStart, "id_Business:", id_Business);
+      // console.log("dateStart:", dateStart, "id_Business:", id_Business);
 
       // Gọi service để lấy doanh thu
       const result = await createRevenueMonthService(dateStart, id_Business);
@@ -116,7 +116,7 @@ export const displayRevenueMonth = async (req, res) => {
       }
 
       // Log dữ liệu ngày gọi API
-      console.log(`Lấy doanh thu ${id_Business} từ ngày: ${dateStart}`);
+      // console.log(`Lấy doanh thu ${id_Business} từ ngày: ${dateStart}`);
 
       // Xử lý và gọi API chỉ khi `dateStart` là ngày bạn mong muốn
       const result = await displayRevenueByMonthService(id_Business, dateStart);

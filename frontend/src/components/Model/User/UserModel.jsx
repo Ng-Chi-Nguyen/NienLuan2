@@ -3,6 +3,7 @@ import { Modal } from 'antd';
 import { useState } from 'react';
 import { updateBusiness } from '../../../services/business.service';
 import { updateUser } from '../../../services/user.service';
+import { Message } from '../../../utils/utils';
 
 export function UpdateUserModel({
    isModalOpenUser,
@@ -18,7 +19,7 @@ export function UpdateUserModel({
 
       setLoading(true);
       let response = await updateUser(localUser);
-
+      // console.log(response)
       if (response.success) {
          const oldUserData = JSON.parse(localStorage.getItem("user")) || {};
          const updatedUser = response.data;
@@ -29,11 +30,13 @@ export function UpdateUserModel({
          if (response.token) {
             localStorage.setItem("token", response.token);
          }
-
+         Message("Hoàn tất", "Cập nhật thông tin thành công", "success")
          setLocalUser(mergedUser);
          closeModalUser()
       } else {
+         Message("Thất bại", response.message, "error")
          console.error("Lỗi cập nhật:", response.error);
+         setLoading(false);
       }
       setLoading(false)
    };

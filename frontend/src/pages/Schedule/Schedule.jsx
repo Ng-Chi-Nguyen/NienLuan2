@@ -259,6 +259,38 @@ export default function Schedule() {
       setCurrentPage(1); // reset lại trang
    };
 
+   const handleResetFilter = async () => {
+      try {
+         const response = await fetch(`/api/foolbalField/`);
+         const result = await response.json();
+
+         if (result.success) {
+            const DataFootball = result.data.map((item, index) => ({
+               ...item,
+               key: item.id || index.toString(),
+            }));
+            setData(DataFootball);
+
+            // Reset tất cả lọc
+            setProvince([]);
+            setDistrict([]);
+            setWard([]);
+            setSearchKeyword("");
+            setFilteredData([]);
+            setCurrentPage(1);
+
+            // Lấy lại ảnh
+            DataFootball.forEach(field => {
+               if (field.id) fetchImages(field.id);
+            });
+         } else {
+            console.error("Lỗi:", result.message);
+         }
+      } catch (error) {
+         console.error("Lỗi kết nối API:", error);
+      }
+   };
+
    return (
       <>
          <Header />
@@ -298,12 +330,16 @@ export default function Schedule() {
                            );
                         })}
                      </select>
+                     <button className="btn btn-outline-secondary mt-2" onClick={handleResetFilter}>
+                        Hiển thị tất cả sân bóng
+                     </button>
                   </div>
 
                   {/* Danh sách sân bóng */}
                   <div className="right col-xl-9">
                      <div className="mg-r row justify-content-center">
                         <Search
+                           className="search"
                            name="Tìm sân bóng"
                            onChange={handleSearch}
                         />

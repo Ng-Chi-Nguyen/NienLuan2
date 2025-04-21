@@ -10,6 +10,7 @@ import { BookingModel } from "../../components/Model/Booking/BookingModel";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
+import { Message } from "../../utils/utils";
 export default function BookingBusiness() {
 
    const navigate = useNavigate();
@@ -45,8 +46,14 @@ export default function BookingBusiness() {
    }, [sanBong.idBusiness]);
    // console.log(business[0].phone)
    const handleClick = (date, time) => {
+
+      if (!business[0]) {
+         Message("Xin lỗi", "Đang tải thông tin sân bóng, vui lòng đợi một chút rồi thử lại!", "warning");
+         return;
+      }
+
       if (!checkLogin()) {
-         navigate("/Login", { state: { messageBooking: `Bạn không muốn đang nhập thì liên hệ ${business[0].phone} để đặt sân giúp nhé! Cám ơn bạn nhiều 😍` } });
+         navigate("/Login", { state: { messageBooking: `Bạn không muốn đang nhập thì liên hệ ${business[0].phone || "chưa load kịp"} để đặt sân giúp nhé! Cám ơn bạn nhiều 😍` } });
          return;
       }
       // console.log(`Bạn đã click vào ngày ${date} lúc ${time}`);

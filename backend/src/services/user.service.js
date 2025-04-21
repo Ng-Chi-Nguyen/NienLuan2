@@ -48,6 +48,35 @@ let updateUserService = async (id, userData) => {
 
       const { name, email, phone, gender, address } = userData;
 
+      // Kiểm tra số điện thoại đã được sử dụng trong bảng User (ngoại trừ user hiện tại)
+      const { data: phoneInUser, error: errorUser } = await sql
+         .from("User")
+         .select("id")
+         .eq("phone", phone)
+         .neq("id", id)
+         .maybeSingle();
+
+      if (errorUser) {
+         console.error("Lỗi kiểm tra số điện thoại trong User:", errorUser);
+         return { success: false, error: "Lỗi khi kiểm tra số điện thoại (User)!" };
+      }
+
+      // Kiểm tra số điện thoại đã được sử dụng trong bảng Business
+      const { data: phoneInBusiness, error: errorBusiness } = await sql
+         .from("Business")
+         .select("id")
+         .eq("phone", phone)
+         .maybeSingle();
+
+      if (errorBusiness) {
+         console.error("Lỗi kiểm tra số điện thoại trong Business:", errorBusiness);
+         return { success: false, error: "Lỗi khi kiểm tra số điện thoại (Business)!" };
+      }
+
+      if (phoneInUser || phoneInBusiness) {
+         return { success: false, message: "Số điện thoại đã được sử dụng bởi người dùng khác!" };
+      }
+
       const { data, error } = await sql
          .from("User")
          .update({ name, email, phone, gender, address })
@@ -84,8 +113,28 @@ let updateUserService = async (id, userData) => {
 };
 
 
+let displayUserService = async (id) => {
+   try {
+      if (!id) {
+         return { success: false, error: "Thiếu id!" };
+      }
+      const { data, error } = await sql
+         .from('User')
+         .select("*")
+         .eq("id", id)
 
+      if (error) {
+         return { success: false, message: error.message }
+      }
+      return {
+         success: true,
+         data: data
+      }
+   } catch (e) {
+      console.log(e)
+   }
+}
 
-export { createUserService, updateUserService };
+export { createUserService, updateUserService, displayUserService };
 
 

@@ -15,7 +15,8 @@ import { FaBarcode } from "react-icons/fa";
 import { RxIdCard } from "react-icons/rx";
 import { HiOutlineCalendarDateRange } from "react-icons/hi2";
 import { AiOutlineSetting } from "react-icons/ai";
-import { EditOutlined, DeleteOutlined, KeyOutlined } from '@ant-design/icons';
+import { EditOutlined } from '@ant-design/icons';
+// import { DeleteOutlined, KeyOutlined } from '@ant-design/icons';
 
 import { FloatButton } from 'antd';
 
@@ -69,8 +70,8 @@ export default function UserInfo({ user }) {
                      tooltip="Sửa"
                      onClick={localUser.type === "user" ? openModalUser : openModalBusiness}
                   />
-                  <FloatButton icon={<DeleteOutlined className="co-red" />} tooltip="Xóa" />
-                  <FloatButton icon={<KeyOutlined />} tooltip="Đổi mật khẩu" />
+                  {/* <FloatButton icon={<DeleteOutlined className="co-red" />} tooltip="Xóa" />
+                  <FloatButton icon={<KeyOutlined />} tooltip="Đổi mật khẩu" /> */}
                </FloatButton.Group>
             </div>
             <div className="left">

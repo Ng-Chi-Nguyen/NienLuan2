@@ -19,7 +19,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 export default function StatisticalDate({ user }) {
    const [chartData, setChartData] = useState(null); // Lưu dữ liệu cho biểu đồ
-   const [selectedDate, setSelectedDate] = useState(null); // Lưu ngày đã chọn
+   const [selectedDate, setSelectedDate] = useState(dayjs().subtract(1, 'day')); // Lưu ngày đã chọn
    const [sumPrice, setSumPrice] = useState(0)
    // console.log(user)
 
@@ -50,6 +50,11 @@ export default function StatisticalDate({ user }) {
       return `rgb(${r}, ${g}, ${b})`; // Trả về màu ngẫu nhiên
    };
 
+   const getBorderColor = (rgb) => {
+      const [r, g, b] = rgb.match(/\d+/g).map(Number);
+      return `rgb(${Math.max(0, r - 50)}, ${Math.max(0, g - 50)}, ${Math.max(0, b - 50)})`;
+   };
+
    // Hàm fetch dữ liệu
    const fetchData = useCallback(async (date) => {
       try {
@@ -59,9 +64,9 @@ export default function StatisticalDate({ user }) {
             const chartValues = data.data.map(item => item.Total || 0); // Nếu k có doanh thu thì gán giá trị là 0
             const fieldNames = await fetchFootballFields(data.data);
             const colors = fieldNames.map(() => getRandomColor());
-
+            const borderColors = colors.map(color => getBorderColor(color));
             const totalRevenue = chartValues.reduce((acc, value) => acc + value, 0);
-            setSumPrice(totalRevenue); // Cập nhật tổng doanh thu
+            await setSumPrice(totalRevenue); // Cập nhật tổng doanh thu
 
             // Cập nhật dữ liệu cho biểu đồ
             setChartData({
@@ -71,6 +76,8 @@ export default function StatisticalDate({ user }) {
                      label: "Doanh thu",
                      data: chartValues, // Dữ liệu các giá trị
                      backgroundColor: colors,
+                     borderColor: borderColors,
+                     borderWidth: 2,
                      hoverOffset: 4 //  hover vào đẩy ra khỏi vị trí ban đầu 4px
                   }
                ]
@@ -84,21 +91,21 @@ export default function StatisticalDate({ user }) {
    }, [user.id]);
    // Lắng nghe sự kiện thay đổi ngày từ DatePicker
    useEffect(() => {
-      const today = dayjs().format('YYYY-MM-DD'); // Lấy ngày hiện tại với dayjs
-      setSelectedDate(today); // Set ngày hiện tại vào selectedDate
-      fetchData(today); // Gọi hàm fetchData để lấy dữ liệu cho ngày hôm nay
+      const yesterday = dayjs().subtract(1, 'day'); // Lấy ngày hiện tại với dayjs
+      setSelectedDate(yesterday); // Set ngày hiện tại vào selectedDate
+      fetchData(yesterday.format('YYYY-MM-DD'));  // Gọi hàm fetchData để lấy dữ liệu cho ngày hôm nay
    }, [fetchData]); // useEffect chỉ chạy khi component mount lần đầu tiên
 
    // Hàm xử lý thay đổi ngày
    const handleDateChange = (date) => {
+      setSelectedDate(date); // vẫn giữ dạng dayjs object
       const formattedDate = date ? date.format('YYYY-MM-DD') : null;
-      setSelectedDate(formattedDate); // Cập nhật ngày đã chọn
-      fetchData(formattedDate); // Gọi API để lấy dữ liệu mới ngay lập tức
+      fetchData(formattedDate); // chỉ format khi gọi API
    };
    return (
       <div className="Revenue_Date">
          <p>Doanh thu theo ngày</p>
-         <DatePicker onChange={handleDateChange} value={dayjs(selectedDate)} />
+         <DatePicker onChange={handleDateChange} value={selectedDate} />
          <div className="char">
             {chartData ? (
                <Pie data={chartData} />

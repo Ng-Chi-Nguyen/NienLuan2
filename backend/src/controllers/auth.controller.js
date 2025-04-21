@@ -40,7 +40,8 @@ export const googleCallback = (req, res, next) => {
       if (err) return next(err);
       if (!user) return res.redirect("http://localhost:3000/Login?error=google_failed");
 
-      const googleUser = user._json; // là object chứa dữ liệu người dùng từ Google (tên, email,...).
+      const googleUser = user._json; // info user gg tra ve
+      
       const result = await handleGoogleLogin(googleUser);
 
       if (!result.success) {

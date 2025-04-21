@@ -13,6 +13,9 @@
 .co-red{
    color: red;
 }
+body{
+   background-color: #E7ECF0;
+}
 .userPage{
    padding-bottom: 200px;
    padding-top: 20px;
@@ -22,6 +25,7 @@
    flex-wrap: wrap;
    margin-top: 60px;
    .table-booking{
+      background-color: #FFF;
       width: calc(60% - 35px);
       box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.2);
       margin-left: 20px;

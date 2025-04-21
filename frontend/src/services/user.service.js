@@ -30,3 +30,23 @@ export const updateUser = async (user) => {
       return { success: false, error: error.message };
    }
 };
+
+
+export const getUserById = async (id_User) => {
+   if (!id_User) {
+      console.log(`Không tìm thấy ${id_User}`);
+      return null;
+   }
+   try {
+      let response = await axios.get(`/api/user/${id_User}`);
+      if (response.data.success) {
+         return response.data.data; // Trả về dữ liệu doanh nghiệp
+      } else {
+         throw new Error("Không thành công khi lấy thông tin doanh nghiệp");
+      }
+   } catch (e) {
+      console.error("Lỗi khi lấy thông tin doanh nghiệp:", e);
+      throw e; // Ném lỗi để có thể xử lý ở nơi gọi hàm
+   }
+   return null;
+};

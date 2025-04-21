@@ -94,7 +94,7 @@ export const getRevenueByDateService = async (data) => {
 
 
 export const displayRevenueByDateService = async (dateStart, id_Business) => {
-   console.log(dateStart, " ", id_Business)
+   // console.log(dateStart, " ", id_Business)
    try {
       // Truy vấn dữ liệu từ bảng Revenue_Date
       const { data, error } = await sql

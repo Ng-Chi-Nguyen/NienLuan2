@@ -2,12 +2,16 @@ import { useState, useEffect } from 'react';
 import { message } from "antd";
 import './Header.scss';
 import LogoAvatar from "../../assets/logo-sport.png";
-import { RiMenuUnfold4Line } from "react-icons/ri";
 
+import { RiMenuUnfold4Line } from "react-icons/ri";
+import { IoHomeOutline, IoFootballOutline } from "react-icons/io5";
 import { CiMenuBurger } from "react-icons/ci";
+import { FaRegUser, FaRegCalendarCheck } from "react-icons/fa";
+
 import { Link, useNavigate } from 'react-router-dom';
 
 import MenuDrawer from "../MenuDrawer/MenuDrawer";
+
 export default function Header() {
    const navigate = useNavigate();
    const [loading, setLoading] = useState(false);
@@ -67,15 +71,19 @@ export default function Header() {
 
    // Danh sách menu bên trái
    const menuLeft = [
-      { path: "/", label: "Trang chủ" },
-      { path: "/Schedule", label: "Đặt sân" },
+      { path: "/", label: "Trang chủ", icon: <IoHomeOutline /> },
+      { path: "/Schedule", label: "Đặt sân", icon: <IoFootballOutline /> },
    ];
 
    // Danh sách menu bên phải
    const menuRight = [
-      { path: "/User", label: "Thông tin tài khoản" },
-      { path: "/User", label: "Lịch đặt sân" },
+      { path: "/User", label: "Thông tin tài khoản", icon: <FaRegUser /> },
+      { path: "/User", label: "Lịch đặt sân", icon: <FaRegCalendarCheck /> },
    ];
+
+   let handleHomePage = () => {
+      navigate("/");
+   }
 
    return (
       <div className="Header">
@@ -91,7 +99,7 @@ export default function Header() {
                placement="left"
                menuItems={menuLeft}
             />
-            <div className="logo">
+            <div className="logo" onClick={handleHomePage}>
                <img src={LogoAvatar} alt="Logo" /> <span>BOOKING</span>
             </div>
          </div>

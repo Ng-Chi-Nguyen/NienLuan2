@@ -13,7 +13,7 @@ export default function ContentBooking({ football }) {
    const fetchImages = async () => {
       try {
          const response = await axios.get(`/api/foolbalField/${football.id}/images`);
-         console.log(response);
+         // console.log(response);
 
          if (response.data.success) {
             setImages(Array.isArray(response.data.image)
@@ -49,7 +49,7 @@ export default function ContentBooking({ football }) {
          setAddress("Không thể tải địa chỉ");
       }
    };
-   console.log(address)
+   // console.log(address)
    useEffect(() => {
       if (football?.id) {
          fetchImages();

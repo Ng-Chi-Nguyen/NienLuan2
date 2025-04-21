@@ -204,7 +204,7 @@ export function BookingFootball({ user }) {
 
    const handleInvoice = (item) => {
       setSelectedInvoice(item);
-      console.log(selectedInvoice)
+      // console.log(selectedInvoice)
       modelInvoice.showModal();
    };
    // console.log(booking)
