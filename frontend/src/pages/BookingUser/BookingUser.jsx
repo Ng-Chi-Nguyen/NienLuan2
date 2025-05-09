@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
-import Header from "../../components/Header/Header";
-import Footer from "../../components/Footer/Footer";
+import Header from "../../layouts/Header/Header";
+import Footer from "../../layouts/Footer/Footer";
 import ContentBooking from "./Content/contentBooking";
 import { getBusinessById } from "../../services/business.service";
 import dayjs from "dayjs";
@@ -142,7 +142,7 @@ export default function BookingBusiness() {
       return days;
    };
    //useMemo: ghi nhớ giá trị đã tính toán, tránh tính lại không cần thiết khi component re-render
-   const weekDays = useMemo(() => generateWeekDays(currentWeekOffset), [currentWeekOffset]);
+   const weekDays = useMemo(() => generateWeekDays(currentWeekOffset), [currentWeekOffset, generateWeekDays]);
 
    const generateTimeSlots = () => {
       let times = [];

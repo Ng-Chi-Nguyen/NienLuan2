@@ -90,6 +90,7 @@ export const createRevenueMonth = async (req, res) => {
       return res.json({ message: 'Có lỗi khi lấy dữ liệu doanh thu' });
    }
 }
+
 export const displayRevenueMonth = async (req, res) => {
    try {
       const { id_Business } = req.params;

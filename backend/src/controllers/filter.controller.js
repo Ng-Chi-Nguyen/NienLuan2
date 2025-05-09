@@ -6,7 +6,7 @@ import {
 
 export const getFootballProvinces = async (req, res) => {
    let { id } = req.params;
-   console.log(id)
+   // console.log(id)
    if (!id) {
       return res.json({
          sucess: false,

@@ -24,7 +24,7 @@ export const createBuness = async (req, res) => {
       });
 
    } catch (err) {
-      console.error("❌ Lỗi server:", err);
+      console.error("Lỗi server:", err);
       return res.status(500).json({ error: "Internal Server Error" });
    }
 };

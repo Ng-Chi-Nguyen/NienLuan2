@@ -1,4 +1,5 @@
 import { sql } from '../config/connect.js';
+
 export const getFootballProvincesService = async (id) => {
    const { data, error } = await sql
       .from("FoolbalField")

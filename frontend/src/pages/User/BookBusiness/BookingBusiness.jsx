@@ -1,17 +1,17 @@
 import { useLocation } from "react-router-dom";
-import Header from "../../../components/Header/Header";
-import Footer from "../../../components/Footer/Footer";
+import Header from "../../../layouts/Header/Header";
+import Footer from "../../../layouts/Footer/Footer";
 import dayjs from "dayjs";
 import { useState, useEffect, useMemo } from "react";
 import './BookingBusiness.scss';
-import { BookingModel } from "../../../components/Model/Booking/BookingModel";
+// import { BookingModel } from "../../../components/Model/Booking/BookingModel";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
 export default function BookingBusiness() {
    const navigate = useNavigate();
-   const [selectedCell, setSelectedCell] = useState(null);
-   const [user, setUser] = useState([]);
+   const [selectedCell,] = useState(null);
+   const [, setUser] = useState([]);
    const [bookings, setBookings] = useState([]);
    const [currentWeekOffset, setCurrentWeekOffset] = useState(0);
 
@@ -85,7 +85,7 @@ export default function BookingBusiness() {
       return days;
    };
 
-   const weekDays = useMemo(() => generateWeekDays(currentWeekOffset), [currentWeekOffset]);
+   const weekDays = useMemo(() => generateWeekDays(currentWeekOffset), [currentWeekOffset, generateWeekDays]);
 
    const generateTimeSlots = () => {
       let times = [];

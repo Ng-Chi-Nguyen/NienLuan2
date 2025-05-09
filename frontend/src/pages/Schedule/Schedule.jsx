@@ -1,8 +1,8 @@
 import { Search } from "../../components/Button/Button";
 import { AddressFetcher } from "../../components/Address/Address";
 import { Pagination } from "antd";
-import Header from "../../components/Header/Header";
-import Footer from "../../components/Footer/Footer";
+import Header from "../../layouts/Header/Header";
+import Footer from "../../layouts/Footer/Footer";
 import "./Schedule.scss";
 import { useNavigate } from "react-router-dom";
 

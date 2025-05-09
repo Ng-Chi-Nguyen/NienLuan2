@@ -14,7 +14,7 @@ import MenuDrawer from "../MenuDrawer/MenuDrawer";
 
 export default function Header() {
    const navigate = useNavigate();
-   const [loading, setLoading] = useState(false);
+   const [, setLoading] = useState(false);
    const [openLeft, setOpenLeft] = useState(false);  // Trạng thái menu trái
    const [openRight, setOpenRight] = useState(false); // Trạng thái menu phải
    const [user, setUser] = useState(null);

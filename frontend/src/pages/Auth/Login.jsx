@@ -1,12 +1,12 @@
 
-import Header from "../../components/Header/Header";
+import Header from "../../layouts/Header/Header";
 import './Login.scss';
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CiUser } from "react-icons/ci";
 import { IoBusinessOutline } from "react-icons/io5";
 import { Tabs } from 'antd';
-import { FaGoogle, FaFacebookF, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa"; // FaFacebookF
 import axios from "axios";
 import { createUser } from "../../services/user.service";
 import { createBusiness } from "../../services/business.service";
@@ -52,6 +52,7 @@ export default function Login() {
          value = value === "true"; // Chuyển "true" thành true, "false" thành false
       }
 
+      // Giữ nguyên các trường cũ trong formData va Ghi đè trường có name bằng giá trị mới value.
       setFormData({ ...formData, [name]: value });
    };
 

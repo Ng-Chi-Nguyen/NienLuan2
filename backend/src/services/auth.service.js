@@ -8,7 +8,7 @@ let loginUserService = async (userData) => {
    try {
       const { email, password } = userData;
 
-      // Kiểm tra trong bảng Users
+      // Kiểm tra trong bảng User
       let { data: user, error } = await sql
          .from("User")
          .select("*")

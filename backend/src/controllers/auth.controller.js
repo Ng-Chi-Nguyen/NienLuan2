@@ -29,6 +29,7 @@ export const loginUser = async (req, res) => {
 
    res.json({ success: true, token: result.token, user: result.user });
 };
+
 // Bắt đầu quá trình xác thực -  Yêu cầu quyền truy cập thông tin cá nhân và email.
 // profile lấy thông tin cơ bản như tên, ảnh đại diện,...
 // email lấy email người dùng.

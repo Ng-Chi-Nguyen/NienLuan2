@@ -1,9 +1,9 @@
-import Header from "../../components/Header/Header";
+import Header from "../../layouts/Header/Header";
+import Footer from "../../layouts/Footer/Footer";
 import UserInfo from "./UserInfo/UserInfo";
 import FoolbalField from "./FoolbalField/FoolbalField";
 import './User.scss';
 import { Tabs, FloatButton } from 'antd';
-import Footer from "../../components/Footer/Footer";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookingUser, BookingFootball, NextLavel } from "./Booking/Booking";

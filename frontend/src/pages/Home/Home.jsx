@@ -1,11 +1,11 @@
-import Header from "../../components/Header/Header";
-import React from 'react';
+import Header from "../../layouts/Header/Header";
+import Footer from "../../layouts/Footer/Footer";
 import './Home.scss';
+import React from 'react';
 import Session1 from "./Section1/Section1";
 import Session2 from "./Section2/Section2";
 import Session3 from "./Section3/Section3";
 import Session4 from "./Section4/Section4";
-import Footer from "../../components/Footer/Footer";
 import { FloatButton } from 'antd';
 import { PiRocket } from "react-icons/pi";
 export default function Home() {

@@ -29,14 +29,25 @@ export default function FoolbalField({ user }) {
 
    useEffect(() => {
       const fetchAddressData = async () => {
-         const newAddressData = {};
-
-         for (const item of data) {
-            if (!newAddressData[item.id]) { // Kiểm tra nếu địa chỉ chưa được lấy cho sân này
+         const fetchPromises = data.map(async (item) => {
+            if (!addressData || !addressData[item.id]) { // Kiểm tra nếu chưa có địa chỉ cho sân này
                const address = await fetchAddress(item.idProvince, item.idDistrict, item.idWard);
-               newAddressData[item.id] = address; // Lưu địa chỉ vào object với key là ID của sân
+               return { id: item.id, address }; // Trả về kết quả
             }
-         }
+            return null; // Nếu đã có dữ liệu, không gọi API nữa
+         });
+
+         const results = await Promise.all(fetchPromises);
+
+         // Lọc kết quả hợp lệ và cập nhật state
+         const newAddressData = {};
+         results.forEach(result => {
+            if (result) {
+               newAddressData[result.id] = result.address;
+            }
+         });
+
+         // Cập nhật state với dữ liệu mới
          setAddressData(prev => ({ ...prev, ...newAddressData }));
       };
 

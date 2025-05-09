@@ -16,7 +16,7 @@ export const createUser = async (req, res) => {
          data: result.data,
       });
    } catch (err) {
-      console.error("❌ Lỗi server:", err);
+      console.error("Lỗi server:", err);
       res.status(500).json({ error: 'Internal Server Error' });
    }
 };

@@ -146,14 +146,14 @@ export const createRevenueMonthService = async (dateStart, id_Business) => {
       // console.log(`Ngày bắt đầu tháng (local): ${adjustedStartDate.toLocaleDateString()}`);
       // console.log(`Ngày kết thúc tháng (local): ${adjustedEndDate.toLocaleDateString()}`);
 
-      // Calculate weeks
       const weeks = [];
-      let currentStartDate = new Date(adjustedStartDate); // Create new copy
+      let currentStartDate = new Date(adjustedStartDate);
 
       while (currentStartDate <= adjustedEndDate) {
+         // Tạo bản sao currentEndDate và cộng thêm 6 ngày để tạo khoảng thời gian 7 ngày (1 tuần)
          const currentEndDate = new Date(currentStartDate);
          currentEndDate.setDate(currentEndDate.getDate() + 6);
-
+         // Nếu ngày kết thúc tuần vượt quá ngày cuối tháng → cắt lại cho đúng bằng adjustedEndDate
          if (currentEndDate > adjustedEndDate) {
             currentEndDate.setTime(adjustedEndDate.getTime());
          }
@@ -171,7 +171,7 @@ export const createRevenueMonthService = async (dateStart, id_Business) => {
          const { startDate, endDate } = week;
 
          const formatDate = (date) => {
-            return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+            return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`; // Đổi ngày thành chuỗi định dạng YYYY-MM-DD
          };
 
          const { data, error } = await sql
@@ -184,16 +184,22 @@ export const createRevenueMonthService = async (dateStart, id_Business) => {
          if (error) throw error;
 
          data.forEach(item => {
+            // Mỗi item là một lượt đặt sân (có price và id_FF)
+
             if (!revenuePerCourt[item.id_FF]) {
                revenuePerCourt[item.id_FF] = [];
             }
 
             const weekLabel = `${startDate.getDate()}-${endDate.getDate()}`;
+            // revenuePerCourt[item.id_FF] là mảng chứa các tuần của sân đó
+            // .find(...) tìm xem trong mảng đó có tuần nào trùng với weekLabel hay chưa
             const existingWeek = revenuePerCourt[item.id_FF].find(rev => rev.week === weekLabel);
 
             if (existingWeek) {
+               // Nếu tuần đó đã tồn tại → chỉ cần cộng thêm giá tiền từ lượt đặt sân hiện tại
                existingWeek.revenue += item.price;
             } else {
+               // Nếu tuần đó chưa có trong danh sách → tạo mới một object { week, revenue } rồi thêm vào
                revenuePerCourt[item.id_FF].push({
                   week: weekLabel,
                   revenue: item.price
@@ -203,10 +209,12 @@ export const createRevenueMonthService = async (dateStart, id_Business) => {
       }
 
       const remainingDaysRevenue = {};
+      // lastWeekEnd: ngày kết thúc của tuần cuối cùng trong danh sách weeks
       const lastWeekEnd = weeks.length > 0 ? weeks[weeks.length - 1].endDate : adjustedStartDate;
+      // remainingDaysStart: là ngày sau ngày kết thúc tuần cuối → bắt đầu tính từ đây
       const remainingDaysStart = new Date(lastWeekEnd);
       remainingDaysStart.setDate(remainingDaysStart.getDate() + 1);
-
+      // Kiểm tra xem có ngày nào còn lại trong tháng hay không
       if (remainingDaysStart <= adjustedEndDate) {
          const formatDate = (date) => {
             return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
@@ -228,6 +236,7 @@ export const createRevenueMonthService = async (dateStart, id_Business) => {
       }
 
       const result = [];
+      // revenuePerCourt là object có key là id_FF, mỗi value là mảng các tuần chứa doanh thu
       Object.keys(revenuePerCourt).forEach(id_FF => {
          revenuePerCourt[id_FF].forEach((weekRevenue, index) => {
             result.push({
@@ -266,7 +275,7 @@ export const createRevenueMonthService = async (dateStart, id_Business) => {
             });
       }
 
-      console.log(result)
+      // console.log(result)
 
       return {
          message: 'Doanh thu của từng sân trong tháng đã được tính toán và lưu vào cơ sở dữ liệu!',

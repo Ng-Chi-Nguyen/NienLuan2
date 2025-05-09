@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 const SECRET_KEY = process.env.SECRET_KEY;
 
 let createBusinessService = async (businessData) => {
-   console.log("Dữ liệu nhận được:", businessData);
+   // console.log("Dữ liệu nhận được:", businessData);
 
 
    try {
@@ -14,7 +14,7 @@ let createBusinessService = async (businessData) => {
       let { data: userExists } = await sql
          .from("User")
          .select("id")
-         .or(`email.eq.${email},phone.eq.${phone}`);
+         .or(`email.eq.${email},phone.eq.${phone}`); // email bằng giá trị email
 
       // Kiểm tra email và số điện thoại trong bảng Business
       let { data: businessExists } = await sql
@@ -35,7 +35,7 @@ let createBusinessService = async (businessData) => {
 
       // console.log("Kết quả insert:", data, error);
       if (error) {
-         console.error("❌ Lỗi insert vào Supabase:", error);
+         console.error("Lỗi insert vào Supabase:", error);
          return { success: false, error };
       }
 

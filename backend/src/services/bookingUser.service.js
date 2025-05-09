@@ -111,7 +111,7 @@ let createBookingService = async (bookingData) => {
          // console.log(`Booking mới: ${newStart} - ${newEnd}`);
 
          return (
-            (newStart >= bookingStart && newStart < bookingEnd) ||  // Bắt đầu trong khoảng đã đặt
+            (newStart >= bookingStart && newStart < bookingEnd) ||  // Thời gian BD nằm trong một khoảng đã đặt
             (newEnd > bookingStart && newEnd <= bookingEnd) ||      // Kết thúc trong khoảng đã đặt
             (newStart <= bookingStart && newEnd >= bookingEnd)      // Bao trùm toàn bộ khung giờ đã đặt
          );
